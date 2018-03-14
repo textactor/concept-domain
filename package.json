@@ -13,8 +13,8 @@
     "preversion": "npm run tsc",
     "postversion": "git push --follow-tags",
     "prepublishOnly": "npm run tsc && npm run clean-test-code",
-    "clean": "rm -fr ./lib && rm -fr ./types",
-    "clean-test-code": "rm -fr ./lib/**/*.test.js && rm -fr ./types/**/*.test.d.ts"
+    "clean": "rimraf ./lib && rimraf ./types",
+    "clean-test-code": "rimraf ./lib/**/*.test.js && rimraf ./types/**/*.test.d.ts"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -37,6 +37,7 @@
   "devDependencies": {
     "@types/node": "latest",
     "ava": "^0.23.0",
+    "rimraf": "^2.6.2",
     "typescript": "latest"
   }
 }
