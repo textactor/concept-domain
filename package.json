@@ -1,6 +1,6 @@
 {
   "name": "@textactor/concept-domain",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Core Concept module",
   "main": "./lib/index.js",
   "types": "./types/index.d.ts",
@@ -39,5 +39,8 @@
     "ava": "^0.23.0",
     "rimraf": "^2.6.2",
     "typescript": "latest"
+  },
+  "dependencies": {
+    "root-name": "^0.0.2"
   }
 }
