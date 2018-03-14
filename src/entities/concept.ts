@@ -77,7 +77,7 @@ export class Concept implements IConcept {
 
         if (this.isAbbr || this.countWords === 1) {
             this.rootText = this.text;
-            this.normalRootText = this.rootText;
+            this.normalRootText = this.normalText;
             this.rootTextHash = this.textHash;
         } else {
             this.rootText = rootName(this.text, this.lang);
