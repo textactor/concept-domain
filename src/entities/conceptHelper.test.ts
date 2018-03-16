@@ -3,8 +3,8 @@ import test from 'ava';
 import { ConceptHelper } from './conceptHelper';
 
 test('#hash', t => {
-    const hash1 = ConceptHelper.hash('text 1', 'en', 'us');
-    const hash2 = ConceptHelper.hash('text 2', 'en', 'us');
+    const hash1 = ConceptHelper.nameHash('text 1', 'en', 'us');
+    const hash2 = ConceptHelper.nameHash('text 2', 'en', 'us');
     t.not(hash1, hash2)
 })
 
