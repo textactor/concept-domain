@@ -41,6 +41,7 @@
     "typescript": "latest"
   },
   "dependencies": {
-    "root-name": "^0.0.2"
+    "root-name": "^0.0.2",
+    "wiki-entity": "^0.3.0"
   }
 }
