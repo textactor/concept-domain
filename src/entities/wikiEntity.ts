@@ -13,7 +13,8 @@ export interface IWikiEntity {
     id?: string
     lang?: string
     name?: string
-    names?: string
+    nameHash?: string
+    names?: string[]
     abbr?: string
     description?: string
     aliases?: string[]
@@ -27,14 +28,8 @@ export interface IWikiEntity {
     rank?: number
     data?: WikiEntityData
     categories?: string[]
-    /**
-     * created at timestamp
-     */
-    createdAt?: number
-    /**
-     * updated at timestamp
-     */
-    updatedAt?: number
+
+    createdAt?: Date
 
     /**
      * Permanent redirect to entity id
