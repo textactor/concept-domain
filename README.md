@@ -1,3 +1,3 @@
-# @textactor/concept-domain
+# @entitizer/concept-domain
 
-Concept code nodejs module.
+Concept domain nodejs module.
