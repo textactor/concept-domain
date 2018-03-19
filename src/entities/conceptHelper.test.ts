@@ -2,10 +2,18 @@
 import test from 'ava';
 import { ConceptHelper } from './conceptHelper';
 
-test('#hash', t => {
-    const hash1 = ConceptHelper.nameHash('text 1', 'en', 'us');
-    const hash2 = ConceptHelper.nameHash('text 2', 'en', 'us');
+test('#nameHash', t => {
+    let hash1 = ConceptHelper.nameHash('text 1', 'en', 'us');
+    let hash2 = ConceptHelper.nameHash('text 2', 'en', 'us');
     t.not(hash1, hash2)
+
+    hash1 = ConceptHelper.nameHash('text 1', 'en', 'us');
+    hash2 = ConceptHelper.nameHash('text 1', 'en', 'gb');
+    t.not(hash1, hash2)
+
+    hash1 = ConceptHelper.nameHash('text 1', 'en', 'us');
+    hash2 = ConceptHelper.nameHash('text 1', 'en', 'us');
+    t.is(hash1, hash2)
 })
 
 test('#normalizeName', t => {
@@ -26,4 +34,11 @@ test('#create', t => {
     t.is(c1.isIrregular, false)
     t.is(c1.normalName, 'moldova 1')
     t.is(c1.rootName, 'Moldov 1')
+})
+
+test('#rootName', t => {
+    t.is(ConceptHelper.rootName('iPhone 5', 'ro'), 'iPhone 5');
+    t.is(ConceptHelper.rootName('Ana Balan', 'ro'), 'An Balan');
+    t.is(ConceptHelper.rootName('Anei Balan', 'ro'), 'An Balan');
+    t.is(ConceptHelper.rootName('PLDM', 'ro'), 'PLDM');
 })
