@@ -19,7 +19,9 @@ export type Repositories = {
 }
 
 export interface ActorsGeneratorOptions {
-    limit?: number
+    minConceptPopularity?: number
+    minAbbrConceptPopularity?: number
+    minOneWordConceptPopularity?: number
 }
 
 export class ActorsGenerator extends EventEmitter implements IActorsGenerator {
@@ -28,8 +30,14 @@ export class ActorsGenerator extends EventEmitter implements IActorsGenerator {
     private ended = false;
     private actions: GeneratorActions = {}
 
-    constructor(private locale: ILocale, private repos: Repositories) {
+    constructor(private locale: ILocale, private repos: Repositories, private options?: ActorsGeneratorOptions) {
         super()
+
+        this.options = Object.assign({
+            minConceptPopularity: 10,
+            minAbbrConceptPopularity: 20,
+            minOneWordConceptPopularity: 20,
+        }, options);
 
         this.actions.buildActor = new BuildActor(this.locale, this.repos.wikiEntity, this.repos.concept);
         this.actions.exporeWikiEntities = new ExploreWikiEntities(this.locale);
@@ -39,7 +47,7 @@ export class ActorsGenerator extends EventEmitter implements IActorsGenerator {
         this.actions.deleteActorConcepts = new DeleteActorConcepts(this.repos.concept);
     }
 
-    start() {
+    async start() {
         if (this.ended) {
             return this.emitError(new Error(`Generator is expired`));
         }
@@ -49,40 +57,59 @@ export class ActorsGenerator extends EventEmitter implements IActorsGenerator {
 
         this.started = true;
 
-        this.actions.getPopularConceptNode.execute(null)
-            .then(node => {
+        try {
+            await this.repos.concept.deleteUnpopular(this.locale, this.options.minConceptPopularity);
+            await this.repos.concept.deleteUnpopularAbbreviations(this.locale, this.options.minAbbrConceptPopularity);
+            await this.repos.concept.deleteUnpopularOneWorlds(this.locale, this.options.minOneWordConceptPopularity);
+        } catch (e) {
+            this.emitError(e);
+            this.emitEnd();
+            return;
+        }
+
+        let actor: IActor;
+
+        while (true) {
+            try {
+                const node = await this.actions.getPopularConceptNode.execute(null);
+
                 if (!node) {
+                    await this.repos.concept.deleteAll(this.locale);
                     this.emitEnd();
                     return;
                 }
+
                 const names = GetPopularConceptNode.getTopConceptsNames(node, 2);
 
-                return this.actions.findWikiTitles.execute(names)
-                    .then(wikiTitles => {
-                        if (wikiTitles.length) {
-                            return this.actions.exporeWikiEntities.execute(wikiTitles)
-                                .then(wikiEntities => this.actions.saveWikiEntities.execute(wikiEntities))
-                        }
-                    })
-                    .then(_ => this.actions.buildActor.execute(node))
-                    .then(actor => this.actions.deleteActorConcepts.execute(actor))
-                    .then(actor => this.emitActor(actor));
-            })
-            .catch(error => {
-                this.emitError(error);
+                const wikiTitles = await this.actions.findWikiTitles.execute(names);
+
+                if (wikiTitles.length) {
+                    const wikiEntities = await this.actions.exporeWikiEntities.execute(wikiTitles)
+                    await this.actions.saveWikiEntities.execute(wikiEntities);
+                }
+
+                actor = await this.actions.buildActor.execute(node);
+                await this.actions.deleteActorConcepts.execute(actor);
+
+            } catch (e) {
+                this.emitError(e);
                 this.emitEnd();
-            });
+                return;
+            }
+
+            this.emitActor(actor);
+        }
     }
 
-    emitActor(actor: IActor) {
+    private emitActor(actor: IActor) {
         this.emit('actor', actor);
     }
 
-    emitEnd() {
+    private emitEnd() {
         this.emit('end');
     }
 
-    emitError(error: Error) {
+    private emitError(error: Error) {
         this.emit('error', error);
     }
 

@@ -5,6 +5,7 @@ import { uniq, md5 } from '../utils';
 import { NameHelper } from '@textactor/domain';
 
 export class WikiEntityHelper {
+
     static convert(wikiEntity: ExternWikiEntity, lang: string): IWikiEntity {
         lang = lang.trim().toLowerCase();
         const simpleEntity = convertToSimpleEntity(wikiEntity, lang);
@@ -106,4 +107,5 @@ export class WikiEntityHelper {
             special: name.substring(firstIndex + 1, lastIndex - 1)
         }
     }
+
 }

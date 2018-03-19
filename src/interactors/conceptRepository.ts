@@ -11,6 +11,8 @@ export type PopularConceptHash = {
 
 export interface IConceptWriteRepository extends IWriteRepository<string, IConcept> {
     deleteUnpopular(locale: ILocale, popularity: number): Promise<number>
+    deleteUnpopularAbbreviations(locale: ILocale, popularity: number): Promise<number>
+    deleteUnpopularOneWorlds(locale: ILocale, popularity: number): Promise<number>
     deleteAll(locale: ILocale): Promise<number>
     deleteIds(ids: string[]): Promise<number>
     incrementPopularity(id: string): Promise<number>
