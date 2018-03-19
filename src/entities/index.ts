@@ -1,2 +1,3 @@
 
-export { IConcept, Concept } from './concept';
+export { IConcept } from './concept';
+export { IActor } from './actor';

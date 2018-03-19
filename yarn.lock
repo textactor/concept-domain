@@ -184,6 +184,10 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
+atonic@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/atonic/-/atonic-1.0.4.tgz#7db3f216070abb68660f18122a380903e09d27c7"
+
 auto-bind@^1.1.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/auto-bind/-/auto-bind-1.2.0.tgz#8b7e318aad53d43ba8a8ecaf0066d85d5f798cd6"
@@ -605,7 +609,7 @@ block-stream@*:
   dependencies:
     inherits "~2.0.0"
 
-bluebird@^3.0.0:
+bluebird@^3.0.0, bluebird@^3.5.0:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.1.tgz#d9551f9de98f1fcda1e683d17ee91a0602ee2eb9"
 
@@ -1002,6 +1006,15 @@ empower-core@^0.6.1:
   dependencies:
     call-signature "0.0.2"
     core-js "^2.0.0"
+
+entity-finder@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/entity-finder/-/entity-finder-0.5.0.tgz#cb7e69e9442c5770d364cf6cb5ecfe0ce7d72681"
+  dependencies:
+    atonic "^1.0.4"
+    request "^2.85.0"
+    wiki-entity "^0.1.3"
+    wikipedia-data "^0.1.1"
 
 equal-length@^1.0.0:
   version "1.0.1"
@@ -2444,7 +2457,7 @@ request@2.81.0:
     tunnel-agent "^0.6.0"
     uuid "^3.0.0"
 
-request@^2.81.0:
+request@^2.81.0, request@^2.85.0:
   version "2.85.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.85.0.tgz#5a03615a47c61420b3eb99b7dba204f83603e1fa"
   dependencies:
@@ -2901,11 +2914,23 @@ widest-line@^2.0.0:
   dependencies:
     string-width "^2.1.1"
 
+wiki-entity@^0.1.3:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/wiki-entity/-/wiki-entity-0.1.4.tgz#9b9d5f5d7cc1b7e0114ae347d87f3675ba97fb12"
+  dependencies:
+    bluebird "^3.5.0"
+    lodash "^4.17.4"
+    request "^2.81.0"
+
 wiki-entity@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/wiki-entity/-/wiki-entity-0.3.0.tgz#23b504851594290665d03a39bcbe206848b24f57"
   dependencies:
     request "^2.81.0"
+
+wikipedia-data@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/wikipedia-data/-/wikipedia-data-0.1.1.tgz#b1ecf4bcf3bfd1cf1ead04267e6dcb8519d80328"
 
 wrappy@1:
   version "1.0.2"

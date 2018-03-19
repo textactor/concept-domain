@@ -16,22 +16,22 @@ export class ConceptHelper {
 
         const lang = data.lang.trim().toLowerCase();
         const country = data.country.trim().toLowerCase();
-        const text = data.text.trim();
-        const textLength = text.length;
+        const name = data.text.trim();
+        const nameLength = name.length;
 
-        const normalText = ConceptHelper.normalizeName(text, lang);
-        const id = ConceptHelper.id(normalText, lang, country);
+        const normalName = ConceptHelper.normalizeName(name, lang);
+        const id = ConceptHelper.id(normalName, lang, country);
 
-        const textHash = ConceptHelper.nameHash(normalText, lang, country);
+        const nameHash = ConceptHelper.nameHash(normalName, lang, country);
 
-        const isAbbr = NameHelper.isAbbr(text);
-        const countWords = text.split(/\s+/g).length;
-        const isIrregular = NameHelper.isIrregular(text);
-        const endsWithNumber = NameHelper.endsWithNumberWord(text);
+        const isAbbr = NameHelper.isAbbr(name);
+        const countWords = name.split(/\s+/g).length;
+        const isIrregular = NameHelper.isIrregular(name);
+        const endsWithNumber = NameHelper.endsWithNumberWord(name);
 
-        const rootText = ConceptHelper.rootName(text, lang);
-        const normalRootText = ConceptHelper.normalizeName(rootText, lang);
-        const rootTextHash = ConceptHelper.nameHash(rootText, lang, country);
+        const rootName = ConceptHelper.rootName(name, lang);
+        const normalRootName = ConceptHelper.normalizeName(rootName, lang);
+        const rootNameHash = ConceptHelper.nameHash(rootName, lang, country);
 
         const popularity = 1;
 
@@ -39,18 +39,18 @@ export class ConceptHelper {
             id,
             country,
             lang,
-            text,
-            textLength,
-            textHash,
-            normalText,
+            name,
+            nameLength,
+            nameHash,
+            normalName,
             isAbbr,
             countWords,
             isIrregular,
             endsWithNumber,
             abbr: data.abbr,
-            rootText,
-            normalRootText,
-            rootTextHash,
+            rootName,
+            normalRootName,
+            rootNameHash,
             popularity,
         }
     }

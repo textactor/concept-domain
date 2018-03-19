@@ -1,8 +1,8 @@
 
 import { WikiEntity as ExternWikiEntity, convertToSimpleEntity, SimpleEntityType } from 'wiki-entity';
 import { WikiEntityType, IWikiEntity } from './wikiEntity';
-import { uniq } from '../utils';
-import { NameHelper, md5 } from '@textactor/domain';
+import { uniq, md5 } from '../utils';
+import { NameHelper } from '@textactor/domain';
 
 export class WikiEntityHelper {
     static convert(wikiEntity: ExternWikiEntity, lang: string): IWikiEntity {
@@ -36,6 +36,18 @@ export class WikiEntityHelper {
             entity.rank += Object.keys(entity.data).length;
         }
 
+        const splittedName = WikiEntityHelper.splitName(entity.name);
+        if (splittedName) {
+            entity.specialName = splittedName.special;
+            entity.simpleName = splittedName.simple;
+        } else if (entity.wikiPageTitle) {
+            const splittedName = WikiEntityHelper.splitName(entity.wikiPageTitle);
+            if (splittedName) {
+                entity.specialName = splittedName.special;
+                entity.simpleName = splittedName.simple;
+            }
+        }
+
         entity.names = [entity.name];
         if (entity.wikiPageTitle) {
             entity.names.push(entity.wikiPageTitle);
@@ -44,14 +56,22 @@ export class WikiEntityHelper {
             entity.names = entity.names.concat(wikiEntity.redirects);
         }
 
+        if (entity.simpleName && entity.simpleName.split(/\s+/g).length > 1) {
+            entity.names.push(entity.simpleName);
+        }
+
         entity.names = uniq(entity.names);
+
+        entity.namesHashes = entity.names.map(item => WikiEntityHelper.nameHash(item, lang));
+        entity.namesHashes = uniq(entity.namesHashes);
 
         return entity;
     }
 
     static nameHash(name: string, lang: string) {
-        name = name.trim().replace(/\s+/g, ' ').trim();
         lang = lang.trim().toLowerCase();
+
+        name = name.trim().replace(/\s+/g, ' ').trim();
         name = NameHelper.standardText(name, lang);
 
         if (!NameHelper.isAbbr(name)) {
@@ -68,6 +88,22 @@ export class WikiEntityHelper {
             case SimpleEntityType.PERSON: return WikiEntityType.PERSON;
             case SimpleEntityType.PLACE: return WikiEntityType.PLACE;
             case SimpleEntityType.PRODUCT: return WikiEntityType.PRODUCT;
+        }
+    }
+
+    static splitName(name: string): { simple: string, special: string } {
+        const firstIndex = name.indexOf('(');
+        if (firstIndex < 3) {
+            return null;
+        }
+        const lastIndex = name.indexOf(')');
+        if (lastIndex !== name.length - 1) {
+            return null;
+        }
+
+        return {
+            simple: name.substr(0, firstIndex).trim(),
+            special: name.substring(firstIndex + 1, lastIndex - 1)
         }
     }
 }

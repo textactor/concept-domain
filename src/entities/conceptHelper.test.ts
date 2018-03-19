@@ -17,13 +17,13 @@ test('#normalizeName', t => {
 
 test('#create', t => {
     const c1 = ConceptHelper.create({ text: 'Moldova 1', lang: 'ro', country: 'md', abbr: 'M1' });
-    t.is(c1.text, 'Moldova 1')
+    t.is(c1.name, 'Moldova 1')
     t.is(c1.lang, 'ro')
     t.is(c1.country, 'md')
     t.is(c1.abbr, 'M1')
     t.is(c1.countWords, 2)
     t.is(c1.isAbbr, false)
     t.is(c1.isIrregular, false)
-    t.is(c1.normalText, 'moldova 1')
-    t.is(c1.rootText, 'Moldov 1')
+    t.is(c1.normalName, 'moldova 1')
+    t.is(c1.rootName, 'Moldov 1')
 })

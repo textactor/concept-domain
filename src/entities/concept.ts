@@ -4,15 +4,15 @@ export interface IConcept {
     lang: string
     country: string
 
-    text?: string
-    textLength?: number
+    name?: string
+    nameLength?: number
     /** normalized text hash */
-    textHash?: string
-    normalText?: string;
-    rootText?: string
-    normalRootText?: string;
+    nameHash?: string
+    normalName?: string;
+    rootName?: string
+    normalRootName?: string;
     /** normalized root text hash */
-    rootTextHash?: string
+    rootNameHash?: string
 
     abbr?: string
 

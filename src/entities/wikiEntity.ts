@@ -13,8 +13,11 @@ export interface IWikiEntity {
     id?: string
     lang?: string
     name?: string
+    simpleName?: string
+    specialName?: string
     nameHash?: string
     names?: string[]
+    namesHashes?: string[]
     abbr?: string
     description?: string
     aliases?: string[]

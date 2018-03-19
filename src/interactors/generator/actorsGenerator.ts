@@ -56,7 +56,7 @@ export class ActorsGenerator implements IActorsGenerator {
     }
 
     private exploreWikiEntity(concept: IConcept) {
-        return this.repos.wikiEntity.getByNameHash(WikiEntityHelper.nameHash(concept.text, concept.lang))
+        return this.repos.wikiEntity.getByNameHash(WikiEntityHelper.nameHash(concept.name, concept.lang))
             .then(entities => {
                 if (entities && entities.length) {
                     entities = entities.sort((a, b) => b.rank - a.rank);
@@ -69,7 +69,7 @@ export class ActorsGenerator implements IActorsGenerator {
                 }
                 return getWikiDataEntities({
                     language: concept.lang,
-                    titles: concept.text,
+                    titles: concept.name,
                     redirects: true,
                     props: 'info|sitelinks|aliases|labels|descriptions|claims|datatype',
                     claims: 'item',

@@ -1,5 +1,5 @@
 {
-  "name": "@entitizer/concept-domain",
+  "name": "@textactor/concept-domain",
   "version": "0.0.1",
   "description": "Core Concept module",
   "main": "./lib/index.js",
@@ -21,19 +21,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/entitizer/concept-domain.git"
+    "url": "git+https://github.com/textactor/concept-domain.git"
   },
   "keywords": [
     "domain",
     "concept",
-    "entitizer"
+    "textactor"
   ],
   "author": "Dumitru Cantea",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/entitizer/concept-domain/issues"
+    "url": "https://github.com/textactor/concept-domain/issues"
   },
-  "homepage": "https://github.com/entitizer/concept-domain#readme",
+  "homepage": "https://github.com/textactor/concept-domain#readme",
   "devDependencies": {
     "@types/node": "latest",
     "ava": "^0.23.0",
@@ -41,6 +41,7 @@
     "typescript": "latest"
   },
   "dependencies": {
+    "entity-finder": "^0.5.0",
     "root-name": "^0.0.2",
     "wiki-entity": "^0.3.0"
   }
