@@ -43,6 +43,6 @@
   "dependencies": {
     "entity-finder": "^0.5.0",
     "root-name": "^0.0.2",
-    "wiki-entity": "^0.3.0"
+    "wiki-entity": "^0.3.1"
   }
 }

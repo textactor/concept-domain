@@ -55,6 +55,9 @@ export class WikiEntityHelper {
         }
         if (wikiEntity.redirects && wikiEntity.redirects.length) {
             entity.names = entity.names.concat(wikiEntity.redirects);
+            if (!entity.abbr) {
+                entity.abbr = NameHelper.findAbbr(wikiEntity.redirects);
+            }
         }
 
         if (entity.simpleName && entity.simpleName.split(/\s+/g).length > 1) {
@@ -104,7 +107,7 @@ export class WikiEntityHelper {
 
         return {
             simple: name.substr(0, firstIndex).trim(),
-            special: name.substring(firstIndex + 1, lastIndex - 1)
+            special: name.substring(firstIndex + 1, lastIndex)
         }
     }
 
