@@ -56,6 +56,9 @@ export class ConceptHelper {
     }
 
     public static rootName(name: string, lang: string) {
+        lang = lang.trim();
+        name = name.trim();
+        
         const isAbbr = NameHelper.isAbbr(name);
         const countWords = name.split(/\s+/g).length;
 

@@ -1,13 +1,16 @@
+
 import { ILocale } from "../../types";
-import { IConceptRepository, PopularConceptHash } from "../conceptRepository";
-import { IWikiEntity } from "../../entities/wikiEntity";
+import { IConceptRepository } from "../conceptRepository";
 import { IWikiEntityRepository } from "../wikiEntityRepository";
-import { IConcept } from "../..";
-import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
-import { getEntities as getWikiDataEntities } from 'wiki-entity';
+import { IActor } from "../..";
+import { EventEmitter } from "events";
+import { GeneratorActions, BuildActor, ExploreWikiEntities, FindWikiTitles, GetPopularConceptNode, SaveWikiEntities, DeleteActorConcepts } from "./actions";
 
 export interface IActorsGenerator {
-    next(): Promise<string>
+    onActor(callback: (actor: IActor) => void): void
+    onEnd(callback: () => void): void
+    onError(callback: (error: Error) => void): void
+    start(): void
 }
 
 export type Repositories = {
@@ -19,70 +22,78 @@ export interface ActorsGeneratorOptions {
     limit?: number
 }
 
-export class ActorsGenerator implements IActorsGenerator {
+export class ActorsGenerator extends EventEmitter implements IActorsGenerator {
+
+    private started = false;
     private ended = false;
-    private nextExecuting = false;
-    // private limit = 50;
-    // private offset = 0;
+    private actions: GeneratorActions = {}
+
     constructor(private locale: ILocale, private repos: Repositories) {
+        super()
 
+        this.actions.buildActor = new BuildActor(this.locale, this.repos.wikiEntity, this.repos.concept);
+        this.actions.exporeWikiEntities = new ExploreWikiEntities(this.locale);
+        this.actions.findWikiTitles = new FindWikiTitles(this.locale);
+        this.actions.getPopularConceptNode = new GetPopularConceptNode(this.locale, this.repos.concept);
+        this.actions.saveWikiEntities = new SaveWikiEntities(this.repos.wikiEntity);
+        this.actions.deleteActorConcepts = new DeleteActorConcepts(this.repos.concept);
     }
 
-    next(): Promise<string> {
+    start() {
         if (this.ended) {
-            return Promise.reject(new Error(`Generator is expired`));
+            return this.emitError(new Error(`Generator is expired`));
+        }
+        if (this.started) {
+            return this.emitError(new Error(`Generator is started`));
         }
 
-        if (this.nextExecuting) {
-            return Promise.reject(new Error(`Waiting for previous executing...`));
-        }
+        this.started = true;
 
-        this.nextExecuting = true;
-
-        return this.repos.concept.getPopularRootTextHashes(this.locale, 1)
-            .then(popularConceptHashes => {
-                if (!popularConceptHashes || !popularConceptHashes.length) {
-                    return this.onEnd()
+        this.actions.getPopularConceptNode.execute(null)
+            .then(node => {
+                if (!node) {
+                    this.emitEnd();
+                    return;
                 }
-                return this.getWikiEntity(popularConceptHashes[0]);
+                const names = GetPopularConceptNode.getTopConceptsNames(node, 2);
+
+                return this.actions.findWikiTitles.execute(names)
+                    .then(wikiTitles => {
+                        if (wikiTitles.length) {
+                            return this.actions.exporeWikiEntities.execute(wikiTitles)
+                                .then(wikiEntities => this.actions.saveWikiEntities.execute(wikiEntities))
+                        }
+                    })
+                    .then(_ => this.actions.buildActor.execute(node))
+                    .then(actor => this.actions.deleteActorConcepts.execute(actor))
+                    .then(actor => this.emitActor(actor));
             })
-    }
-
-    private getWikiEntity(popularConceptHashe: PopularConceptHash): Promise<IWikiEntity> {
-        return this.repos.concept.getByIds(popularConceptHashe.ids)
-            .then(concepts => {
-
-            })
-    }
-
-    private exploreWikiEntity(concept: IConcept) {
-        return this.repos.wikiEntity.getByNameHash(WikiEntityHelper.nameHash(concept.name, concept.lang))
-            .then(entities => {
-                if (entities && entities.length) {
-                    entities = entities.sort((a, b) => b.rank - a.rank);
-                    const countryEntity = entities.find(a => a.countryCode === concept.country);
-                    if (countryEntity) {
-                        return countryEntity;
-                    }
-                    // most ranked entity
-                    return entities[0];
-                }
-                return getWikiDataEntities({
-                    language: concept.lang,
-                    titles: concept.name,
-                    redirects: true,
-                    props: 'info|sitelinks|aliases|labels|descriptions|claims|datatype',
-                    claims: 'item',
-                    extract: 3,
-                    types: true,
-                    categories: true,
-                })
+            .catch(error => {
+                this.emitError(error);
+                this.emitEnd();
             });
     }
 
-    private onEnd() {
-        this.ended = true;
-        this.nextExecuting = false;
-        return Promise.resolve(null);
+    emitActor(actor: IActor) {
+        this.emit('actor', actor);
+    }
+
+    emitEnd() {
+        this.emit('end');
+    }
+
+    emitError(error: Error) {
+        this.emit('error', error);
+    }
+
+    onActor(callback: (actor: IActor) => void): void {
+        this.on('actor', callback);
+    }
+    onError(callback: (error: Error) => void): void {
+        this.on('error', callback);
+    }
+
+    onEnd(callback: (error: Error) => void) {
+        this.on('end', callback);
     }
 }
