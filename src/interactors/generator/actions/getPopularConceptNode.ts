@@ -20,7 +20,7 @@ export class GetPopularConceptNode extends UseCase<null, PopularConceptNode, nul
 
     protected async innerExecute(): Promise<PopularConceptNode> {
 
-        const popularHashes = await this.conceptRepository.getPopularRootTextHashes(this.locale, 1);
+        const popularHashes = await this.conceptRepository.getPopularRootNameHashes(this.locale, 1);
 
         if (popularHashes.length < 1) {
             return null;

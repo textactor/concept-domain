@@ -44,7 +44,7 @@ export class BuildActor extends UseCase<PopularConceptNode, IActor, void> {
         let allConcepts: IConcept[] = []
 
         for (let nameHash of rootNamesHashes) {
-            const concepts = await this.conceptRepository.getByRootTextHash(nameHash);
+            const concepts = await this.conceptRepository.getByRootNameHash(nameHash);
             allConcepts = allConcepts.concat(concepts);
         }
 

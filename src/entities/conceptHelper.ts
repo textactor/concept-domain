@@ -1,5 +1,5 @@
 
-import { md5, rootName as formatRootName } from '../utils';
+import { md5 } from '../utils';
 import { NameHelper } from '@textactor/domain';
 import { IConcept } from './concept';
 
@@ -65,7 +65,7 @@ export class ConceptHelper {
         if (isAbbr || countWords === 1) {
             return name;
         }
-        return formatRootName(name, lang)
+        return NameHelper.rootName(name, lang);
     }
 
     /**

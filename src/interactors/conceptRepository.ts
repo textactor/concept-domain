@@ -20,9 +20,9 @@ export interface IConceptWriteRepository extends IWriteRepository<string, IConce
 }
 
 export interface IConceptReadRepository extends IReadRepository<string, IConcept> {
-    getByTextHash(hash: string): Promise<IConcept[]>
-    getByRootTextHash(hash: string): Promise<IConcept[]>
-    getPopularRootTextHashes(locale: ILocale, limit: number): Promise<PopularConceptHash[]>
+    getByNameHash(hash: string): Promise<IConcept[]>
+    getByRootNameHash(hash: string): Promise<IConcept[]>
+    getPopularRootNameHashes(locale: ILocale, limit: number): Promise<PopularConceptHash[]>
 }
 
 export interface IConceptRepository extends IConceptReadRepository, IConceptWriteRepository {

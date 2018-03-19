@@ -3,7 +3,6 @@ import test from 'ava';
 import { WikiEntityHelper } from './wikiEntityHelper';
 import { getEntities } from 'wiki-entity';
 import { WikiEntityType } from './wikiEntity';
-// import { IWikiEntity, WikiEntityType } from './wikiEntity';
 
 test('#nameHash', t => {
     let hash1 = WikiEntityHelper.nameHash('text 1', 'en');
