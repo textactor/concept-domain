@@ -12,4 +12,8 @@ export {
 } from './wikiEntityRepository';
 
 export { PushConceptsUseCase } from './pushConceptsUseCase';
-export { GenerateActorsUseCase } from './generateActorsUseCase';
+
+export { IActorsGenerator, ActorsGenerator } from './generator/actorsGenerator';
+
+export { MemoryConceptRepository } from './memoryConceptRepository';
+export { MemoryWikiEntityRepository } from './memoryWikiEntityRepository';
