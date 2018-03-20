@@ -1,4 +1,6 @@
 
+const debug = require('debug')('textactor:concept-domain');
+
 import { UseCase } from "@textactor/domain";
 import { ILocale } from "../../../types";
 import { findTitles } from 'entity-finder';
@@ -14,13 +16,16 @@ export class FindWikiTitles extends UseCase<string[], string[], null> {
 
         names = uniq(names);
 
-        const tags = getWikiTitleTags(this.locale);
+        // const tags = getWikiTitleTags(this.locale);
         let allTitles: string[] = [];
 
         for (let name of names) {
-            const titles = await findTitles(name, this.locale.lang, { tags, limit: 2 });
+            debug(`finding wiki titles for ${name}...`);
+            const titles = await findTitles(name, this.locale.lang, { limit: 10 });
             if (titles && titles.length) {
-                allTitles = allTitles.concat(titles.map(item => item.title));
+                const titleNames = titles.map(item => item.title).filter(item => item && item.trim().length >= 2);
+                debug(`found wiki titles for ${name}: ${titleNames}`);
+                allTitles = allTitles.concat(titleNames);
             }
             await delay(1000 * 1)
         }
@@ -29,17 +34,17 @@ export class FindWikiTitles extends UseCase<string[], string[], null> {
     }
 }
 
-function getWikiTitleTags(locale: ILocale) {
-    if (LOCALE_COUNTRY_TAGS[locale.country]) {
-        return LOCALE_COUNTRY_TAGS[locale.country][locale.lang];
-    }
-}
+// function getWikiTitleTags(locale: ILocale) {
+//     if (LOCALE_COUNTRY_TAGS[locale.country]) {
+//         return LOCALE_COUNTRY_TAGS[locale.country][locale.lang];
+//     }
+// }
 
-const LOCALE_COUNTRY_TAGS: { [country: string]: { [lang: string]: string[] } } = {
-    md: {
-        ro: ['moldova'],
-    },
-    ro: {
-        ro: ['românia', 'româniei'],
-    },
-}
+// const LOCALE_COUNTRY_TAGS: { [country: string]: { [lang: string]: string[] } } = {
+//     md: {
+//         ro: ['republica moldova', 'moldova'],
+//     },
+//     ro: {
+//         ro: ['românia', 'româniei'],
+//     },
+// }

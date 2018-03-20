@@ -46,7 +46,7 @@ export class ActorHelper {
             entity.abbr = entity.names.find(item => NameHelper.isAbbr(item));
         }
 
-        if (!entity.abbr) {
+        if (!actor.abbr) {
             const abbrConcept = concepts.find(item => NameHelper.isAbbr(item.name) || !!item.abbr);
             if (abbrConcept) {
                 actor.abbr = abbrConcept.abbr || abbrConcept.name;

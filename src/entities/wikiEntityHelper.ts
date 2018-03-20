@@ -11,8 +11,8 @@ export class WikiEntityHelper {
         const simpleEntity = convertToSimpleEntity(wikiEntity, lang);
         const entity: IWikiEntity = {
             id: `${simpleEntity.lang.trim().toUpperCase()}${simpleEntity.wikiDataId}`,
-            name: simpleEntity.name,
-            nameHash: WikiEntityHelper.nameHash(simpleEntity.name, lang),
+            name: simpleEntity.name || wikiEntity.label,
+            nameHash: WikiEntityHelper.nameHash(simpleEntity.name || wikiEntity.label, lang),
             lang: lang,
             abbr: simpleEntity.abbr,
             description: simpleEntity.description,
@@ -63,6 +63,17 @@ export class WikiEntityHelper {
         if (entity.simpleName && entity.simpleName.split(/\s+/g).length > 1) {
             entity.names.push(entity.simpleName);
         }
+
+        entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
+
+        const simpleNames = entity.names.map(name => {
+            const sname = WikiEntityHelper.splitName(name);
+            if (sname) {
+                return sname.simple;
+            }
+        }).filter(name => !!name);
+
+        entity.names = entity.names.concat(simpleNames);
 
         entity.names = uniq(entity.names);
 

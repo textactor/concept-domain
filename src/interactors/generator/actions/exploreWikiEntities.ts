@@ -1,4 +1,6 @@
 
+const debug = require('debug')('textactor:concept-domain');
+
 import { UseCase } from "@textactor/domain";
 import { ILocale } from "../../../types";
 import { IWikiEntity } from "../../../entities/wikiEntity";
@@ -13,6 +15,8 @@ export class ExploreWikiEntities extends UseCase<string[], IWikiEntity[], null> 
 
     protected async innerExecute(titles: string[]): Promise<IWikiEntity[]> {
 
+        debug(`exploring wiki entities for ${titles.join('|')}`);
+
         const wikiEntities = await getEntities({
             titles: titles.join('|'),
             claims: 'item',
@@ -20,10 +24,14 @@ export class ExploreWikiEntities extends UseCase<string[], IWikiEntity[], null> 
             extract: 3,
             language: this.locale.lang,
             redirects: true,
+            types: true,
         });
 
         if (!wikiEntities || wikiEntities.length === 0) {
+            debug(`NO wiki entities found for ${titles.join('|')}`);
             return []
+        } else {
+            debug(`Found wiki entities found for ${titles.join('|')}: ${wikiEntities.map(item => item.label)}`);
         }
 
         return wikiEntities.map(item => WikiEntityHelper.convert(item, this.locale.lang));

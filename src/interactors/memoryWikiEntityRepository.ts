@@ -7,19 +7,13 @@ import { RepUpdateData } from '@textactor/domain';
 export class MemoryWikiEntityRepository implements IWikiEntityRepository {
     private db: Map<string, IWikiEntity> = new Map()
 
-    private filterByFieldValue(field: keyof IWikiEntity, value: any): IWikiEntity[] {
+    getByNameHash(hash: string): Promise<IWikiEntity[]> {
         const list: IWikiEntity[] = []
         for (let item of this.db.values()) {
-            if (item[field] === value) {
+            if (~item.namesHashes.indexOf(hash)) {
                 list.push(item)
             }
         }
-
-        return list;
-    }
-
-    getByNameHash(hash: string): Promise<IWikiEntity[]> {
-        const list = this.filterByFieldValue('nameHash', hash);
 
         return Promise.resolve(list);
     }
