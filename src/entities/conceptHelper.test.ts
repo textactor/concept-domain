@@ -41,4 +41,5 @@ test('#rootName', t => {
     t.is(ConceptHelper.rootName('Ana Balan', 'ro'), 'An Balan');
     t.is(ConceptHelper.rootName('Anei Balan', 'ro'), 'An Balan');
     t.is(ConceptHelper.rootName('PLDM', 'ro'), 'PLDM');
+    t.is(ConceptHelper.rootName('Владимира Путина', 'ru'), 'Владимир Путин');
 })

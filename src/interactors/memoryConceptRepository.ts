@@ -31,7 +31,7 @@ export class MemoryConceptRepository implements IConceptRepository {
         if (!!this.db.get(data.id)) {
             return Promise.reject(new Error(`Item already exists!`));
         }
-        this.db.set(data.id, Object.assign({}, data));
+        this.db.set(data.id, Object.assign({ popularity: 1, createdAt: new Date() }, data));
 
         return this.getById(data.id);
     }
@@ -63,7 +63,6 @@ export class MemoryConceptRepository implements IConceptRepository {
     }
     getPopularRootNameHashes(locale: ILocale, limit: number): Promise<PopularConceptHash[]> {
         const map: { [hash: string]: { popularity: number, ids: string[] } } = {}
-
 
         for (let item of this.db.values()) {
             if (item.country !== locale.country || item.lang !== locale.lang) {
@@ -157,8 +156,9 @@ export class MemoryConceptRepository implements IConceptRepository {
         let item = this.db.get(id);
         if (!item) {
             await this.create(concept);
+        } else {
+            await this.incrementPopularity(id);
         }
-        await this.incrementPopularity(id);
 
         return Promise.resolve(this.db.get(id));
     }
