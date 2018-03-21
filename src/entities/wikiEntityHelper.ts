@@ -14,20 +14,26 @@ export class WikiEntityHelper {
             name: NameHelper.standardText(simpleEntity.name || wikiEntity.label, lang),
             nameHash: WikiEntityHelper.nameHash(simpleEntity.name || wikiEntity.label, lang),
             lang: lang,
-            abbr: simpleEntity.abbr,
             description: simpleEntity.description,
             aliases: uniq(wikiEntity.aliases || []),
             about: simpleEntity.about,
             wikiDataId: simpleEntity.wikiDataId,
             wikiPageId: simpleEntity.wikiPageId,
-            wikiPageTitle: NameHelper.standardText(simpleEntity.wikiPageTitle, lang),
-            type: WikiEntityHelper.convertSimpleEntityType(simpleEntity.type),
+            wikiPageTitle: simpleEntity.wikiPageTitle,
             types: simpleEntity.types,
             countryCode: simpleEntity.countryCode && simpleEntity.countryCode.trim().toLowerCase(),
             data: simpleEntity.data,
             categories: simpleEntity.categories,
             rank: 1,
         };
+
+        if (simpleEntity.type) {
+            entity.type = WikiEntityHelper.convertSimpleEntityType(simpleEntity.type);
+        }
+
+        if (simpleEntity.abbr) {
+            entity.abbr = simpleEntity.abbr;
+        }
 
         entity.rank += entity.aliases.length;
         if (wikiEntity.sitelinks) {
@@ -122,4 +128,7 @@ export class WikiEntityHelper {
         }
     }
 
+    static isDisambiguation(entity: IWikiEntity) {
+        return entity && entity.data && entity.data.P31 && entity.data.P31.indexOf('Q4167410') > -1;
+    }
 }

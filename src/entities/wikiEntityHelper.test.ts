@@ -35,3 +35,11 @@ test('#convert', async t => {
     t.is(entity.abbr, 'CIA')
     t.is(entity.wikiDataId, 'Q37230')
 })
+
+test('#isDisambiguation', async t => {
+    const wikiEntity = (await getEntities({ titles: 'Adrian Ursu', language: 'ro', claims: 'item', extract: 3, types: true, redirects: true }))[0];
+
+    const entity = WikiEntityHelper.convert(wikiEntity, 'ro');
+
+    t.is(WikiEntityHelper.isDisambiguation(entity), true);
+})
