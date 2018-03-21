@@ -1,6 +1,6 @@
 {
   "name": "@textactor/concept-domain",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Core Concept module",
   "main": "./lib/index.js",
   "types": "./types/index.d.ts",
@@ -41,6 +41,7 @@
     "typescript": "latest"
   },
   "dependencies": {
+    "@textactor/domain": "^0.1.0",
     "entity-finder": "^0.5.1",
     "wiki-entity": "^0.3.1"
   }
