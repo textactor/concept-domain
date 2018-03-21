@@ -31,7 +31,7 @@ export class ExploreWikiEntitiesByTitles extends UseCase<string[], IWikiEntity[]
             debug(`NO wiki entities found for ${titles.join('|')}`);
             return []
         } else {
-            debug(`Found wiki entities found for ${titles.join('|')}: ${wikiEntities.map(item => item.label)}`);
+            debug(`Found wiki entities for ${titles.join('|')}: ${wikiEntities.map(item => item.label)}`);
         }
 
         return wikiEntities.map(item => WikiEntityHelper.convert(item, this.locale.lang));

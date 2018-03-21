@@ -6,12 +6,11 @@ import { IWikiEntityRepository } from './wikiEntityRepository';
 import { IConceptRepository } from './conceptRepository';
 import { BuildActor, GetPopularConceptNode, DeleteActorConcepts } from './actions';
 
-export interface GenerateActorsParams {
-    onActor: (actor: IActor) => void
-    onError: (error: Error) => void
+export interface OnGenerateActorCallback {
+    (actor: IActor): void
 }
 
-export class GenerateActors extends UseCase<GenerateActorsParams, void, void> {
+export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void> {
     private buildActor:BuildActor
     private getPopularConceptNode:GetPopularConceptNode
     private deleteActorConcepts:DeleteActorConcepts
@@ -24,7 +23,7 @@ export class GenerateActors extends UseCase<GenerateActorsParams, void, void> {
         this.deleteActorConcepts = new DeleteActorConcepts(this.conceptRepository);
     }
 
-    protected async innerExecute(params: GenerateActorsParams): Promise<void> {
+    protected async innerExecute(callback: OnGenerateActorCallback): Promise<void> {
         let actor: IActor;
 
         while (true) {
@@ -40,16 +39,12 @@ export class GenerateActors extends UseCase<GenerateActorsParams, void, void> {
                 await this.deleteActorConcepts.execute(actor);
 
             } catch (e) {
-                if (params.onError) {
-                    params.onError(e);
-                }
                 return Promise.reject(e);
             }
 
-            if (params.onActor) {
-                params.onActor(actor);
+            if (callback) {
+                callback(actor);
             }
         }
-
     }
 }

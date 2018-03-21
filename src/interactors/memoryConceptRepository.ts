@@ -8,7 +8,8 @@ export class MemoryConceptRepository implements IConceptRepository {
 
     private db: Map<string, IConcept> = new Map()
 
-    list(locale: ILocale, limit: number, skip: number): Promise<IConcept[]> {
+    list(locale: ILocale, limit: number, skip?: number): Promise<IConcept[]> {
+        skip = skip || 0;
         const list: IConcept[] = []
         for (let item of this.db.values()) {
             if (item.country !== locale.country || item.lang !== locale.lang) {
@@ -73,7 +74,8 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(list);
     }
-    getPopularRootNameHashes(locale: ILocale, limit: number): Promise<PopularConceptHash[]> {
+    getPopularRootNameHashes(locale: ILocale, limit: number, skip?: number): Promise<PopularConceptHash[]> {
+        skip = skip || 0;
         const map: { [hash: string]: { popularity: number, ids: string[] } } = {}
 
         for (let item of this.db.values()) {
@@ -90,7 +92,7 @@ export class MemoryConceptRepository implements IConceptRepository {
         const list = Object.keys(map)
             .map(hash => ({ hash, ...map[hash] }))
             .sort((a, b) => b.popularity - a.popularity)
-            .slice(0, limit);
+            .slice(skip, skip + limit);
 
         return Promise.resolve(list);
     }

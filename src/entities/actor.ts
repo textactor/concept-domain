@@ -15,4 +15,6 @@ export interface IActor {
     
     wikiEntity?: IWikiEntity
     concepts?: IConcept[]
+
+    popularity?: number
 }

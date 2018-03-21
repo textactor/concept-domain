@@ -24,6 +24,7 @@ export class ActorHelper {
             wikiEntity: entity,
             names: [],
             concepts,
+            popularity: concepts.reduce<number>((total, current) => total + current.popularity, 0),
         };
 
         if (entity) {

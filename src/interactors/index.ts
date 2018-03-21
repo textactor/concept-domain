@@ -2,18 +2,19 @@
 export {
     IConceptRepository,
     IConceptReadRepository,
-    IConceptWriteRepository
+    IConceptWriteRepository,
 } from './conceptRepository';
 
 export {
     IWikiEntityRepository,
     IWikiEntityReadRepository,
-    IWikiEntityWriteRepository
+    IWikiEntityWriteRepository,
 } from './wikiEntityRepository';
 
 export { DeleteUnpopularConcepts } from './deleteUnpopularConcepts';
 export { PushConcepts } from './pushConcepts';
-export { GenerateActors, GenerateActorsParams } from './generateActors';
+export { GenerateActors } from './generateActors';
+export { ExploreWikiEntities } from './exploreWikiEntities';
 
 export { MemoryConceptRepository } from './memoryConceptRepository';
 export { MemoryWikiEntityRepository } from './memoryWikiEntityRepository';

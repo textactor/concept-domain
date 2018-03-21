@@ -18,24 +18,22 @@ test('ro-md', async t => {
     const conceptTexts: string[] = ['R. Moldova', 'Republica Moldova', 'Moldova', 'Republicii Moldova', 'Chișinău', 'Chisinau', 'Chisinaului', 'Adrian Ursu', 'Partidul Liberal', 'PDM', 'Partidul Democrat', 'PSRM'];
 
     const concepts = conceptTexts
-        .map(text => ({ text, ...locale }))
-        .map(text => ConceptHelper.create(text));
+        .map(text => ConceptHelper.create({ text, ...locale }));
 
     await pushConcepts.execute(concepts);
 
-    const inter = {
-        onActor: (actor: IActor) => {
-            t.true(!!actor);
-            if (actor.wikiEntity) {
-                delete actor.wikiEntity.data
-            }
-            console.log('------------NEW ACTOR------------');
-            console.log(actor);
-            console.log('------------------------');
-        },
-        onError: (error: Error) => console.log('Error', error)
-    }
+    const onActor = (actor: IActor) => {
+        t.true(!!actor);
+        t.true(actor.popularity > 0);
+        t.true(actor.slug.length > 1);
+        // if (actor.wikiEntity) {
+        //     delete actor.wikiEntity.data
+        // }
+        // console.log('------------NEW ACTOR------------');
+        // console.log(actor);
+        // console.log('------------------------');
+    };
 
-    await actorsGenerator.execute(inter);
+    await actorsGenerator.execute(onActor);
 });
 

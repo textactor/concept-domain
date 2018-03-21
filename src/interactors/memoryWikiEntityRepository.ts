@@ -5,7 +5,12 @@ import { RepUpdateData } from '@textactor/domain';
 
 
 export class MemoryWikiEntityRepository implements IWikiEntityRepository {
+
     private db: Map<string, IWikiEntity> = new Map()
+
+    count(): Promise<number> {
+        return Promise.resolve(this.db.size);
+    }
 
     getByNameHash(hash: string): Promise<IWikiEntity[]> {
         const list: IWikiEntity[] = []

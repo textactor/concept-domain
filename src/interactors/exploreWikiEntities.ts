@@ -1,14 +1,18 @@
 
+const debug = require('debug')('textactor:concept-domain');
+
 import { UseCase, eachSeries } from '@textactor/domain';
 import { IConcept } from '../entities/concept';
 import { IConceptReadRepository } from './conceptRepository';
 import { ILocale } from '../types';
-import { ExploreWikiEntitiesByTitles, SaveWikiEntities } from './actions';
+import { ExploreWikiEntitiesByTitles, SaveWikiEntities, FindWikiTitles } from './actions';
 import { IWikiEntityRepository } from './wikiEntityRepository';
+import { uniq } from '../utils';
 
 export class ExploreWikiEntities extends UseCase<void, void, void> {
     private exploreWikiEntitiesByTitles: ExploreWikiEntitiesByTitles;
     private saveWikiEntities: SaveWikiEntities;
+    private findWikiTitles: FindWikiTitles;
 
     constructor(private locale: ILocale, private conceptRepository: IConceptReadRepository,
         wikiEntityRepository: IWikiEntityRepository) {
@@ -16,37 +20,50 @@ export class ExploreWikiEntities extends UseCase<void, void, void> {
 
         this.exploreWikiEntitiesByTitles = new ExploreWikiEntitiesByTitles(locale);
         this.saveWikiEntities = new SaveWikiEntities(wikiEntityRepository);
+        this.findWikiTitles = new FindWikiTitles(locale);
     }
 
-    protected innerExecute(): Promise<void> {
+    protected async innerExecute(): Promise<void> {
         let skip = 0;
         const limit = 100;
         const self = this;
 
-        function start(): Promise<void> {
-            return self.conceptRepository.list(self.locale, limit, skip)
-                .then(concepts => {
-                    if (concepts.length === 0) {
-                        return;
-                    }
-                    skip += limit;
+        async function start(): Promise<void> {
+            const hashes = await self.conceptRepository.getPopularRootNameHashes(self.locale, limit, skip);
 
-                    return eachSeries(concepts, concept => self.processConcept(concept))
-                        .then(() => start());
-                });
+            if (hashes.length === 0) {
+                debug(`concepts hashes==0`);
+                return;
+            }
+            skip += limit;
+
+            let ids = hashes.reduce<string[]>((list, hash) => list.concat(hash.ids.splice(0, 2)), []);
+            ids = uniq(ids);
+
+            debug(`hashes ids: ${ids}`);
+
+            const concepts = await self.conceptRepository.getByIds(ids);
+            await eachSeries(concepts, concept => self.processConcept(concept));
+
+            await start();
         }
 
-        return start();
+        await start();
     }
 
-    private processConcept(concept: IConcept): Promise<boolean> {
-        return this.exploreWikiEntitiesByTitles.execute([concept.name])
-            .then(wikiEntities => {
-                if (wikiEntities.length) {
-                    return this.saveWikiEntities.execute(wikiEntities)
-                        .then(() => true);
-                }
-                return false;
-            });
+    private async processConcept(concept: IConcept): Promise<boolean> {
+        const titles = await this.findWikiTitles.execute([concept.name]);
+        if (!titles.length) {
+            return false;
+        }
+
+        const wikiEntities = await this.exploreWikiEntitiesByTitles.execute(titles);
+        if (!wikiEntities.length) {
+            return false;
+        }
+
+        debug(`found wiki entities for ${concept.name}==${wikiEntities.length}`);
+        await this.saveWikiEntities.execute(wikiEntities);
+        return true;
     }
 }
