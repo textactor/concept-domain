@@ -3,7 +3,7 @@ import { UseCase } from '@textactor/domain';
 import { IConcept } from '../entities/concept';
 import { IConceptWriteRepository } from './conceptRepository';
 
-export class PushConceptsUseCase extends UseCase<IConcept[], void, void> {
+export class PushConcepts extends UseCase<IConcept[], void, void> {
     constructor(private repository: IConceptWriteRepository) {
         super()
     }

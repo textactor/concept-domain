@@ -41,7 +41,7 @@
     "typescript": "latest"
   },
   "dependencies": {
-    "entity-finder": "^0.5.0",
+    "entity-finder": "^0.5.1",
     "wiki-entity": "^0.3.1"
   }
 }

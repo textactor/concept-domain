@@ -1,7 +1,7 @@
 
 import { UseCase } from "@textactor/domain";
-import { IConceptWriteRepository } from "../../conceptRepository";
-import { IActor } from "../../../entities";
+import { IConceptWriteRepository } from "../conceptRepository";
+import { IActor } from "../../entities";
 
 export class DeleteActorConcepts extends UseCase<IActor, IActor, void> {
 

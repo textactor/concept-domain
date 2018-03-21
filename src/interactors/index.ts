@@ -11,9 +11,9 @@ export {
     IWikiEntityWriteRepository
 } from './wikiEntityRepository';
 
-export { PushConceptsUseCase } from './pushConceptsUseCase';
-
-export { IActorsGenerator, ActorsGenerator } from './generator/actorsGenerator';
+export { DeleteUnpopularConcepts } from './deleteUnpopularConcepts';
+export { PushConcepts } from './pushConcepts';
+export { GenerateActors, GenerateActorsParams } from './generateActors';
 
 export { MemoryConceptRepository } from './memoryConceptRepository';
 export { MemoryWikiEntityRepository } from './memoryWikiEntityRepository';

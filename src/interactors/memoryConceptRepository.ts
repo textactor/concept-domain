@@ -5,8 +5,20 @@ import { IConceptRepository, PopularConceptHash } from './conceptRepository';
 import { RepUpdateData } from '@textactor/domain';
 
 export class MemoryConceptRepository implements IConceptRepository {
+
     private db: Map<string, IConcept> = new Map()
 
+    list(locale: ILocale, limit: number, skip: number): Promise<IConcept[]> {
+        const list: IConcept[] = []
+        for (let item of this.db.values()) {
+            if (item.country !== locale.country || item.lang !== locale.lang) {
+                continue;
+            }
+            list.push(item)
+        }
+
+        return Promise.resolve(list.slice(skip, skip + limit));
+    }
 
     getById(id: string): Promise<IConcept> {
         return Promise.resolve(this.db.get(id));

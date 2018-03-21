@@ -11,7 +11,7 @@ export class WikiEntityHelper {
         const simpleEntity = convertToSimpleEntity(wikiEntity, lang);
         const entity: IWikiEntity = {
             id: `${simpleEntity.lang.trim().toUpperCase()}${simpleEntity.wikiDataId}`,
-            name: simpleEntity.name || wikiEntity.label,
+            name: NameHelper.standardText(simpleEntity.name || wikiEntity.label, lang),
             nameHash: WikiEntityHelper.nameHash(simpleEntity.name || wikiEntity.label, lang),
             lang: lang,
             abbr: simpleEntity.abbr,
@@ -20,7 +20,7 @@ export class WikiEntityHelper {
             about: simpleEntity.about,
             wikiDataId: simpleEntity.wikiDataId,
             wikiPageId: simpleEntity.wikiPageId,
-            wikiPageTitle: simpleEntity.wikiPageTitle,
+            wikiPageTitle: NameHelper.standardText(simpleEntity.wikiPageTitle, lang),
             type: WikiEntityHelper.convertSimpleEntityType(simpleEntity.type),
             types: simpleEntity.types,
             countryCode: simpleEntity.countryCode && simpleEntity.countryCode.trim().toLowerCase(),

@@ -1,15 +1,15 @@
 
 import { UseCase } from "@textactor/domain";
-import { IWikiEntity } from "../../../entities/wikiEntity";
-import { IWikiEntityReadRepository } from "../../wikiEntityRepository";
-import { ILocale } from "../../../types";
+import { IWikiEntity, IConcept } from "../../entities";
+import { IWikiEntityReadRepository } from "../wikiEntityRepository";
+import { IConceptReadRepository } from "../conceptRepository";
+import { ILocale } from "../../types";
 import { PopularConceptNode } from "./getPopularConceptNode";
-import { IActor } from "../../../entities/actor";
-import { IConcept, IConceptReadRepository } from "../../..";
-import { WikiEntityHelper } from "../../../entities/wikiEntityHelper";
-import { uniqProp, uniq } from "../../../utils";
-import { ActorHelper } from "../../../entities/actorHelper";
-import { ConceptHelper } from "../../../entities/conceptHelper";
+import { IActor } from "../../entities/actor";
+import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
+import { uniqProp, uniq } from "../../utils";
+import { ActorHelper } from "../../entities/actorHelper";
+import { ConceptHelper } from "../../entities/conceptHelper";
 
 
 

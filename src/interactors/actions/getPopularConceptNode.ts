@@ -1,9 +1,9 @@
 
 import { UseCase } from "@textactor/domain";
-import { IConceptReadRepository } from "../../conceptRepository";
-import { ILocale } from "../../../types";
-import { IConcept } from "../../../entities";
-import { uniq } from "../../../utils";
+import { IConceptReadRepository } from "../conceptRepository";
+import { ILocale } from "../../types";
+import { IConcept } from "../../entities";
+import { uniq } from "../../utils";
 
 export type PopularConceptNode = {
     hash: string

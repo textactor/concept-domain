@@ -1,7 +1,7 @@
 
 import { UseCase } from "@textactor/domain";
-import { IWikiEntity } from "../../../entities/wikiEntity";
-import { IWikiEntityRepository } from "../../wikiEntityRepository";
+import { IWikiEntity } from "../../entities/wikiEntity";
+import { IWikiEntityRepository } from "../wikiEntityRepository";
 
 
 export class SaveWikiEntities extends UseCase<IWikiEntity[], boolean, null> {
