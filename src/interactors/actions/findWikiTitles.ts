@@ -1,10 +1,10 @@
 
 const debug = require('debug')('textactor:concept-domain');
 
-import { UseCase } from "@textactor/domain";
+import { UseCase, uniq } from "@textactor/domain";
 import { ILocale } from "../../types";
 import { findTitles } from 'entity-finder';
-import { delay, uniq } from "../../utils";
+import { delay } from "../../utils";
 
 export class FindWikiTitles extends UseCase<string[], string[], null> {
 

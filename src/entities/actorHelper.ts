@@ -1,8 +1,7 @@
 import { Concept } from "./concept";
 import { WikiEntity } from "./wikiEntity";
 import { ConceptActor } from "./actor";
-import { NameHelper } from "@textactor/domain";
-import { md5, uniq } from "../utils";
+import { NameHelper, uniq, md5 } from "@textactor/domain";
 
 export class ActorHelper {
     static create(concepts: Concept[], entity?: WikiEntity, concept?: Concept): ConceptActor {

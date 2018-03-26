@@ -1,9 +1,9 @@
 
-import { md5 } from '../utils';
-import { NameHelper } from '@textactor/domain';
+import { NameHelper, md5 } from '@textactor/domain';
 import { Concept } from './concept';
+import * as isAbbrOf from 'is-abbr-of';
 
-export interface IConceptText {
+export type CreatingConceptData = {
     lang: string
     country: string
     text: string
@@ -12,7 +12,7 @@ export interface IConceptText {
 
 export class ConceptHelper {
 
-    static create(data: IConceptText): Concept {
+    static create(data: CreatingConceptData): Concept {
 
         const lang = data.lang.trim().toLowerCase();
         const country = data.country.trim().toLowerCase();
@@ -58,7 +58,7 @@ export class ConceptHelper {
     public static rootName(name: string, lang: string) {
         lang = lang.trim();
         name = name.trim();
-        
+
         const isAbbr = NameHelper.isAbbr(name);
         const countWords = name.split(/\s+/g).length;
 
@@ -101,5 +101,21 @@ export class ConceptHelper {
     public static id(name: string, lang: string, country: string) {
         name = ConceptHelper.normalizeName(name, lang);
         return ConceptHelper.hash(name, lang, country);
+    }
+
+    public static setConceptsContextAbbr(concepts: Concept[]) {
+        const abbreviations = concepts.filter(item => !!item.isAbbr);
+        for (let concept of concepts) {
+            if (!concept.isAbbr && concept.countWords > 2 && !concept.endsWithNumber && !concept.abbr && !concept.contextAbbr) {
+                for (let abbr of abbreviations) {
+                    if (isAbbrOf(abbr.name, concept.name)) {
+                        concept.contextAbbr = abbr.name;
+                        abbr.contextName = concept.name;
+                    }
+                }
+            }
+        }
+
+        return concepts;
     }
 }

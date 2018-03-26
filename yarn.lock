@@ -44,9 +44,9 @@
   dependencies:
     arrify "^1.0.1"
 
-"@textactor/domain@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@textactor/domain/-/domain-0.1.1.tgz#297a87cce9b8ce2b935957f9f7c2cf334dddbeab"
+"@textactor/domain@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@textactor/domain/-/domain-0.1.2.tgz#30ff86f500ae210fb0bc0b7f0713786cc0864e25"
   dependencies:
     atonic "^1.0.4"
     root-name "^0.1.0"
@@ -1499,6 +1499,10 @@ invariant@^2.2.2:
 irregular-plurals@^1.0.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/irregular-plurals/-/irregular-plurals-1.4.0.tgz#2ca9b033651111855412f16be5d77c62a458a766"
+
+is-abbr-of@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/is-abbr-of/-/is-abbr-of-0.1.0.tgz#d2e204f0c18a45dd72ba678a6910d0f9449655fd"
 
 is-arrayish@^0.2.1:
   version "0.2.1"

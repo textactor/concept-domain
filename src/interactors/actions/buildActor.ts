@@ -1,5 +1,5 @@
 
-import { UseCase } from "@textactor/domain";
+import { UseCase, NameHelper, uniq } from "@textactor/domain";
 import { WikiEntity, Concept } from "../../entities";
 import { IWikiEntityReadRepository } from "../wikiEntityRepository";
 import { IConceptReadRepository } from "../conceptRepository";
@@ -7,7 +7,7 @@ import { ILocale } from "../../types";
 import { PopularConceptNode } from "./getPopularConceptNode";
 import { ConceptActor } from "../../entities/actor";
 import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
-import { uniqProp, uniq } from "../../utils";
+import { uniqProp } from "../../utils";
 import { ActorHelper } from "../../entities/actorHelper";
 import { ConceptHelper } from "../../entities/conceptHelper";
 
@@ -57,6 +57,7 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
     }
 
     private async findPerfectWikiEntity(concepts: Concept[]): Promise<WikiEntity> {
+        const concept = concepts[0];
         let nameHashes = concepts.map(item => WikiEntityHelper.nameHash(item.name, this.locale.lang));
         nameHashes = uniq(nameHashes);
 
@@ -67,11 +68,30 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
             entities = entities.concat(list);
         }
 
-        if (entities.length === 0) {
-            const concept = concepts[0];
-            if (concept.countWords === 1 && !concept.isAbbr) {
-                const list = await this.wikiEntityRepository.getByLastName(concept.name, concept.lang);
+        if (concept.isAbbr && concept.contextName) {
+            if (!entities.find(item => item.countryCode === concept.country)) {
+                console.log(`finding by contextName: ${concept.contextName}`)
+                const list = await this.wikiEntityRepository.getByNameHash(WikiEntityHelper.nameHash(concept.contextName, this.locale.lang));
+                console.log(`found by contextName: ${list.map(item => item.name)}`)
                 entities = entities.concat(list);
+            }
+        }
+
+        if (entities.length === 0) {
+            if (concept.countWords === 1 && !concept.isAbbr) {
+                const list = await this.wikiEntityRepository.getByLastName(concept.name, this.locale.lang);
+                entities = entities.concat(list);
+            }
+
+            if (entities.length === 0) {
+                const fullNames = entityFullNames(concept.name, this.locale.country, this.locale.lang);
+                if (fullNames && fullNames.length) {
+                    nameHashes = fullNames.map(item => WikiEntityHelper.nameHash(item, this.locale.lang));
+                    for (let nameHash of nameHashes) {
+                        const list = await this.wikiEntityRepository.getByNameHash(nameHash);
+                        entities = entities.concat(list);
+                    }
+                }
             }
         }
 
@@ -89,4 +109,32 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
 
         return uniq(entities);
     }
+}
+
+function entityFullNames(name: string, country: string, lang: string): string[] {
+
+    const countrySuffixes: { [country: string]: { [lang: string]: string[] } } = {
+        md: {
+            ro: [' din Repoblica Moldova', ' al Republicii Moldova', ' din Moldova'],
+        },
+    };
+
+    const countryAbbrSuffixes: { [country: string]: { [lang: string]: string[] } } = {
+        md: {
+            ro: ['RM', 'M'],
+        },
+    };
+
+    if (NameHelper.isAbbr(name)) {
+        if (countryAbbrSuffixes[country] && countryAbbrSuffixes[country][lang]) {
+            return countryAbbrSuffixes[country][lang].map(item => name + item);
+        }
+        return [];
+    }
+
+    if (countrySuffixes[country] && countrySuffixes[country][lang]) {
+        return countrySuffixes[country][lang].map(item => name + item);
+    }
+
+    return [];
 }

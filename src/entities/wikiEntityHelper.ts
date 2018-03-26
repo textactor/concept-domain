@@ -1,8 +1,7 @@
 
 import { WikiEntity as ExternWikiEntity, convertToSimpleEntity, SimpleEntityType } from 'wiki-entity';
 import { WikiEntityType, WikiEntity } from './wikiEntity';
-import { uniq, md5 } from '../utils';
-import { NameHelper } from '@textactor/domain';
+import { NameHelper, uniq, md5 } from '@textactor/domain';
 
 export class WikiEntityHelper {
 

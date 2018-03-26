@@ -1,13 +1,11 @@
 
 const debug = require('debug')('textactor:concept-domain');
 
-import { UseCase, eachSeries } from '@textactor/domain';
-import { Concept } from '../entities/concept';
+import { UseCase, uniq, seriesPromise } from '@textactor/domain';
 import { IConceptReadRepository } from './conceptRepository';
 import { ILocale } from '../types';
 import { ExploreWikiEntitiesByTitles, SaveWikiEntities, FindWikiTitles } from './actions';
 import { IWikiEntityRepository } from './wikiEntityRepository';
-import { uniq } from '../utils';
 import { WikiEntityHelper } from '../entities/wikiEntityHelper';
 
 export class ExploreWikiEntities extends UseCase<void, void, void> {
@@ -44,7 +42,15 @@ export class ExploreWikiEntities extends UseCase<void, void, void> {
             debug(`hashes ids: ${ids}`);
 
             const concepts = await self.conceptRepository.getByIds(ids);
-            await eachSeries(concepts, concept => self.processConcept(concept));
+            let names: string[] = [];
+            for (let concept of concepts) {
+                names.push(concept.name);
+                if (concept.contextName) {
+                    names.push(concept.contextName);
+                }
+            }
+            names = uniq(names);
+            await seriesPromise(names, name => self.processName(name, self.locale.lang));
 
             await start();
         }
@@ -52,13 +58,13 @@ export class ExploreWikiEntities extends UseCase<void, void, void> {
         await start();
     }
 
-    private async processConcept(concept: Concept): Promise<boolean> {
-        const existingWikiEntities = await this.wikiEntityRepository.getByNameHash(WikiEntityHelper.nameHash(concept.name, concept.lang));
+    private async processName(name: string, lang: string): Promise<boolean> {
+        const existingWikiEntities = await this.wikiEntityRepository.getByNameHash(WikiEntityHelper.nameHash(name, lang));
         if (existingWikiEntities.length) {
-            debug(`WikiEntity exists name=${concept.name}`);
+            debug(`WikiEntity exists name=${name}`);
             return true;
         }
-        const titles = await this.findWikiTitles.execute([concept.name]);
+        const titles = await this.findWikiTitles.execute([name]);
         if (!titles.length) {
             return false;
         }
@@ -68,7 +74,7 @@ export class ExploreWikiEntities extends UseCase<void, void, void> {
             return false;
         }
 
-        debug(`found wiki entities for ${concept.name}==${wikiEntities.length}`);
+        debug(`found wiki entities for ${name}==${wikiEntities.length}`);
         await this.saveWikiEntities.execute(wikiEntities);
         return true;
     }

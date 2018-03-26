@@ -22,5 +22,8 @@ export type Concept = {
     isIrregular?: boolean
     isAbbr?: boolean
     createdAt?: number
+
+    contextAbbr?: string
+    contextName?: string
 }
 
