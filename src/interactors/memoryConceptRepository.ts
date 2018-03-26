@@ -176,4 +176,13 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(this.db.get(id));
     }
+
+    all(): Promise<IConcept[]> {
+        const array: IConcept[] = []
+        for (let item of this.db.values()) {
+            array.push(item);
+        }
+
+        return Promise.resolve(array);
+    }
 }

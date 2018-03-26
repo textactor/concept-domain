@@ -44,9 +44,9 @@
   dependencies:
     arrify "^1.0.1"
 
-"@textactor/domain@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@textactor/domain/-/domain-0.1.0.tgz#fc33cf3a5ca105aca95d0a0eb2c1fcc447659afa"
+"@textactor/domain@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@textactor/domain/-/domain-0.1.1.tgz#297a87cce9b8ce2b935957f9f7c2cf334dddbeab"
   dependencies:
     atonic "^1.0.4"
     root-name "^0.1.0"

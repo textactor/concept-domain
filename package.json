@@ -41,7 +41,7 @@
     "typescript": "latest"
   },
   "dependencies": {
-    "@textactor/domain": "^0.1.0",
+    "@textactor/domain": "^0.1.2",
     "entity-finder": "^0.5.1",
     "wiki-entity": "^0.3.1"
   }

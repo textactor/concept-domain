@@ -7,7 +7,7 @@ import { IConceptRepository } from './conceptRepository';
 import { BuildActor, GetPopularConceptNode, DeleteActorConcepts } from './actions';
 
 export interface OnGenerateActorCallback {
-    (actor: IActor): void
+    (actor: IActor): Promise<void>
 }
 
 export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void> {
@@ -43,7 +43,7 @@ export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void>
             }
 
             if (callback) {
-                callback(actor);
+                await callback(actor);
             }
         }
     }

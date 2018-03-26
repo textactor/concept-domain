@@ -26,12 +26,7 @@ test('ro-md', async t => {
         t.true(!!actor);
         t.true(actor.popularity > 0);
         t.true(actor.slug.length > 1);
-        // if (actor.wikiEntity) {
-        //     delete actor.wikiEntity.data
-        // }
-        // console.log('------------NEW ACTOR------------');
-        // console.log(actor);
-        // console.log('------------------------');
+        return Promise.resolve();
     };
 
     await actorsGenerator.execute(onActor);
