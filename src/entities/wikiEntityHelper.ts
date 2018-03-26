@@ -1,6 +1,6 @@
 
 import { WikiEntity as ExternWikiEntity, convertToSimpleEntity, SimpleEntityType } from 'wiki-entity';
-import { WikiEntityType, WikiEntity, WikiEntityData } from './wikiEntity';
+import { WikiEntityType, WikiEntity } from './wikiEntity';
 import { uniq, md5 } from '../utils';
 import { NameHelper } from '@textactor/domain';
 
@@ -37,7 +37,7 @@ export class WikiEntityHelper {
         if (simpleEntity.type) {
             entity.type = WikiEntityHelper.convertSimpleEntityType(simpleEntity.type);
 
-            const lastname = entity.type === WikiEntityType.PERSON && WikiEntityHelper.getLastname(entity.data, entity.name);
+            const lastname = entity.type === WikiEntityType.PERSON && WikiEntityHelper.getLastname(entity.name);
             if (lastname) {
                 entity.lastname = lastname;
             }
@@ -144,13 +144,8 @@ export class WikiEntityHelper {
         return entity && entity.data && entity.data.P31 && entity.data.P31.indexOf('Q4167410') > -1;
     }
 
-    static getLastname(data: WikiEntityData, name?: string): string {
-        if (!data) {
-            return;
-        }
-        if (data.P734 && data.P734.length) {
-            return data.P734[0];
-        }
+    static getLastname(name: string): string {
+
         if (!name) {
             return;
         }
@@ -161,14 +156,6 @@ export class WikiEntityHelper {
             return;
         }
 
-        const firstName = data.P735 && data.P735.length && data.P735[0];
-        if (!firstName) {
-            return;
-        }
-
-        if (firstName.toLowerCase() === nameParts[0].toLowerCase()) {
-            return nameParts.slice(1).join(' ');
-        }
-
+        return nameParts.slice(1).join(' ');
     }
 }

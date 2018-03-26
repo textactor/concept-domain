@@ -46,10 +46,22 @@ test('#isDisambiguation', async t => {
 
 test('#getLastname', t => {
     t.is(WikiEntityHelper.getLastname(null), undefined);
-    t.is(WikiEntityHelper.getLastname({}), undefined);
-    t.is(WikiEntityHelper.getLastname({ P734: [] }), undefined);
-    t.is(WikiEntityHelper.getLastname({ P734: ['Bauer'] }), 'Bauer');
-    t.is(WikiEntityHelper.getLastname({ P734: ['Bauer'] }, 'Kim Bauer'), 'Bauer');
-    t.is(WikiEntityHelper.getLastname({ P735: ['Kim'] }, 'Kim Bauer'), 'Bauer');
-    t.is(WikiEntityHelper.getLastname({ P735: ['Kim'] }), undefined);
+    t.is(WikiEntityHelper.getLastname('Bauer'), undefined);
+    t.is(WikiEntityHelper.getLastname( 'Kim Bauer'), 'Bauer');
+})
+
+test('lastname', async t => {
+
+    const lang = 'en';
+
+    const wikiEntity = (await getEntities({ ids: 'Q1049347', language: lang, claims: 'item', extract: 3, types: true, redirects: true }))[0];
+
+    t.not(wikiEntity, null);
+
+    const entity = WikiEntityHelper.convert(wikiEntity, lang);
+
+    t.is(entity.name, wikiEntity.label)
+    t.is(entity.type, WikiEntityType.PERSON)
+    t.is(entity.countryCode, 'us')
+    t.is(entity.lastname, 'Bauer')
 })
