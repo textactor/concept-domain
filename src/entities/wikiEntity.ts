@@ -9,7 +9,7 @@ export enum WikiEntityType {
 
 export type WikiEntityData = { [prop: string]: string[] }
 
-export interface IWikiEntity {
+export type WikiEntity = {
     id?: string
     lang?: string
     name?: string
@@ -38,4 +38,5 @@ export interface IWikiEntity {
      * Permanent redirect to entity id
      */
     redirectId?: string
+    lastname?: string
 }

@@ -3,17 +3,17 @@ const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase } from "@textactor/domain";
 import { ILocale } from "../../types";
-import { IWikiEntity } from "../../entities/wikiEntity";
+import { WikiEntity } from "../../entities/wikiEntity";
 import { getEntities } from 'wiki-entity';
 import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
 
-export class ExploreWikiEntitiesByTitles extends UseCase<string[], IWikiEntity[], null> {
+export class ExploreWikiEntitiesByTitles extends UseCase<string[], WikiEntity[], null> {
 
     constructor(private locale: ILocale) {
         super()
     }
 
-    protected async innerExecute(titles: string[]): Promise<IWikiEntity[]> {
+    protected async innerExecute(titles: string[]): Promise<WikiEntity[]> {
 
         debug(`exploring wiki entities for ${titles.join('|')}`);
 

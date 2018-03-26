@@ -1,6 +1,6 @@
 
 import { UseCase } from "@textactor/domain";
-import { IWikiEntity, Concept } from "../../entities";
+import { WikiEntity, Concept } from "../../entities";
 import { IWikiEntityReadRepository } from "../wikiEntityRepository";
 import { IConceptReadRepository } from "../conceptRepository";
 import { ILocale } from "../../types";
@@ -56,11 +56,11 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
         return actor;
     }
 
-    private async findPerfectWikiEntity(concepts: Concept[]): Promise<IWikiEntity> {
+    private async findPerfectWikiEntity(concepts: Concept[]): Promise<WikiEntity> {
         let nameHashes = concepts.map(item => WikiEntityHelper.nameHash(item.name, this.locale.lang));
         nameHashes = uniq(nameHashes);
 
-        let entities: IWikiEntity[] = []
+        let entities: WikiEntity[] = []
 
         for (let nameHash of nameHashes) {
             const list = await this.wikiEntityRepository.getByNameHash(nameHash);
@@ -73,7 +73,7 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
         return entities[0];
     }
 
-    private sortWikiEntities(entities: IWikiEntity[]): IWikiEntity[] {
+    private sortWikiEntities(entities: WikiEntity[]): WikiEntity[] {
         entities = entities.sort((a, b) => b.rank - a.rank);
 
         const countryEntities = entities.filter(item => item.countryCode === this.locale.country);

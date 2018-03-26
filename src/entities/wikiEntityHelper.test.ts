@@ -43,3 +43,13 @@ test('#isDisambiguation', async t => {
 
     t.is(WikiEntityHelper.isDisambiguation(entity), true);
 })
+
+test('#getLastname', t => {
+    t.is(WikiEntityHelper.getLastname(null), undefined);
+    t.is(WikiEntityHelper.getLastname({}), undefined);
+    t.is(WikiEntityHelper.getLastname({ P734: [] }), undefined);
+    t.is(WikiEntityHelper.getLastname({ P734: ['Bauer'] }), 'Bauer');
+    t.is(WikiEntityHelper.getLastname({ P734: ['Bauer'] }, 'Kim Bauer'), 'Bauer');
+    t.is(WikiEntityHelper.getLastname({ P735: ['Kim'] }, 'Kim Bauer'), 'Bauer');
+    t.is(WikiEntityHelper.getLastname({ P735: ['Kim'] }), undefined);
+})

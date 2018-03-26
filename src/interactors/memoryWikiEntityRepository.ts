@@ -1,19 +1,19 @@
 
 import { IWikiEntityRepository } from './wikiEntityRepository';
-import { IWikiEntity } from '../entities/wikiEntity';
+import { WikiEntity } from '../entities/wikiEntity';
 import { RepUpdateData } from '@textactor/domain';
 
 
 export class MemoryWikiEntityRepository implements IWikiEntityRepository {
 
-    private db: Map<string, IWikiEntity> = new Map()
+    private db: Map<string, WikiEntity> = new Map()
 
     count(): Promise<number> {
         return Promise.resolve(this.db.size);
     }
 
-    getByNameHash(hash: string): Promise<IWikiEntity[]> {
-        const list: IWikiEntity[] = []
+    getByNameHash(hash: string): Promise<WikiEntity[]> {
+        const list: WikiEntity[] = []
         for (let item of this.db.values()) {
             if (~item.namesHashes.indexOf(hash)) {
                 list.push(item)
@@ -22,11 +22,11 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
 
         return Promise.resolve(list);
     }
-    getById(id: string): Promise<IWikiEntity> {
+    getById(id: string): Promise<WikiEntity> {
         return Promise.resolve(this.db.get(id));
     }
-    getByIds(ids: string[]): Promise<IWikiEntity[]> {
-        const list: IWikiEntity[] = [];
+    getByIds(ids: string[]): Promise<WikiEntity[]> {
+        const list: WikiEntity[] = [];
         for (let id of ids) {
             const item = this.db.get(id);
             if (item) {
@@ -41,7 +41,7 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
     delete(id: string): Promise<boolean> {
         return Promise.resolve(this.db.delete(id));
     }
-    create(data: IWikiEntity): Promise<IWikiEntity> {
+    create(data: WikiEntity): Promise<WikiEntity> {
         if (!!this.db.get(data.id)) {
             return Promise.reject(new Error(`Item already exists!`));
         }
@@ -49,7 +49,7 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
 
         return this.getById(data.id);
     }
-    update(_data: RepUpdateData<IWikiEntity>): Promise<IWikiEntity> {
+    update(_data: RepUpdateData<WikiEntity>): Promise<WikiEntity> {
         throw new Error("Method not implemented.");
     }
 }

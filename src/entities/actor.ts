@@ -1,4 +1,4 @@
-import { IWikiEntity } from "./wikiEntity";
+import { WikiEntity } from "./wikiEntity";
 import { Concept } from "./concept";
 
 
@@ -13,9 +13,8 @@ export type ConceptActor = {
     shortName?: string
     abbr?: string
     
-    wikiEntity?: IWikiEntity
+    wikiEntity?: WikiEntity
     concepts?: Concept[]
 
     popularity?: number
-    lastname?: string
 }
