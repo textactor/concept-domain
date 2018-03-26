@@ -67,6 +67,14 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
             entities = entities.concat(list);
         }
 
+        if (entities.length === 0) {
+            const concept = concepts[0];
+            if (concept.countWords === 1 && !concept.isAbbr) {
+                const list = await this.wikiEntityRepository.getByLastName(concept.name, concept.lang);
+                entities = entities.concat(list);
+            }
+        }
+
         entities = uniqProp(entities, 'id');
         entities = this.sortWikiEntities(entities);
 

@@ -5,8 +5,18 @@ import { RepUpdateData } from '@textactor/domain';
 
 
 export class MemoryWikiEntityRepository implements IWikiEntityRepository {
-
     private db: Map<string, WikiEntity> = new Map()
+
+    getByLastName(lastname: string, lang: string): Promise<WikiEntity[]> {
+        const list: WikiEntity[] = [];
+        for (let item of this.db.values()) {
+            if (item.lang === lang && item.lastname === lastname) {
+                list.push(item);
+            }
+        }
+
+        return Promise.resolve(list);
+    }
 
     count(): Promise<number> {
         return Promise.resolve(this.db.size);
