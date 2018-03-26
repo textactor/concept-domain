@@ -1,5 +1,5 @@
 import { IConcept } from "./concept";
-import { IWikiEntity } from "./wikiEntity";
+import { IWikiEntity, WikiEntityData } from "./wikiEntity";
 import { IActor } from "./actor";
 import { NameHelper } from "@textactor/domain";
 import { md5, uniq } from "../utils";
@@ -14,6 +14,7 @@ export class ActorHelper {
         const name = entity && (entity.simpleName || entity.name) || concept.name;
         const slug = NameHelper.slug((entity && entity.name || concept.name).toLowerCase());
         const id = md5([lang, country, slug].join('_'));
+        const actorNameCountWords = name.split(/\s+/g).length;
 
         const actor: IActor = {
             id,
@@ -36,7 +37,8 @@ export class ActorHelper {
             // set short name
             let shortName: string = actor.name;
             entity.names.forEach(item => {
-                if (item && !NameHelper.isAbbr(item) && !NameHelper.endsWithNumberWord(item) && item.length < shortName.length) {
+                const countWords = item.split(/\s+/g).length;
+                if (item && !NameHelper.isAbbr(item) && !NameHelper.endsWithNumberWord(item) && item.length < shortName.length && countWords < actorNameCountWords) {
                     shortName = item;
                 }
             });
@@ -61,5 +63,33 @@ export class ActorHelper {
         actor.names = uniq(actor.names);
 
         return actor;
+    }
+
+    static getLastname(data: WikiEntityData, name?: string): string {
+        if (!data) {
+            return;
+        }
+        if (data.P734 && data.P734.length) {
+            return data.P734[0];
+        }
+        if (!name) {
+            return;
+        }
+
+        const nameParts = name.split(/\s+/g);
+
+        if (nameParts.length < 2) {
+            return;
+        }
+
+        const firstName = data.P735 && data.P735.length && data.P735[0];
+        if (!firstName) {
+            return;
+        }
+
+        if (firstName.toLowerCase() === nameParts[0].toLowerCase()) {
+            return nameParts.slice(1).join(' ');
+        }
+
     }
 }

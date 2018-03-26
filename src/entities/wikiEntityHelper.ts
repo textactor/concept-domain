@@ -9,10 +9,17 @@ export class WikiEntityHelper {
     static convert(wikiEntity: ExternWikiEntity, lang: string): IWikiEntity {
         lang = lang.trim().toLowerCase();
         const simpleEntity = convertToSimpleEntity(wikiEntity, lang);
+        const wikiSplittedName = WikiEntityHelper.splitName(simpleEntity.wikiPageTitle);
+        const name = simpleEntity.name || wikiSplittedName && wikiSplittedName.simple || simpleEntity.wikiPageTitle;
+
+        if (!name) {
+            throw new Error(`Entity has no name! ${simpleEntity.wikiDataId}`);
+        }
+
         const entity: IWikiEntity = {
             id: `${simpleEntity.lang.trim().toUpperCase()}${simpleEntity.wikiDataId}`,
-            name: NameHelper.standardText(simpleEntity.name || wikiEntity.label, lang),
-            nameHash: WikiEntityHelper.nameHash(simpleEntity.name || wikiEntity.label, lang),
+            name: NameHelper.standardText(name, lang),
+            nameHash: WikiEntityHelper.nameHash(name, lang),
             lang: lang,
             description: simpleEntity.description,
             aliases: uniq(wikiEntity.aliases || []),
@@ -70,8 +77,6 @@ export class WikiEntityHelper {
             entity.names.push(entity.simpleName);
         }
 
-        entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
-
         const simpleNames = entity.names.map(name => {
             const sname = WikiEntityHelper.splitName(name);
             if (sname) {
@@ -80,6 +85,8 @@ export class WikiEntityHelper {
         }).filter(name => !!name);
 
         entity.names = entity.names.concat(simpleNames);
+        entity.names = entity.names.filter(name => name.trim().length > 1);
+        entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
 
         entity.names = uniq(entity.names);
 
