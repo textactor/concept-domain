@@ -1,11 +1,11 @@
 
 import { UseCase } from "@textactor/domain";
-import { IWikiEntity, IConcept } from "../../entities";
+import { IWikiEntity, Concept } from "../../entities";
 import { IWikiEntityReadRepository } from "../wikiEntityRepository";
 import { IConceptReadRepository } from "../conceptRepository";
 import { ILocale } from "../../types";
 import { PopularConceptNode } from "./getPopularConceptNode";
-import { IActor } from "../../entities/actor";
+import { ConceptActor } from "../../entities/actor";
 import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
 import { uniqProp, uniq } from "../../utils";
 import { ActorHelper } from "../../entities/actorHelper";
@@ -13,13 +13,13 @@ import { ConceptHelper } from "../../entities/conceptHelper";
 
 
 
-export class BuildActor extends UseCase<PopularConceptNode, IActor, void> {
+export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> {
 
     constructor(private locale: ILocale, private wikiEntityRepository: IWikiEntityReadRepository, private conceptRepository: IConceptReadRepository) {
         super()
     }
 
-    protected async innerExecute(node: PopularConceptNode): Promise<IActor> {
+    protected async innerExecute(node: PopularConceptNode): Promise<ConceptActor> {
 
         const wikiEntity = await this.findPerfectWikiEntity(node.topConcepts);
 
@@ -41,7 +41,7 @@ export class BuildActor extends UseCase<PopularConceptNode, IActor, void> {
 
         rootNamesHashes = uniq(rootNamesHashes);
 
-        let allConcepts: IConcept[] = []
+        let allConcepts: Concept[] = []
 
         for (let nameHash of rootNamesHashes) {
             const concepts = await this.conceptRepository.getByRootNameHash(nameHash);
@@ -56,7 +56,7 @@ export class BuildActor extends UseCase<PopularConceptNode, IActor, void> {
         return actor;
     }
 
-    private async findPerfectWikiEntity(concepts: IConcept[]): Promise<IWikiEntity> {
+    private async findPerfectWikiEntity(concepts: Concept[]): Promise<IWikiEntity> {
         let nameHashes = concepts.map(item => WikiEntityHelper.nameHash(item.name, this.locale.lang));
         nameHashes = uniq(nameHashes);
 

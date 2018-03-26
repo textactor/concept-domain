@@ -1,9 +1,9 @@
 import { IWikiEntity } from "./wikiEntity";
-import { IConcept } from "./concept";
+import { Concept } from "./concept";
 
 
 
-export interface IActor {
+export type ConceptActor = {
     id: string
     lang: string
     country: string
@@ -14,7 +14,8 @@ export interface IActor {
     abbr?: string
     
     wikiEntity?: IWikiEntity
-    concepts?: IConcept[]
+    concepts?: Concept[]
 
     popularity?: number
+    lastname?: string
 }

@@ -2,7 +2,7 @@
 const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase, eachSeries } from '@textactor/domain';
-import { IConcept } from '../entities/concept';
+import { Concept } from '../entities/concept';
 import { IConceptReadRepository } from './conceptRepository';
 import { ILocale } from '../types';
 import { ExploreWikiEntitiesByTitles, SaveWikiEntities, FindWikiTitles } from './actions';
@@ -51,7 +51,7 @@ export class ExploreWikiEntities extends UseCase<void, void, void> {
         await start();
     }
 
-    private async processConcept(concept: IConcept): Promise<boolean> {
+    private async processConcept(concept: Concept): Promise<boolean> {
         const titles = await this.findWikiTitles.execute([concept.name]);
         if (!titles.length) {
             return false;

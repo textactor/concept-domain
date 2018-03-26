@@ -1,16 +1,16 @@
 
-import { IConcept } from '../entities/concept';
+import { Concept } from '../entities/concept';
 import { ILocale } from '../types';
 import { IConceptRepository, PopularConceptHash } from './conceptRepository';
 import { RepUpdateData } from '@textactor/domain';
 
 export class MemoryConceptRepository implements IConceptRepository {
 
-    private db: Map<string, IConcept> = new Map()
+    private db: Map<string, Concept> = new Map()
 
-    list(locale: ILocale, limit: number, skip?: number): Promise<IConcept[]> {
+    list(locale: ILocale, limit: number, skip?: number): Promise<Concept[]> {
         skip = skip || 0;
-        const list: IConcept[] = []
+        const list: Concept[] = []
         for (let item of this.db.values()) {
             if (item.country !== locale.country || item.lang !== locale.lang) {
                 continue;
@@ -21,11 +21,11 @@ export class MemoryConceptRepository implements IConceptRepository {
         return Promise.resolve(list.slice(skip, skip + limit));
     }
 
-    getById(id: string): Promise<IConcept> {
+    getById(id: string): Promise<Concept> {
         return Promise.resolve(this.db.get(id));
     }
-    getByIds(ids: string[]): Promise<IConcept[]> {
-        const list: IConcept[] = [];
+    getByIds(ids: string[]): Promise<Concept[]> {
+        const list: Concept[] = [];
         for (let id of ids) {
             const item = this.db.get(id);
             if (item) {
@@ -40,7 +40,7 @@ export class MemoryConceptRepository implements IConceptRepository {
     delete(id: string): Promise<boolean> {
         return Promise.resolve(this.db.delete(id));
     }
-    create(data: IConcept): Promise<IConcept> {
+    create(data: Concept): Promise<Concept> {
         if (!!this.db.get(data.id)) {
             return Promise.reject(new Error(`Item already exists!`));
         }
@@ -48,12 +48,12 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return this.getById(data.id);
     }
-    update(_data: RepUpdateData<IConcept>): Promise<IConcept> {
+    update(_data: RepUpdateData<Concept>): Promise<Concept> {
         throw new Error("Method not implemented.");
     }
 
-    private filterByFieldValue(field: keyof IConcept, value: any): IConcept[] {
-        const list: IConcept[] = []
+    private filterByFieldValue(field: keyof Concept, value: any): Concept[] {
+        const list: Concept[] = []
         for (let item of this.db.values()) {
             if (item[field] === value) {
                 list.push(item)
@@ -63,13 +63,13 @@ export class MemoryConceptRepository implements IConceptRepository {
         return list;
     }
 
-    getByNameHash(hash: string): Promise<IConcept[]> {
+    getByNameHash(hash: string): Promise<Concept[]> {
 
         const list = this.filterByFieldValue('nameHash', hash);
 
         return Promise.resolve(list);
     }
-    getByRootNameHash(hash: string): Promise<IConcept[]> {
+    getByRootNameHash(hash: string): Promise<Concept[]> {
         const list = this.filterByFieldValue('rootNameHash', hash);
 
         return Promise.resolve(list);
@@ -165,7 +165,7 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(item.popularity);
     }
-    async createOrIncrementPopularity(concept: IConcept): Promise<IConcept> {
+    async createOrIncrementPopularity(concept: Concept): Promise<Concept> {
         const id = concept.id;
         let item = this.db.get(id);
         if (!item) {
@@ -177,8 +177,8 @@ export class MemoryConceptRepository implements IConceptRepository {
         return Promise.resolve(this.db.get(id));
     }
 
-    all(): Promise<IConcept[]> {
-        const array: IConcept[] = []
+    all(): Promise<Concept[]> {
+        const array: Concept[] = []
         for (let item of this.db.values()) {
             array.push(item);
         }

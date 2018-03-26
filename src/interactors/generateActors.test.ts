@@ -6,7 +6,7 @@ import { MemoryWikiEntityRepository } from './memoryWikiEntityRepository';
 import { ConceptHelper } from '../entities/conceptHelper';
 import { PushConcepts } from './pushConcepts';
 import { ILocale } from '../types';
-import { IActor } from '..';
+import { ConceptActor } from '..';
 
 test('ro-md', async t => {
     const conceptRepository = new MemoryConceptRepository();
@@ -22,7 +22,7 @@ test('ro-md', async t => {
 
     await pushConcepts.execute(concepts);
 
-    const onActor = (actor: IActor) => {
+    const onActor = (actor: ConceptActor) => {
         t.true(!!actor);
         t.true(actor.popularity > 0);
         t.true(actor.slug.length > 1);

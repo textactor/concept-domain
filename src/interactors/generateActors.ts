@@ -1,13 +1,13 @@
 
 import { UseCase } from '@textactor/domain';
-import { IActor } from '../entities';
+import { ConceptActor } from '../entities';
 import { ILocale } from '../types';
 import { IWikiEntityRepository } from './wikiEntityRepository';
 import { IConceptRepository } from './conceptRepository';
 import { BuildActor, GetPopularConceptNode, DeleteActorConcepts } from './actions';
 
 export interface OnGenerateActorCallback {
-    (actor: IActor): Promise<void>
+    (actor: ConceptActor): Promise<void>
 }
 
 export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void> {
@@ -24,7 +24,7 @@ export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void>
     }
 
     protected async innerExecute(callback: OnGenerateActorCallback): Promise<void> {
-        let actor: IActor;
+        let actor: ConceptActor;
 
         while (true) {
             try {

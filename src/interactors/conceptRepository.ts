@@ -1,6 +1,6 @@
 
 import { IWriteRepository, IReadRepository } from '@textactor/domain';
-import { IConcept } from '../entities/concept';
+import { Concept } from '../entities/concept';
 import { ILocale } from '../types';
 
 export type PopularConceptHash = {
@@ -9,21 +9,21 @@ export type PopularConceptHash = {
     popularity: number
 }
 
-export interface IConceptWriteRepository extends IWriteRepository<string, IConcept> {
+export interface IConceptWriteRepository extends IWriteRepository<string, Concept> {
     deleteUnpopular(locale: ILocale, popularity: number): Promise<number>
     deleteUnpopularAbbreviations(locale: ILocale, popularity: number): Promise<number>
     deleteUnpopularOneWorlds(locale: ILocale, popularity: number): Promise<number>
     deleteAll(locale: ILocale): Promise<number>
     deleteIds(ids: string[]): Promise<number>
     incrementPopularity(id: string): Promise<number>
-    createOrIncrementPopularity(concept: IConcept): Promise<IConcept>
+    createOrIncrementPopularity(concept: Concept): Promise<Concept>
 }
 
-export interface IConceptReadRepository extends IReadRepository<string, IConcept> {
-    getByNameHash(hash: string): Promise<IConcept[]>
-    getByRootNameHash(hash: string): Promise<IConcept[]>
+export interface IConceptReadRepository extends IReadRepository<string, Concept> {
+    getByNameHash(hash: string): Promise<Concept[]>
+    getByRootNameHash(hash: string): Promise<Concept[]>
     getPopularRootNameHashes(locale: ILocale, limit: number, skip?: number): Promise<PopularConceptHash[]>
-    list(locale: ILocale, limit: number, skip?: number): Promise<IConcept[]>
+    list(locale: ILocale, limit: number, skip?: number): Promise<Concept[]>
 }
 
 export interface IConceptRepository extends IConceptReadRepository, IConceptWriteRepository {

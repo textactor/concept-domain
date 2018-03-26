@@ -1,7 +1,7 @@
 
 import { md5 } from '../utils';
 import { NameHelper } from '@textactor/domain';
-import { IConcept } from './concept';
+import { Concept } from './concept';
 
 export interface IConceptText {
     lang: string
@@ -12,7 +12,7 @@ export interface IConceptText {
 
 export class ConceptHelper {
 
-    static create(data: IConceptText): IConcept {
+    static create(data: IConceptText): Concept {
 
         const lang = data.lang.trim().toLowerCase();
         const country = data.country.trim().toLowerCase();

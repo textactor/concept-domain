@@ -2,14 +2,14 @@
 import { UseCase } from "@textactor/domain";
 import { IConceptReadRepository } from "../conceptRepository";
 import { ILocale } from "../../types";
-import { IConcept } from "../../entities";
+import { Concept } from "../../entities";
 import { uniq } from "../../utils";
 
 export type PopularConceptNode = {
     hash: string
     ids: string[]
     popularity: number
-    topConcepts?: IConcept[]
+    topConcepts?: Concept[]
 }
 
 export class GetPopularConceptNode extends UseCase<null, PopularConceptNode, null> {

@@ -1,11 +1,11 @@
-import { IConcept } from "./concept";
-import { IWikiEntity, WikiEntityData } from "./wikiEntity";
-import { IActor } from "./actor";
+import { Concept } from "./concept";
+import { IWikiEntity, WikiEntityData, WikiEntityType } from "./wikiEntity";
+import { ConceptActor } from "./actor";
 import { NameHelper } from "@textactor/domain";
 import { md5, uniq } from "../utils";
 
 export class ActorHelper {
-    static create(concepts: IConcept[], entity?: IWikiEntity, concept?: IConcept): IActor {
+    static create(concepts: Concept[], entity?: IWikiEntity, concept?: Concept): ConceptActor {
 
         concept = concept || concepts[0];
 
@@ -16,7 +16,7 @@ export class ActorHelper {
         const id = md5([lang, country, slug].join('_'));
         const actorNameCountWords = name.split(/\s+/g).length;
 
-        const actor: IActor = {
+        const actor: ConceptActor = {
             id,
             name,
             lang,
@@ -34,12 +34,18 @@ export class ActorHelper {
                 actor.names.push(entity.wikiPageTitle);
             }
             actor.names = actor.names.concat(entity.names || []);
+            const lastname = entity.type === WikiEntityType.PERSON && ActorHelper.getLastname(entity.data, name);
+            if (lastname) {
+                actor.lastname = lastname;
+            }
             // set short name
             let shortName: string = actor.name;
             entity.names.forEach(item => {
                 const countWords = item.split(/\s+/g).length;
                 if (item && !NameHelper.isAbbr(item) && !NameHelper.endsWithNumberWord(item) && item.length < shortName.length && countWords < actorNameCountWords) {
-                    shortName = item;
+                    if (!lastname || lastname.toUpperCase() !== item.toString()) {
+                        shortName = item;
+                    }
                 }
             });
             if (shortName.length < actor.name.length) {

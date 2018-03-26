@@ -1,5 +1,5 @@
 
-export interface IConcept {
+export type Concept = {
     id: string
     lang: string
     country: string
