@@ -8,6 +8,7 @@ import { ILocale } from '../types';
 import { ExploreWikiEntitiesByTitles, SaveWikiEntities, FindWikiTitles } from './actions';
 import { IWikiEntityRepository } from './wikiEntityRepository';
 import { uniq } from '../utils';
+import { WikiEntityHelper } from '../entities/wikiEntityHelper';
 
 export class ExploreWikiEntities extends UseCase<void, void, void> {
     private exploreWikiEntitiesByTitles: ExploreWikiEntitiesByTitles;
@@ -15,7 +16,7 @@ export class ExploreWikiEntities extends UseCase<void, void, void> {
     private findWikiTitles: FindWikiTitles;
 
     constructor(private locale: ILocale, private conceptRepository: IConceptReadRepository,
-        wikiEntityRepository: IWikiEntityRepository) {
+        private wikiEntityRepository: IWikiEntityRepository) {
         super()
 
         this.exploreWikiEntitiesByTitles = new ExploreWikiEntitiesByTitles(locale);
@@ -52,6 +53,11 @@ export class ExploreWikiEntities extends UseCase<void, void, void> {
     }
 
     private async processConcept(concept: Concept): Promise<boolean> {
+        const existingWikiEntities = await this.wikiEntityRepository.getByNameHash(WikiEntityHelper.nameHash(concept.name, concept.lang));
+        if (existingWikiEntities.length) {
+            debug(`WikiEntity exists name=${concept.name}`);
+            return true;
+        }
         const titles = await this.findWikiTitles.execute([concept.name]);
         if (!titles.length) {
             return false;
