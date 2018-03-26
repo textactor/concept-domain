@@ -36,7 +36,7 @@ export class ExploreWikiEntitiesByTitles extends UseCase<string[], WikiEntity[],
 
         let entities = wikiEntities.map(item => WikiEntityHelper.convert(item, this.locale.lang));
 
-        entities.filter(item => !WikiEntityHelper.isDisambiguation(item));
+        entities = entities.filter(item => !WikiEntityHelper.isDisambiguation(item));
 
         return entities;
     }

@@ -1,4 +1,6 @@
 
+const debug = require('debug')('textactor:concept-domain');
+
 import { UseCase, NameHelper, uniq } from "@textactor/domain";
 import { WikiEntity, Concept } from "../../entities";
 import { IWikiEntityReadRepository } from "../wikiEntityRepository";
@@ -70,9 +72,9 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
 
         if (concept.isAbbr && concept.contextName) {
             if (!entities.find(item => item.countryCode === concept.country)) {
-                console.log(`finding by contextName: ${concept.contextName}`)
+                debug(`finding by contextName: ${concept.contextName}`)
                 const list = await this.wikiEntityRepository.getByNameHash(WikiEntityHelper.nameHash(concept.contextName, this.locale.lang));
-                console.log(`found by contextName: ${list.map(item => item.name)}`)
+                debug(`found by contextName: ${list.map(item => JSON.stringify(item))}`);
                 entities = entities.concat(list);
             }
         }

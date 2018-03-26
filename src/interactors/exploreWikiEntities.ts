@@ -46,6 +46,7 @@ export class ExploreWikiEntities extends UseCase<void, void, void> {
             for (let concept of concepts) {
                 names.push(concept.name);
                 if (concept.contextName) {
+                    debug(`exploring wiki entity by context name: ${concept.contextName}`);
                     names.push(concept.contextName);
                 }
             }
@@ -70,6 +71,7 @@ export class ExploreWikiEntities extends UseCase<void, void, void> {
         }
 
         const wikiEntities = await this.exploreWikiEntitiesByTitles.execute(titles);
+
         if (!wikiEntities.length) {
             return false;
         }
