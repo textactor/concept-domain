@@ -39,7 +39,7 @@ export class ActorHelper {
             entity.names.forEach(item => {
                 const countWords = item.split(/\s+/g).length;
                 if (item && !NameHelper.isAbbr(item) && !NameHelper.endsWithNumberWord(item) && item.length < shortName.length && countWords < actorNameCountWords) {
-                    if (!entity.lastname || entity.lastname.toUpperCase() !== item.toString()) {
+                    if (!entity.lastname || entity.lastname.toLowerCase() !== item.toLowerCase()) {
                         shortName = item;
                     }
                 }
