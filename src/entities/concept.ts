@@ -23,7 +23,6 @@ export type Concept = {
     isAbbr?: boolean
     createdAt?: number
 
-    contextAbbr?: string
     contextName?: string
 }
 

@@ -103,14 +103,14 @@ export class ConceptHelper {
         return ConceptHelper.hash(name, lang, country);
     }
 
-    public static setConceptsContextAbbr(concepts: Concept[]) {
+    public static setConceptsContextName(concepts: Concept[]) {
         const abbreviations = concepts.filter(item => !!item.isAbbr);
         for (let concept of concepts) {
-            if (!concept.isAbbr && concept.countWords > 2 && !concept.endsWithNumber && !concept.abbr && !concept.contextAbbr) {
+            if (!concept.isAbbr && concept.countWords > 2 && !concept.endsWithNumber && !concept.abbr) {
                 for (let abbr of abbreviations) {
                     if (isAbbrOf(abbr.name, concept.name)) {
-                        concept.contextAbbr = abbr.name;
-                        abbr.contextName = concept.name;
+                        concept.contextName = concept.contextName || abbr.name;
+                        abbr.contextName = abbr.contextName || concept.name;
                     }
                 }
             }

@@ -44,16 +44,16 @@ test('#rootName', t => {
     t.is(ConceptHelper.rootName('Владимира Путина', 'ru'), 'Владимир Путин');
 })
 
-test('#setConceptsContextAbbr', t => {
+test('#setConceptsContextName', t => {
     const concepts = [
         { text: 'Moldova 1', lang: 'ro', country: 'md', abbr: 'M1' },
         { text: 'Comisia Electorala Centrala', lang: 'ro', country: 'md' },
         { text: 'CEC', lang: 'ro', country: 'md' },
     ].map(item => ConceptHelper.create(item));
 
-    ConceptHelper.setConceptsContextAbbr(concepts)
+    ConceptHelper.setConceptsContextName(concepts)
 
-    t.is(concepts[0].contextAbbr, undefined);
-    t.is(concepts[1].contextAbbr, 'CEC');
-    t.is(concepts[2].contextAbbr, undefined);
+    t.is(concepts[0].contextName, undefined);
+    t.is(concepts[1].contextName, 'CEC');
+    t.is(concepts[2].contextName, undefined);
 })

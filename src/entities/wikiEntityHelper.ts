@@ -2,6 +2,7 @@
 import { WikiEntity as ExternWikiEntity, convertToSimpleEntity, SimpleEntityType } from 'wiki-entity';
 import { WikiEntityType, WikiEntity } from './wikiEntity';
 import { NameHelper, uniq, md5 } from '@textactor/domain';
+import { ConceptHelper } from '.';
 
 export class WikiEntityHelper {
 
@@ -36,10 +37,7 @@ export class WikiEntityHelper {
         if (simpleEntity.type) {
             entity.type = WikiEntityHelper.convertSimpleEntityType(simpleEntity.type);
 
-            const lastname = entity.type === WikiEntityType.PERSON && WikiEntityHelper.getLastname(entity.name);
-            if (lastname) {
-                entity.lastname = lastname;
-            }
+            entity.partialName = WikiEntityHelper.getPartialName(entity);
         }
 
         if (simpleEntity.abbr) {
@@ -86,7 +84,7 @@ export class WikiEntityHelper {
             if (sname) {
                 return sname.simple;
             }
-        }).filter(name => !!name);
+        }).filter(name => !!name && name.trim().split(/\s+/g).length > 1);
 
         entity.names = entity.names.concat(simpleNames);
         entity.names = entity.names.filter(name => name.trim().length > 1);
@@ -98,6 +96,20 @@ export class WikiEntityHelper {
         entity.namesHashes = uniq(entity.namesHashes);
 
         return entity;
+    }
+
+    static getPartialName(entity: WikiEntity): string {
+        let name: string;
+        switch (entity.type) {
+            case WikiEntityType.PERSON:
+                name = WikiEntityHelper.getLastname(entity.name);
+        }
+
+        if (!name || name.trim().length < 2) {
+            return;
+        }
+
+        return ConceptHelper.normalizeName(name, entity.lang);
     }
 
     static nameHash(name: string, lang: string) {

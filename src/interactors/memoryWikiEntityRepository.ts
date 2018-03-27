@@ -10,7 +10,7 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
     getByLastName(lastname: string, lang: string): Promise<WikiEntity[]> {
         const list: WikiEntity[] = [];
         for (let item of this.db.values()) {
-            if (item.lang === lang && item.lastname === lastname) {
+            if (item.lang === lang && item.partialName === lastname) {
                 list.push(item);
             }
         }

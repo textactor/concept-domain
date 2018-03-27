@@ -38,5 +38,5 @@ export type WikiEntity = {
      * Permanent redirect to entity id
      */
     redirectId?: string
-    lastname?: string
+    partialName?: string
 }

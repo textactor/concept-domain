@@ -63,5 +63,5 @@ test('lastname', async t => {
     t.is(entity.name, wikiEntity.label)
     t.is(entity.type, WikiEntityType.PERSON)
     t.is(entity.countryCode, 'us')
-    t.is(entity.lastname, 'Bauer')
+    t.is(entity.partialName, 'Bauer')
 })
