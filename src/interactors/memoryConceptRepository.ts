@@ -8,6 +8,20 @@ export class MemoryConceptRepository implements IConceptRepository {
 
     private db: Map<string, Concept> = new Map()
 
+    deleteByNameHash(hashes: string[]): Promise<number> {
+        let count = 0;
+        for (let hash of hashes) {
+            const list = this.filterByFieldValue('nameHash', hash);
+            count += list.length;
+
+            for (let item of list) {
+                this.db.delete(item.id);
+            }
+        }
+
+        return Promise.resolve(count);
+    }
+
     list(locale: Locale, limit: number, skip?: number): Promise<Concept[]> {
         skip = skip || 0;
         const list: Concept[] = []

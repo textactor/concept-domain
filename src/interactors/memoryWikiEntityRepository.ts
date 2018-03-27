@@ -5,21 +5,22 @@ import { RepUpdateData } from '@textactor/domain';
 
 
 export class MemoryWikiEntityRepository implements IWikiEntityRepository {
+
     private db: Map<string, WikiEntity> = new Map()
 
-    getByLastName(lastname: string, lang: string): Promise<WikiEntity[]> {
-        const list: WikiEntity[] = [];
+    count(): Promise<number> {
+        return Promise.resolve(this.db.size);
+    }
+
+    getByPartialNameHash(hash: string): Promise<WikiEntity[]> {
+        const list: WikiEntity[] = []
         for (let item of this.db.values()) {
-            if (item.lang === lang && item.partialName === lastname) {
-                list.push(item);
+            if (~item.partialNamesHashes.indexOf(hash)) {
+                list.push(item)
             }
         }
 
         return Promise.resolve(list);
-    }
-
-    count(): Promise<number> {
-        return Promise.resolve(this.db.size);
     }
 
     getByNameHash(hash: string): Promise<WikiEntity[]> {

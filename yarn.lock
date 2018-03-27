@@ -2164,6 +2164,10 @@ parse-ms@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/parse-ms/-/parse-ms-1.0.1.tgz#56346d4749d78f23430ca0c713850aef91aa361d"
 
+partial-name@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/partial-name/-/partial-name-0.1.2.tgz#ccdd85b4a227e4d106222b964dcff4faf51c522d"
+
 path-exists@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/path-exists/-/path-exists-2.1.0.tgz#0feb6c64f0fc518d9a754dd5efb62c7022761f4b"

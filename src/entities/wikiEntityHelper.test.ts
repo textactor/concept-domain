@@ -47,7 +47,7 @@ test('#isDisambiguation', async t => {
 test('#getLastname', t => {
     t.is(WikiEntityHelper.getLastname(null), undefined);
     t.is(WikiEntityHelper.getLastname('Bauer'), undefined);
-    t.is(WikiEntityHelper.getLastname( 'Kim Bauer'), 'Bauer');
+    t.is(WikiEntityHelper.getLastname('Kim Bauer'), 'Bauer');
 })
 
 test('lastname', async t => {
@@ -63,5 +63,5 @@ test('lastname', async t => {
     t.is(entity.name, wikiEntity.label)
     t.is(entity.type, WikiEntityType.PERSON)
     t.is(entity.countryCode, 'us')
-    t.is(entity.partialName, 'Bauer')
+    t.is(entity.lastname, 'Bauer')
 })

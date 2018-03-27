@@ -24,5 +24,8 @@ export type Concept = {
     createdAt?: number
 
     contextName?: string
-}
+    partialName?: string
 
+    contextNameHash?: string
+    partialNameHash?: string
+}

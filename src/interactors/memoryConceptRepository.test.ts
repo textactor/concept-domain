@@ -87,3 +87,13 @@ test('#deleteUnpopular', async t => {
     t.is(popularHashes[0].popularity, 2);
     t.is(popularHashes[0].ids.length, 1);
 })
+
+test('#deleteByNameHash', async t => {
+    const repository = new MemoryConceptRepository();
+
+    const concept1 = ConceptHelper.create({ text: 'Владимир Путин', country: 'ru', lang: 'ru' });
+    await repository.deleteByNameHash([concept1.nameHash]);
+    const concepts = await repository.getByNameHash(concept1.nameHash);
+
+    t.is(concepts.length, 0);
+})

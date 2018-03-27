@@ -15,6 +15,7 @@ export interface IConceptWriteRepository extends IWriteRepository<string, Concep
     deleteUnpopularOneWorlds(locale: Locale, popularity: number): Promise<number>
     deleteAll(locale: Locale): Promise<number>
     deleteIds(ids: string[]): Promise<number>
+    deleteByNameHash(hashes: string[]): Promise<number>
     incrementPopularity(id: string): Promise<number>
     createOrIncrementPopularity(concept: Concept): Promise<Concept>
 }

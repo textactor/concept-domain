@@ -2,6 +2,7 @@
 import { NameHelper, md5 } from '@textactor/domain';
 import { Concept } from './concept';
 import * as isAbbrOf from 'is-abbr-of';
+import { partialName as getPartialName } from 'partial-name';
 
 export type CreatingConceptData = {
     lang: string
@@ -35,7 +36,7 @@ export class ConceptHelper {
 
         const popularity = 1;
 
-        return {
+        const concept: Concept = {
             id,
             country,
             lang,
@@ -52,7 +53,15 @@ export class ConceptHelper {
             normalRootName,
             rootNameHash,
             popularity,
+        };
+
+        const partialName = getPartialName(name, { lang });
+        if (partialName && partialName.split(/\s+/g).length > 1) {
+            concept.partialName = partialName;
+            concept.partialNameHash = ConceptHelper.nameHash(concept.partialName, lang, country);
         }
+
+        return concept;
     }
 
     public static rootName(name: string, lang: string) {
@@ -110,7 +119,10 @@ export class ConceptHelper {
                 for (let abbr of abbreviations) {
                     if (isAbbrOf(abbr.name, concept.name)) {
                         concept.contextName = concept.contextName || abbr.name;
+                        concept.contextNameHash = ConceptHelper.nameHash(concept.contextName, concept.lang, concept.country);
+
                         abbr.contextName = abbr.contextName || concept.name;
+                        abbr.contextNameHash = ConceptHelper.nameHash(abbr.contextName, concept.lang, concept.country);
                     }
                 }
             }

@@ -10,11 +10,12 @@ export type ConceptActor = {
     slug: string
     name: string
     names?: string[]
-    shortName?: string
     abbr?: string
     
     wikiEntity?: WikiEntity
     concepts?: Concept[]
 
     popularity?: number
+
+    partialNames?: string[]
 }

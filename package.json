@@ -44,6 +44,7 @@
     "@textactor/domain": "^0.1.2",
     "entity-finder": "^0.5.1",
     "is-abbr-of": "^0.1.0",
+    "partial-name": "^0.1.2",
     "wiki-entity": "^0.3.1"
   }
 }

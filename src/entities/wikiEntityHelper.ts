@@ -2,7 +2,7 @@
 import { WikiEntity as ExternWikiEntity, convertToSimpleEntity, SimpleEntityType } from 'wiki-entity';
 import { WikiEntityType, WikiEntity } from './wikiEntity';
 import { NameHelper, uniq, md5 } from '@textactor/domain';
-import { ConceptHelper } from '.';
+import { partialName as getPartialName } from 'partial-name';
 
 export class WikiEntityHelper {
 
@@ -37,7 +37,9 @@ export class WikiEntityHelper {
         if (simpleEntity.type) {
             entity.type = WikiEntityHelper.convertSimpleEntityType(simpleEntity.type);
 
-            entity.partialName = WikiEntityHelper.getPartialName(entity);
+            if (entity.type === WikiEntityType.PERSON) {
+                entity.lastname = WikiEntityHelper.getLastname(name);
+            }
         }
 
         if (simpleEntity.abbr) {
@@ -75,18 +77,19 @@ export class WikiEntityHelper {
             }
         }
 
-        if (entity.simpleName && entity.simpleName.split(/\s+/g).length > 1) {
-            entity.names.push(entity.simpleName);
-        }
+        // if (entity.simpleName && entity.simpleName.split(/\s+/g).length > 1) {
+        //     entity.names.push(entity.simpleName);
+        // }
 
-        const simpleNames = entity.names.map(name => {
-            const sname = WikiEntityHelper.splitName(name);
-            if (sname) {
-                return sname.simple;
-            }
-        }).filter(name => !!name && name.trim().split(/\s+/g).length > 1);
+        // const simpleNames = entity.names.map(name => {
+        //     const sname = WikiEntityHelper.splitName(name);
+        //     if (sname) {
+        //         return sname.simple;
+        //     }
+        // }).filter(name => !!name && name.trim().split(/\s+/g).length > 1);
 
-        entity.names = entity.names.concat(simpleNames);
+        // entity.names = entity.names.concat(simpleNames);
+
         entity.names = entity.names.filter(name => name.trim().length > 1);
         entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
 
@@ -95,22 +98,39 @@ export class WikiEntityHelper {
         entity.namesHashes = entity.names.map(item => WikiEntityHelper.nameHash(item, lang));
         entity.namesHashes = uniq(entity.namesHashes);
 
+        entity.partialNames = entity.names.map(name => getPartialName(name, { lang }))
+            .filter(name => !!name && name.trim().split(/\s+/g).length > 1);
+        entity.partialNames = uniq(entity.partialNames);
+
+        if (entity.partialNames.length) {
+            for (let name of entity.names) {
+                const index = entity.partialNames.indexOf(name);
+                if (~index) {
+                    entity.partialNames.splice(index, 1);
+                }
+            }
+        }
+
+        entity.partialNamesHashes = entity.partialNames.map(name => WikiEntityHelper.nameHash(name, lang));
+        entity.partialNamesHashes = uniq(entity.partialNamesHashes);
+
         return entity;
     }
 
-    static getPartialName(entity: WikiEntity): string {
-        let name: string;
-        switch (entity.type) {
-            case WikiEntityType.PERSON:
-                name = WikiEntityHelper.getLastname(entity.name);
-        }
+    // static getLastname(entity: WikiEntity): string {
+    //     let name: string;
+    //     switch (entity.type) {
+    //         case WikiEntityType.PERSON:
+    //             name = WikiEntityHelper.getLastname(entity.name);
+    //             break;
+    //     }
 
-        if (!name || name.trim().length < 2) {
-            return;
-        }
+    //     if (!name || name.trim().length < 2) {
+    //         return;
+    //     }
 
-        return ConceptHelper.normalizeName(name, entity.lang);
-    }
+    //     return ConceptHelper.normalizeName(name, entity.lang);
+    // }
 
     static nameHash(name: string, lang: string) {
         lang = lang.trim().toLowerCase();
@@ -157,16 +177,20 @@ export class WikiEntityHelper {
 
     static getLastname(name: string): string {
 
-        if (!name) {
+        if (!name || name.indexOf('(') > -1) {
             return;
         }
 
-        const nameParts = name.split(/\s+/g);
+        const nameParts = name.trim().split(/\s+/g);
 
-        if (nameParts.length < 2) {
+        if (nameParts.length !== 2) {
             return;
         }
 
-        return nameParts.slice(1).join(' ');
+        const lastname = nameParts.slice(1).join(' ');
+
+        if (!NameHelper.isAbbr(lastname) && !NameHelper.isIrregular(lastname)) {
+            return lastname;
+        }
     }
 }

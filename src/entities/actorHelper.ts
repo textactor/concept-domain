@@ -4,7 +4,7 @@ import { ConceptActor } from "./actor";
 import { NameHelper, uniq, md5 } from "@textactor/domain";
 
 export class ActorHelper {
-    static create(concepts: Concept[], entity?: WikiEntity, concept?: Concept): ConceptActor {
+    static create(concepts: Concept[], entity?: WikiEntity, additionalNames?: string[], concept?: Concept): ConceptActor {
 
         concept = concept || concepts[0];
 
@@ -13,7 +13,6 @@ export class ActorHelper {
         const name = entity && (entity.simpleName || entity.name) || concept.name;
         const slug = NameHelper.slug((entity && entity.name || concept.name).toLowerCase());
         const id = md5([lang, country, slug].join('_'));
-        const actorNameCountWords = name.split(/\s+/g).length;
 
         const actor: ConceptActor = {
             id,
@@ -33,19 +32,7 @@ export class ActorHelper {
                 actor.names.push(entity.wikiPageTitle);
             }
             actor.names = actor.names.concat(entity.names || []);
-            // set short name
-            let shortName: string = actor.name;
-            entity.names.forEach(item => {
-                const countWords = item.split(/\s+/g).length;
-                if (item && !NameHelper.isAbbr(item) && !NameHelper.endsWithNumberWord(item) && item.length < shortName.length && countWords < actorNameCountWords) {
-                    if (!entity.partialName || entity.partialName.toLowerCase() !== item.toLowerCase()) {
-                        shortName = item;
-                    }
-                }
-            });
-            if (shortName.length < actor.name.length) {
-                actor.shortName = shortName;
-            }
+
             // set abbreviation
             entity.abbr = entity.names.find(item => NameHelper.isAbbr(item));
         }
@@ -60,6 +47,11 @@ export class ActorHelper {
 
         actor.names = actor.names.concat(concepts.map(item => item.name));
         actor.names.push(concept.name);
+
+        if (additionalNames) {
+            actor.names = actor.names.concat(additionalNames);
+            actor.partialNames = additionalNames;
+        }
 
         actor.names = uniq(actor.names);
 

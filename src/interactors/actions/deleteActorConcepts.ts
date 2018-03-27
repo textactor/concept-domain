@@ -1,7 +1,7 @@
 
 import { UseCase } from "@textactor/domain";
 import { IConceptWriteRepository } from "../conceptRepository";
-import { ConceptActor } from "../../entities";
+import { ConceptActor, ConceptHelper } from "../../entities";
 
 export class DeleteActorConcepts extends UseCase<ConceptActor, ConceptActor, void> {
 
@@ -13,6 +13,10 @@ export class DeleteActorConcepts extends UseCase<ConceptActor, ConceptActor, voi
 
         const ids = actor.concepts.map(item => item.id);
         await this.conceptRepository.deleteIds(ids);
+
+        if (actor.partialNames && actor.partialNames.length) {
+            await this.conceptRepository.deleteIds(actor.partialNames.map(name => ConceptHelper.id(name, actor.lang, actor.country)));
+        }
 
         return actor;
     }

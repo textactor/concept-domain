@@ -1,7 +1,7 @@
 
 const debug = require('debug')('textactor:concept-domain');
 
-import { UseCase, NameHelper, uniq } from "@textactor/domain";
+import { UseCase, uniq, NameHelper, seriesPromise } from "@textactor/domain";
 import { WikiEntity, Concept } from "../../entities";
 import { IWikiEntityReadRepository } from "../wikiEntityRepository";
 import { IConceptReadRepository } from "../conceptRepository";
@@ -23,7 +23,8 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
 
     protected async innerExecute(node: PopularConceptNode): Promise<ConceptActor> {
 
-        const wikiEntity = await this.findPerfectWikiEntity(node.topConcepts);
+        const wikiEntityNames = await this.findPerfectWikiEntity(node.topConcepts);
+        const wikiEntity = wikiEntityNames && wikiEntityNames.entity;
 
         const nodeConcepts = await this.conceptRepository.getByIds(node.ids);
 
@@ -31,6 +32,7 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
 
         if (wikiEntity) {
             names = names.concat(wikiEntity.names);
+            names = names.concat(wikiEntityNames.names);
         }
 
         names = uniq(names);
@@ -45,98 +47,93 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
 
         let allConcepts: Concept[] = []
 
-        for (let nameHash of rootNamesHashes) {
-            const concepts = await this.conceptRepository.getByRootNameHash(nameHash);
-            allConcepts = allConcepts.concat(concepts);
-        }
+        await seriesPromise(rootNamesHashes, nameHash => this.conceptRepository.getByRootNameHash(nameHash)
+            .then(concepts => allConcepts = allConcepts.concat(concepts)));
 
         allConcepts = uniqProp(allConcepts, 'id');
         allConcepts = allConcepts.sort((a, b) => b.popularity - a.popularity);
 
-        const actor = ActorHelper.create(allConcepts, wikiEntity, node.topConcepts[0]);
+        const actor = ActorHelper.create(allConcepts, wikiEntity, wikiEntityNames && wikiEntityNames.names, node.topConcepts[0]);
 
         return actor;
     }
 
-    private async findPerfectWikiEntity(concepts: Concept[]): Promise<WikiEntity> {
+    private async findPerfectWikiEntity(concepts: Concept[]): Promise<WikiEntityNames> {
         const concept = concepts[0];
         let nameHashes = concepts.map(item => WikiEntityHelper.nameHash(item.name, this.locale.lang));
         nameHashes = uniq(nameHashes);
 
-        let entities: WikiEntity[] = []
+        let entities: WikiEntityNames[] = []
 
-        for (let nameHash of nameHashes) {
-            const list = await this.wikiEntityRepository.getByNameHash(nameHash);
-            entities = entities.concat(list);
-        }
+        seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByNameHash(nameHash)
+            .then(list => entities = entities.concat(list.map(entity => ({ entity, names: [] })))));
 
         if (concept.isAbbr && concept.contextName) {
-            if (!entities.find(item => item.countryCode === concept.country)) {
+            if (this.getCountryWikiEntities(entities).length === 0) {
                 debug(`finding by contextName: ${concept.contextName}`)
                 const list = await this.wikiEntityRepository.getByNameHash(WikiEntityHelper.nameHash(concept.contextName, this.locale.lang));
-                debug(`found by contextName: ${list.map(item => JSON.stringify(item))}`);
+                debug(`found by contextName: ${list.map(item => item.name)}`);
+                entities = entities.concat(list.map(entity => ({ entity, names: [concept.contextName] })));
+            }
+        }
+
+        if (this.getCountryWikiEntities(entities).length === 0) {
+            const names = [concept.name, concept.contextName].filter(name => !!name && !NameHelper.isAbbr(name));
+            if (names.length) {
+                debug(`finding by partial names: ${JSON.stringify(names)}`);
+                let list: WikiEntityNames[] = [];
+                await seriesPromise(names, name => this.wikiEntityRepository.getByPartialNameHash(WikiEntityHelper.nameHash(name, this.locale.lang))
+                    .then(results => list = list.concat(results.map(entity => ({ entity, names: [name] })))));
+                debug(`found by partial names: ${list.map(item => item.entity.name)}`);
                 entities = entities.concat(list);
             }
         }
 
-        if (entities.length === 0) {
-            if (concept.countWords === 1 && !concept.isAbbr) {
-                const list = await this.wikiEntityRepository.getByLastName(concept.name, this.locale.lang);
-                entities = entities.concat(list);
-            }
-
-            if (entities.length === 0) {
-                const fullNames = entityFullNames(concept.name, this.locale.country, this.locale.lang);
-                if (fullNames && fullNames.length) {
-                    nameHashes = fullNames.map(item => WikiEntityHelper.nameHash(item, this.locale.lang));
-                    for (let nameHash of nameHashes) {
-                        const list = await this.wikiEntityRepository.getByNameHash(nameHash);
-                        entities = entities.concat(list);
-                    }
+        const entitiesMap: Map<string, WikiEntityNames> = new Map();
+        for (let entityName of entities) {
+            const existingItem = entitiesMap.get(entityName.entity.id);
+            if (existingItem) {
+                if (entityName.names.length) {
+                    existingItem.names = existingItem.names.concat(entityName.names);
                 }
+            } else {
+                entitiesMap.set(entityName.entity.id, entityName);
             }
         }
 
-        entities = uniqProp(entities, 'id');
+        entities = [];
+        for (let item of entitiesMap.values()) {
+            entities.push(item);
+        }
+
         entities = this.sortWikiEntities(entities);
 
         return entities[0];
     }
 
-    private sortWikiEntities(entities: WikiEntity[]): WikiEntity[] {
-        entities = entities.sort((a, b) => b.rank - a.rank);
+    private getCountryWikiEntities(entities: WikiEntityNames[]): WikiEntityNames[] {
+        return entities.filter(item => item.entity.countryCode === this.locale.country);
+    }
 
-        const countryEntities = entities.filter(item => item.countryCode === this.locale.country);
-        entities = countryEntities.concat(entities);
+    private sortWikiEntities(entities: WikiEntityNames[]): WikiEntityNames[] {
+        if (!entities.length) {
+            return entities;
+        }
+
+        entities = entities.sort((a, b) => b.entity.rank - a.entity.rank);
+
+        const topEntity = entities[0];
+
+        const countryEntities = entities.filter(item => item.entity.countryCode === this.locale.country);
+        if (countryEntities.length && countryEntities[0].entity.rank > topEntity.entity.rank / 2) {
+            entities = countryEntities.concat(entities);
+        }
 
         return uniq(entities);
     }
 }
 
-function entityFullNames(name: string, country: string, lang: string): string[] {
-
-    const countrySuffixes: { [country: string]: { [lang: string]: string[] } } = {
-        md: {
-            ro: [' din Repoblica Moldova', ' al Republicii Moldova', ' din Moldova'],
-        },
-    };
-
-    const countryAbbrSuffixes: { [country: string]: { [lang: string]: string[] } } = {
-        md: {
-            ro: ['RM', 'M'],
-        },
-    };
-
-    if (NameHelper.isAbbr(name)) {
-        if (countryAbbrSuffixes[country] && countryAbbrSuffixes[country][lang]) {
-            return countryAbbrSuffixes[country][lang].map(item => name + item);
-        }
-        return [];
-    }
-
-    if (countrySuffixes[country] && countrySuffixes[country][lang]) {
-        return countrySuffixes[country][lang].map(item => name + item);
-    }
-
-    return [];
+type WikiEntityNames = {
+    entity: WikiEntity
+    names: string[]
 }

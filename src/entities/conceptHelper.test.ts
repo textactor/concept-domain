@@ -55,5 +55,5 @@ test('#setConceptsContextName', t => {
 
     t.is(concepts[0].contextName, undefined);
     t.is(concepts[1].contextName, 'CEC');
-    t.is(concepts[2].contextName, undefined);
+    t.is(concepts[2].contextName, 'Comisia Electorala Centrala');
 })
