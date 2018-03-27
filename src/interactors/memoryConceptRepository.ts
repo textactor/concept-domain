@@ -1,6 +1,6 @@
 
 import { Concept } from '../entities/concept';
-import { ILocale } from '../types';
+import { Locale } from '../types';
 import { IConceptRepository, PopularConceptHash } from './conceptRepository';
 import { RepUpdateData } from '@textactor/domain';
 
@@ -8,7 +8,7 @@ export class MemoryConceptRepository implements IConceptRepository {
 
     private db: Map<string, Concept> = new Map()
 
-    list(locale: ILocale, limit: number, skip?: number): Promise<Concept[]> {
+    list(locale: Locale, limit: number, skip?: number): Promise<Concept[]> {
         skip = skip || 0;
         const list: Concept[] = []
         for (let item of this.db.values()) {
@@ -74,7 +74,7 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(list);
     }
-    getPopularRootNameHashes(locale: ILocale, limit: number, skip?: number): Promise<PopularConceptHash[]> {
+    getPopularRootNameHashes(locale: Locale, limit: number, skip?: number): Promise<PopularConceptHash[]> {
         skip = skip || 0;
         const map: { [hash: string]: { popularity: number, ids: string[] } } = {}
 
@@ -96,7 +96,7 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(list);
     }
-    deleteUnpopular(locale: ILocale, popularity: number): Promise<number> {
+    deleteUnpopular(locale: Locale, popularity: number): Promise<number> {
         let count = 0;
         for (let item of this.db.values()) {
             if (item.country !== locale.country || item.lang !== locale.lang) {
@@ -109,7 +109,7 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(count);
     }
-    deleteUnpopularAbbreviations(locale: ILocale, popularity: number): Promise<number> {
+    deleteUnpopularAbbreviations(locale: Locale, popularity: number): Promise<number> {
         let count = 0;
         for (let item of this.db.values()) {
             if (item.country !== locale.country || item.lang !== locale.lang) {
@@ -122,7 +122,7 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(count);
     }
-    deleteUnpopularOneWorlds(locale: ILocale, popularity: number): Promise<number> {
+    deleteUnpopularOneWorlds(locale: Locale, popularity: number): Promise<number> {
         let count = 0;
         for (let item of this.db.values()) {
             if (item.country !== locale.country || item.lang !== locale.lang) {
@@ -135,7 +135,7 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(count);
     }
-    deleteAll(locale: ILocale): Promise<number> {
+    deleteAll(locale: Locale): Promise<number> {
         let count = 0;
         for (let item of this.db.values()) {
             if (item.country !== locale.country || item.lang !== locale.lang) {

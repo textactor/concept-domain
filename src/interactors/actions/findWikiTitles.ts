@@ -2,13 +2,13 @@
 const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase, uniq } from "@textactor/domain";
-import { ILocale } from "../../types";
+import { Locale } from "../../types";
 import { findTitles } from 'entity-finder';
 import { delay } from "../../utils";
 
 export class FindWikiTitles extends UseCase<string[], string[], null> {
 
-    constructor(private locale: ILocale) {
+    constructor(private locale: Locale) {
         super()
     }
 
@@ -34,7 +34,7 @@ export class FindWikiTitles extends UseCase<string[], string[], null> {
     }
 }
 
-function getWikiTitleTags(locale: ILocale) {
+function getWikiTitleTags(locale: Locale) {
     if (LOCALE_COUNTRY_TAGS[locale.country]) {
         return LOCALE_COUNTRY_TAGS[locale.country][locale.lang];
     }

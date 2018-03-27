@@ -2,14 +2,14 @@
 const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase } from "@textactor/domain";
-import { ILocale } from "../../types";
+import { Locale } from "../../types";
 import { WikiEntity } from "../../entities/wikiEntity";
 import { getEntities } from 'wiki-entity';
 import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
 
 export class ExploreWikiEntitiesByTitles extends UseCase<string[], WikiEntity[], null> {
 
-    constructor(private locale: ILocale) {
+    constructor(private locale: Locale) {
         super()
     }
 

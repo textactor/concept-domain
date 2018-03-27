@@ -1,6 +1,6 @@
 import { UseCase } from "@textactor/domain";
 import { IConceptWriteRepository } from "./conceptRepository";
-import { ILocale } from "../types";
+import { Locale } from "../types";
 
 export interface DeleteUnpopularConceptsOptions {
     minConceptPopularity?: number
@@ -8,13 +8,13 @@ export interface DeleteUnpopularConceptsOptions {
     minOneWordConceptPopularity?: number
 }
 
-export class DeleteUnpopularConcepts extends UseCase<ILocale, void, DeleteUnpopularConceptsOptions> {
+export class DeleteUnpopularConcepts extends UseCase<Locale, void, DeleteUnpopularConceptsOptions> {
 
     constructor(private repository: IConceptWriteRepository) {
         super()
     }
 
-    protected async innerExecute(locale: ILocale, options?: DeleteUnpopularConceptsOptions): Promise<void> {
+    protected async innerExecute(locale: Locale, options?: DeleteUnpopularConceptsOptions): Promise<void> {
 
         options = Object.assign({
             minConceptPopularity: 10,

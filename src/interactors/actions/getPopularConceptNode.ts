@@ -1,7 +1,7 @@
 
 import { UseCase, uniq } from "@textactor/domain";
 import { IConceptReadRepository } from "../conceptRepository";
-import { ILocale } from "../../types";
+import { Locale } from "../../types";
 import { Concept } from "../../entities";
 
 export type PopularConceptNode = {
@@ -13,7 +13,7 @@ export type PopularConceptNode = {
 
 export class GetPopularConceptNode extends UseCase<null, PopularConceptNode, null> {
 
-    constructor(private locale: ILocale, private conceptRepository: IConceptReadRepository) {
+    constructor(private locale: Locale, private conceptRepository: IConceptReadRepository) {
         super()
     }
 

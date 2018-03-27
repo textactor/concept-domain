@@ -3,7 +3,7 @@ const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase, uniq, seriesPromise } from '@textactor/domain';
 import { IConceptReadRepository } from './conceptRepository';
-import { ILocale } from '../types';
+import { Locale } from '../types';
 import { ExploreWikiEntitiesByTitles, SaveWikiEntities, FindWikiTitles } from './actions';
 import { IWikiEntityRepository } from './wikiEntityRepository';
 import { WikiEntityHelper } from '../entities/wikiEntityHelper';
@@ -13,7 +13,7 @@ export class ExploreWikiEntities extends UseCase<void, void, void> {
     private saveWikiEntities: SaveWikiEntities;
     private findWikiTitles: FindWikiTitles;
 
-    constructor(private locale: ILocale, private conceptRepository: IConceptReadRepository,
+    constructor(private locale: Locale, private conceptRepository: IConceptReadRepository,
         private wikiEntityRepository: IWikiEntityRepository) {
         super()
 

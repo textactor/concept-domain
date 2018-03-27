@@ -5,7 +5,7 @@ import { UseCase, NameHelper, uniq } from "@textactor/domain";
 import { WikiEntity, Concept } from "../../entities";
 import { IWikiEntityReadRepository } from "../wikiEntityRepository";
 import { IConceptReadRepository } from "../conceptRepository";
-import { ILocale } from "../../types";
+import { Locale } from "../../types";
 import { PopularConceptNode } from "./getPopularConceptNode";
 import { ConceptActor } from "../../entities/actor";
 import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
@@ -17,7 +17,7 @@ import { ConceptHelper } from "../../entities/conceptHelper";
 
 export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> {
 
-    constructor(private locale: ILocale, private wikiEntityRepository: IWikiEntityReadRepository, private conceptRepository: IConceptReadRepository) {
+    constructor(private locale: Locale, private wikiEntityRepository: IWikiEntityReadRepository, private conceptRepository: IConceptReadRepository) {
         super()
     }
 
