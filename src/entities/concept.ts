@@ -1,8 +1,8 @@
 
 export type Concept = {
     id: string
-    lang: string
-    country: string
+    lang?: string
+    country?: string
 
     name?: string
     nameLength?: number
@@ -15,6 +15,7 @@ export type Concept = {
     rootNameHash?: string
 
     abbr?: string
+    abbrLongName?: string
 
     popularity?: number
     countWords?: number

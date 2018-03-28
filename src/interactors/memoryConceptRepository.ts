@@ -8,6 +8,28 @@ export class MemoryConceptRepository implements IConceptRepository {
 
     private db: Map<string, Concept> = new Map()
 
+    getAbbrConceptsWithContextName(locale: Locale): Promise<Concept[]> {
+        const list: Concept[] = []
+        for (let item of this.db.values()) {
+            if (item.country === locale.country && item.lang === locale.lang && item.isAbbr && item.contextName) {
+                list.push(item);
+            }
+        }
+
+        return Promise.resolve(list);
+    }
+
+    getConceptsWithAbbr(locale: Locale): Promise<Concept[]> {
+        const list: Concept[] = []
+        for (let item of this.db.values()) {
+            if (item.country === locale.country && item.lang === locale.lang && !item.isAbbr && item.abbr) {
+                list.push(item);
+            }
+        }
+
+        return Promise.resolve(list);
+    }
+
     deleteByNameHash(hashes: string[]): Promise<number> {
         let count = 0;
         for (let hash of hashes) {
@@ -62,8 +84,23 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return this.getById(data.id);
     }
-    update(_data: RepUpdateData<Concept>): Promise<Concept> {
-        throw new Error("Method not implemented.");
+    update(data: RepUpdateData<Concept>): Promise<Concept> {
+        const item = this.db.get(data.item.id);
+        if (!item) {
+            return Promise.reject(new Error(`Item not found! id=${data.item.id}`));
+        }
+
+        for (let prop in data.item) {
+            (<any>item)[prop] = (<any>data.item)[prop]
+        }
+
+        if (data.delete) {
+            for (let prop of data.delete) {
+                delete (<any>item)[prop];
+            }
+        }
+
+        return Promise.resolve(item);
     }
 
     private filterByFieldValue(field: keyof Concept, value: any): Concept[] {

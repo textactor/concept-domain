@@ -60,7 +60,22 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
 
         return this.getById(data.id);
     }
-    update(_data: RepUpdateData<WikiEntity>): Promise<WikiEntity> {
-        throw new Error("Method not implemented.");
+    update(data: RepUpdateData<WikiEntity>): Promise<WikiEntity> {
+        const item = this.db.get(data.item.id);
+        if (!item) {
+            return Promise.reject(new Error(`Item not found! id=${data.item.id}`));
+        }
+
+        for (let prop in data.item) {
+            (<any>item)[prop] = (<any>data.item)[prop]
+        }
+
+        if (data.delete) {
+            for (let prop of data.delete) {
+                delete (<any>item)[prop];
+            }
+        }
+
+        return Promise.resolve(item);
     }
 }

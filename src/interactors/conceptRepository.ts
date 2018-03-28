@@ -25,6 +25,8 @@ export interface IConceptReadRepository extends IReadRepository<string, Concept>
     getByRootNameHash(hash: string): Promise<Concept[]>
     getPopularRootNameHashes(locale: Locale, limit: number, skip?: number): Promise<PopularConceptHash[]>
     list(locale: Locale, limit: number, skip?: number): Promise<Concept[]>
+    getConceptsWithAbbr(locale: Locale): Promise<Concept[]>
+    getAbbrConceptsWithContextName(locale: Locale): Promise<Concept[]>
 }
 
 export interface IConceptRepository extends IConceptReadRepository, IConceptWriteRepository {
