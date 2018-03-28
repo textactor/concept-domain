@@ -3,8 +3,9 @@ const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase, seriesPromise } from "@textactor/domain";
 import { IConceptRepository } from "../conceptRepository";
-import { ConceptHelper, Concept } from "../../entities";
 import { Locale } from "../../types";
+import { Concept } from "../../entities/concept";
+import { ConceptHelper } from "../../entities/conceptHelper";
 
 export class SetAbbrConceptsLongName extends UseCase<void, Map<string, string>, void> {
 
@@ -17,19 +18,15 @@ export class SetAbbrConceptsLongName extends UseCase<void, Map<string, string>, 
 
         let concepts = await this.conceptRepository.getConceptsWithAbbr(this.locale);
 
-        await this.setConceptsLongNameFromName(concepts, results);
-
-        concepts = await this.conceptRepository.getAbbrConceptsWithContextName(this.locale);
-
-        await this.setConceptsLongNameFromContextName(concepts, results);
+        await this.setConceptsLongName(concepts, results);
 
         return results;
     }
 
-    private setConceptsLongNameFromName(concepts: Concept[], results: Map<string, string>): Promise<Map<string, string>> {
+    private setConceptsLongName(concepts: Concept[], results: Map<string, string>): Promise<Map<string, string>> {
 
         concepts = concepts.sort((a, b) => b.popularity - a.popularity)
-            .filter(item => !results.has(item.abbr));
+            .filter(item => item.abbr && !results.has(item.abbr));
 
         return seriesPromise(concepts, concept => {
             if (results.has(concept.abbr)) {
@@ -45,30 +42,6 @@ export class SetAbbrConceptsLongName extends UseCase<void, Map<string, string>, 
             }).then(() => {
                 debug(`Set concept longName: ${concept.abbr}=${concept.name}`);
                 results.set(concept.abbr, concept.name);
-            })
-        })
-            .then(() => results);
-    }
-
-    private setConceptsLongNameFromContextName(concepts: Concept[], results: Map<string, string>): Promise<Map<string, string>> {
-
-        concepts = concepts.sort((a, b) => b.popularity - a.popularity)
-            .filter(item => !results.has(item.name) && item.isAbbr);
-
-        return seriesPromise(concepts, concept => {
-            if (results.has(concept.name)) {
-                return Promise.resolve();
-            }
-            const id = ConceptHelper.id(concept.name, this.locale.lang, this.locale.country);
-
-            return this.conceptRepository.update({
-                item: {
-                    id,
-                    abbrLongName: concept.contextName
-                }
-            }).then(() => {
-                debug(`Set concept longName: ${concept.name}=${concept.contextName}`);
-                results.set(concept.name, concept.contextName);
             })
         })
             .then(() => results);

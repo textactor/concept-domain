@@ -1,7 +1,8 @@
 
 import { UseCase } from '@textactor/domain';
-import { Concept, ConceptHelper } from '../entities';
-import { IConceptWriteRepository } from './conceptRepository';
+import { IConceptWriteRepository } from '../conceptRepository';
+import { Concept } from '../../entities/concept';
+import { ConceptHelper } from '../../entities/conceptHelper';
 
 export class PushConcepts extends UseCase<Concept[], void, void> {
     constructor(private repository: IConceptWriteRepository) {

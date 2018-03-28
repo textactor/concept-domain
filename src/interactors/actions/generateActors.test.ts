@@ -1,12 +1,12 @@
 
 import { GenerateActors } from './generateActors';
 import test from 'ava';
-import { MemoryConceptRepository } from './memoryConceptRepository';
-import { MemoryWikiEntityRepository } from './memoryWikiEntityRepository';
-import { ConceptHelper } from '../entities/conceptHelper';
+import { MemoryConceptRepository } from '../memoryConceptRepository';
+import { MemoryWikiEntityRepository } from '../memoryWikiEntityRepository';
+import { Locale } from '../../types';
 import { PushConcepts } from './pushConcepts';
-import { Locale } from '../types';
-import { ConceptActor } from '..';
+import { ConceptHelper } from '../../entities/conceptHelper';
+import { ConceptActor } from '../../entities/actor';
 
 test('ro-md', async t => {
     const conceptRepository = new MemoryConceptRepository();

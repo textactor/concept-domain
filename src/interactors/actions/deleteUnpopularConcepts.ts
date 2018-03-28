@@ -1,6 +1,6 @@
 import { UseCase } from "@textactor/domain";
-import { IConceptWriteRepository } from "./conceptRepository";
-import { Locale } from "../types";
+import { IConceptWriteRepository } from "../conceptRepository";
+import { Locale } from "../../types";
 
 export interface DeleteUnpopularConceptsOptions {
     minConceptPopularity?: number

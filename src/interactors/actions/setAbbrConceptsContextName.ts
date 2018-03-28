@@ -3,8 +3,9 @@ const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase, seriesPromise } from "@textactor/domain";
 import { IConceptRepository } from "../conceptRepository";
-import { ConceptHelper, Concept } from "../../entities";
 import { Locale } from "../../types";
+import { Concept } from "../../entities/concept";
+import { ConceptHelper } from "../../entities/conceptHelper";
 
 export class SetAbbrConceptsContextName extends UseCase<void, Map<string, string>, void> {
 

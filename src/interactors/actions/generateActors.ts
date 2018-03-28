@@ -1,10 +1,12 @@
 
 import { UseCase } from '@textactor/domain';
-import { ConceptActor } from '../entities';
-import { Locale } from '../types';
-import { IWikiEntityRepository } from './wikiEntityRepository';
-import { IConceptRepository } from './conceptRepository';
-import { BuildActor, GetPopularConceptNode, DeleteActorConcepts } from './actions';
+import { Locale } from '../../types';
+import { IWikiEntityRepository } from '../wikiEntityRepository';
+import { IConceptRepository } from '../conceptRepository';
+import { ConceptActor } from '../../entities/actor';
+import { BuildActor } from './buildActor';
+import { GetPopularConceptNode } from './getPopularConceptNode';
+import { DeleteActorConcepts } from './deleteActorConcepts';
 
 export interface OnGenerateActorCallback {
     (actor: ConceptActor): Promise<any>

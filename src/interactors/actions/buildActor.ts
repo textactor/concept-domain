@@ -2,7 +2,6 @@
 const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase, uniq, NameHelper, seriesPromise } from "@textactor/domain";
-import { WikiEntity, Concept } from "../../entities";
 import { IWikiEntityReadRepository } from "../wikiEntityRepository";
 import { IConceptReadRepository } from "../conceptRepository";
 import { Locale } from "../../types";
@@ -12,6 +11,8 @@ import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
 import { uniqProp } from "../../utils";
 import { ActorHelper } from "../../entities/actorHelper";
 import { ConceptHelper } from "../../entities/conceptHelper";
+import { Concept } from "../../entities/concept";
+import { WikiEntity } from "../../entities/wikiEntity";
 
 
 

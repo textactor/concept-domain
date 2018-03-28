@@ -1,11 +1,11 @@
 
 import test from 'ava';
-import { MemoryConceptRepository } from './memoryConceptRepository';
-import { MemoryWikiEntityRepository } from './memoryWikiEntityRepository';
-import { ConceptHelper } from '../entities/conceptHelper';
-import { PushConcepts } from './pushConcepts';
-import { Locale } from '../types';
+import { MemoryConceptRepository } from '../memoryConceptRepository';
+import { MemoryWikiEntityRepository } from '../memoryWikiEntityRepository';
+import { Locale } from '../../types';
 import { ExploreWikiEntities } from './exploreWikiEntities';
+import { ConceptHelper } from '../../entities/conceptHelper';
+import { PushConcepts } from './pushConcepts';
 
 test('ro-md', async t => {
     const conceptRepository = new MemoryConceptRepository();

@@ -2,12 +2,14 @@
 const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase, uniq, seriesPromise } from '@textactor/domain';
-import { IConceptReadRepository } from './conceptRepository';
-import { Locale } from '../types';
-import { ExploreWikiEntitiesByTitles, SaveWikiEntities, FindWikiTitles } from './actions';
-import { IWikiEntityRepository } from './wikiEntityRepository';
-import { WikiEntityHelper } from '../entities/wikiEntityHelper';
-import { WikiEntity } from '../entities';
+import { IConceptReadRepository } from '../conceptRepository';
+import { Locale } from '../../types';
+import { IWikiEntityRepository } from '../wikiEntityRepository';
+import { ExploreWikiEntitiesByTitles } from './exploreWikiEntitiesByTitles';
+import { SaveWikiEntities } from './saveWikiEntities';
+import { FindWikiTitles } from './findWikiTitles';
+import { WikiEntityHelper } from '../../entities/wikiEntityHelper';
+import { WikiEntity } from '../../entities/wikiEntity';
 
 export type ExploreWikiEntitiesResults = {
     countProcessedNames: number

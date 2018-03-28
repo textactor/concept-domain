@@ -2,7 +2,7 @@
 import { UseCase, uniq } from "@textactor/domain";
 import { IConceptReadRepository } from "../conceptRepository";
 import { Locale } from "../../types";
-import { Concept } from "../../entities";
+import { Concept } from "../../entities/concept";
 
 export type PopularConceptNode = {
     hash: string
