@@ -5,12 +5,12 @@ import { MemoryWikiEntityRepository } from '../memoryWikiEntityRepository';
 import { Locale } from '../../types';
 import { ExploreWikiEntities } from './exploreWikiEntities';
 import { ConceptHelper } from '../../entities/conceptHelper';
-import { PushConcepts } from './pushConcepts';
+import { PushContextConcepts } from './pushContextConcepts';
 
 test('ro-md', async t => {
     const conceptRepository = new MemoryConceptRepository();
     const wikiEntityRepository = new MemoryWikiEntityRepository();
-    const pushConcepts = new PushConcepts(conceptRepository);
+    const pushConcepts = new PushContextConcepts(conceptRepository);
     const locale: Locale = { lang: 'ro', country: 'md' };
     const exploreWikiEntities = new ExploreWikiEntities(locale, conceptRepository, wikiEntityRepository);
 

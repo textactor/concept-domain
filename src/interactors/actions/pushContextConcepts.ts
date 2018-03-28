@@ -4,7 +4,7 @@ import { IConceptWriteRepository } from '../conceptRepository';
 import { Concept } from '../../entities/concept';
 import { ConceptHelper } from '../../entities/conceptHelper';
 
-export class PushConcepts extends UseCase<Concept[], void, void> {
+export class PushContextConcepts extends UseCase<Concept[], void, void> {
     constructor(private repository: IConceptWriteRepository) {
         super()
     }

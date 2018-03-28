@@ -31,6 +31,7 @@ export interface IConceptReadRepository extends IReadRepository<string, Concept>
     list(locale: Locale, limit: number, skip?: number): Promise<Concept[]>
     getConceptsWithAbbr(locale: Locale): Promise<Concept[]>
     getAbbrConceptsWithContextName(locale: Locale): Promise<Concept[]>
+    count(locale: Locale): Promise<number>
 }
 
 export interface IConceptRepository extends IConceptReadRepository, IConceptWriteRepository {

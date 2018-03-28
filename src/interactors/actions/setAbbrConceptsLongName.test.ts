@@ -2,13 +2,13 @@
 import { SetAbbrConceptsLongName } from './setAbbrConceptsLongName';
 import test from 'ava';
 import { MemoryConceptRepository } from '../memoryConceptRepository';
-import { PushConcepts } from './pushConcepts';
+import { PushContextConcepts } from './pushContextConcepts';
 import { Locale } from '../../types';
 import { ConceptHelper } from '../../entities/conceptHelper';
 
 test('set concept abbrLongName', async t => {
     const conceptRepository = new MemoryConceptRepository();
-    const pushConcepts = new PushConcepts(conceptRepository);
+    const pushConcepts = new PushContextConcepts(conceptRepository);
     const locale: Locale = { lang: 'ro', country: 'md' };
 
     const concepts = [

@@ -8,6 +8,10 @@ export class MemoryConceptRepository implements IConceptRepository {
 
     private db: Map<string, Concept> = new Map()
 
+    count(): Promise<number> {
+        return Promise.resolve(this.db.size);
+    }
+
     getAbbrConceptsWithContextName(locale: Locale): Promise<Concept[]> {
         const list: Concept[] = []
         for (let item of this.db.values()) {

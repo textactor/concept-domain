@@ -23,3 +23,14 @@ export {
 
 export { MemoryConceptRepository } from './interactors/memoryConceptRepository';
 export { MemoryWikiEntityRepository } from './interactors/memoryWikiEntityRepository';
+
+export { PushContextConcepts } from './interactors/actions/pushContextConcepts';
+export {
+    DeleteUnpopularConcepts,
+    createDeleteUnpopularConceptsOptions,
+} from './interactors/actions/deleteUnpopularConcepts';
+
+export {
+    ProcessConcepts,
+    ProcessConceptsOptions,
+} from './interactors/processConcepts';
