@@ -56,18 +56,25 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
 
         const actor = ActorHelper.create(allConcepts, wikiEntity, wikiEntityNames && wikiEntityNames.names, node.topConcepts[0]);
 
+        debug(`Created actor(${actor.name}): concepts:${JSON.stringify(allConcepts.map(item => item.name))}, wikiEntity: ${wikiEntity && wikiEntity.name}`);
+
         return actor;
     }
 
     private async findPerfectWikiEntity(concepts: Concept[]): Promise<WikiEntityNames> {
         const concept = concepts[0];
-        let nameHashes = concepts.map(item => WikiEntityHelper.nameHash(item.name, this.locale.lang));
+        let conceptNames = concepts.map(item => item.name);
+        conceptNames = conceptNames.concat(concepts.map(item => item.rootName));
+        conceptNames = uniq(conceptNames);
+        let nameHashes = conceptNames.map(name => WikiEntityHelper.nameHash(name, this.locale.lang));
         nameHashes = uniq(nameHashes);
 
         let entities: WikiEntityNames[] = []
 
-        seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByNameHash(nameHash)
+        await seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByNameHash(nameHash)
             .then(list => entities = entities.concat(list.map(entity => ({ entity, names: [] })))));
+
+        debug(`Found wikientity by names: ${JSON.stringify(conceptNames)}`);
 
         if (concept.isAbbr && concept.contextName) {
             if (this.getCountryWikiEntities(entities).length === 0) {
@@ -79,7 +86,8 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
         }
 
         if (this.getCountryWikiEntities(entities).length === 0) {
-            const names = [concept.name, concept.contextName].filter(name => !!name && !NameHelper.isAbbr(name));
+            let names = [concept.name, concept.contextName, concept.rootName].filter(name => !!name && !NameHelper.isAbbr(name));
+            names = uniq(names);
             if (names.length) {
                 debug(`finding by partial names: ${JSON.stringify(names)}`);
                 let list: WikiEntityNames[] = [];
@@ -126,7 +134,7 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
         const topEntity = entities[0];
 
         const countryEntities = entities.filter(item => item.entity.countryCode === this.locale.country);
-        if (countryEntities.length && countryEntities[0].entity.rank > topEntity.entity.rank / 2) {
+        if (countryEntities.length && countryEntities[0].entity.rank > topEntity.entity.rank / 4) {
             entities = countryEntities.concat(entities);
         }
 

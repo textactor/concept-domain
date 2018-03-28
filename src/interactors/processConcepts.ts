@@ -36,10 +36,12 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         const generateActors = new GenerateActors(locale, this.conceptRepository, this.entityRepository);
 
         debug(`=====> Start setAbbrLongName`);
-        await setAbbrLongName.execute(null);
+        const setAbbrLongNameMap = await setAbbrLongName.execute(null);
+        debug(`setAbbrLongNameMap=${JSON.stringify(setAbbrLongNameMap)}`);
         debug(`<===== End setAbbrLongName`);
         debug(`=====> Start setAbbrConcextName`);
-        await setAbbrConcextName.execute(null);
+        const setAbbrContextNameMap = await setAbbrConcextName.execute(null);
+        debug(`setAbbrContextNameMap=${JSON.stringify(setAbbrContextNameMap)}`);
         debug(`<===== End setAbbrConcextName`);
         debug(`=====> Start deleteUnpopularConcepts`);
         await deleteUnpopularConcepts.execute(options);
@@ -49,9 +51,9 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         const wikiExploreResults = await exploreWikiEntities.execute(null);
         debug(`<===== End exploreWikiEntities`);
         const lastnamesHashes = uniq(wikiExploreResults.lastnames.map(name => ConceptHelper.nameHash(name, locale.lang, locale.country)));
-
         debug(`=====> Start deleteByNameHash`);
         await this.conceptRepository.deleteByNameHash(lastnamesHashes);
+        debug(`Deleted lastnames=${JSON.stringify(wikiExploreResults.lastnames)}`);
         debug(`<===== End deleteByNameHash`);
 
         debug(`=====> Start generateActors`);
