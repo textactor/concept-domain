@@ -11,7 +11,7 @@ export class PushConcepts extends UseCase<Concept[], void, void> {
 
     protected innerExecute(concepts: Concept[]): Promise<void> {
         ConceptHelper.setConceptsContextName(concepts);
-        return Promise.all(concepts.map(concept => this.repository.createOrIncrementPopularity(concept)))
+        return Promise.all(concepts.map(concept => this.repository.createOrIncrement(concept)))
             .then(_ => null)
     }
 }

@@ -91,7 +91,9 @@ export class MemoryConceptRepository implements IConceptRepository {
         }
 
         for (let prop in data.item) {
-            (<any>item)[prop] = (<any>data.item)[prop]
+            if ([null, undefined].indexOf((<any>data.item)[prop]) < 0) {
+                (<any>item)[prop] = (<any>data.item)[prop];
+            }
         }
 
         if (data.delete) {
@@ -216,16 +218,17 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(item.popularity);
     }
-    async createOrIncrementPopularity(concept: Concept): Promise<Concept> {
+    async createOrIncrement(concept: Concept): Promise<Concept> {
         const id = concept.id;
         let item = this.db.get(id);
         if (!item) {
             await this.create(concept);
         } else {
-            await this.incrementPopularity(id);
+            item = await this.update({ item: concept });
+            item.popularity++;
         }
 
-        return Promise.resolve(this.db.get(id));
+        return Promise.resolve(item);
     }
 
     all(): Promise<Concept[]> {
