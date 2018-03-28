@@ -8,8 +8,17 @@ export class MemoryConceptRepository implements IConceptRepository {
 
     private db: Map<string, Concept> = new Map()
 
-    count(): Promise<number> {
-        return Promise.resolve(this.db.size);
+    count(locale: Locale): Promise<number> {
+        let count = 0;
+        for (let item of this.db.values()) {
+            if (item.country !== locale.country || item.lang !== locale.lang) {
+                continue;
+            }
+
+            count++;
+        }
+
+        return Promise.resolve(count);
     }
 
     getAbbrConceptsWithContextName(locale: Locale): Promise<Concept[]> {
@@ -223,12 +232,14 @@ export class MemoryConceptRepository implements IConceptRepository {
         return Promise.resolve(item.popularity);
     }
     async createOrIncrement(concept: Concept): Promise<Concept> {
+        concept = { ...concept };
         const id = concept.id;
         let item = this.db.get(id);
         if (!item) {
             await this.create(concept);
         } else {
-            item = await this.update({ item: concept });
+            // delete concept.popularity;
+            // item = await this.update({ item: concept });
             item.popularity++;
         }
 

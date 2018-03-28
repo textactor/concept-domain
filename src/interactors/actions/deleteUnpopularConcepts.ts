@@ -1,3 +1,6 @@
+
+const debug = require('debug')('textactor:concept-domain');
+
 import { UseCase } from "@textactor/domain";
 import { IConceptRepository } from "../conceptRepository";
 import { Locale } from "../../types";
@@ -17,10 +20,8 @@ export class DeleteUnpopularConcepts extends UseCase<DeleteUnpopularConceptsOpti
     protected async innerExecute(options: DeleteUnpopularConceptsOptions): Promise<void> {
 
         try {
-            if (!options) {
-                const totalConcepts = await this.repository.count(this.locale);
-                options = createDeleteUnpopularConceptsOptions(totalConcepts);
-            }
+            debug(`Deleting unpopular concepts: ${JSON.stringify(options)}`);
+
             await this.repository.deleteUnpopular(this.locale, options.minConceptPopularity);
             await this.repository.deleteUnpopularAbbreviations(this.locale, options.minAbbrConceptPopularity);
             await this.repository.deleteUnpopularOneWorlds(this.locale, options.minOneWordConceptPopularity);
