@@ -12,10 +12,10 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
         return Promise.resolve(this.db.size);
     }
 
-    getByPartialNameHash(hash: string): Promise<WikiEntity[]> {
+    getByRootNameHash(hash: string): Promise<WikiEntity[]> {
         const list: WikiEntity[] = []
         for (let item of this.db.values()) {
-            if (~item.partialNamesHashes.indexOf(hash)) {
+            if (~item.rootNamesHashes.indexOf(hash)) {
                 list.push(item)
             }
         }

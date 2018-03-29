@@ -18,6 +18,8 @@ export type WikiEntity = {
     nameHash?: string
     names?: string[]
     namesHashes?: string[]
+    rootNames?: string[]
+    rootNamesHashes?: string[]
     abbr?: string
     description?: string
     aliases?: string[]
@@ -38,7 +40,5 @@ export type WikiEntity = {
      * Permanent redirect to entity id
      */
     redirectId?: string
-    partialNames?: string[]
-    partialNamesHashes?: string[]
     lastname?: string
 }

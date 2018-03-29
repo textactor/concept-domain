@@ -93,32 +93,21 @@ export class WikiEntityHelper {
         entity.names = entity.names.filter(name => name.trim().length > 1);
         entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
 
-        entity.partialNames = entity.names.map(name => getPartialName(name, { lang }))
+        let partialNames = entity.names.map(name => getPartialName(name, { lang }))
             .filter(name => !!name && NameHelper.countWords(name) > 1);
-        entity.partialNames = uniq(entity.partialNames);
+        partialNames = uniq(partialNames);
 
-        entity.names = entity.names.concat(entity.partialNames);
+        entity.names = entity.names.concat(partialNames);
 
         entity.names = uniq(entity.names);
 
         entity.namesHashes = entity.names.map(item => WikiEntityHelper.nameHash(item, lang));
         entity.namesHashes = uniq(entity.namesHashes);
 
-        entity.partialNames = entity.names.map(name => getPartialName(name, { lang }))
-            .filter(name => !!name && NameHelper.countWords(name) > 1);
-        entity.partialNames = uniq(entity.partialNames);
+        entity.rootNames = entity.names.map(name => WikiEntityHelper.rootName(name, lang));
 
-        if (entity.partialNames.length) {
-            for (let name of entity.names) {
-                const index = entity.partialNames.indexOf(name);
-                if (~index) {
-                    entity.partialNames.splice(index, 1);
-                }
-            }
-        }
-
-        entity.partialNamesHashes = entity.partialNames.map(name => WikiEntityHelper.nameHash(name, lang));
-        entity.partialNamesHashes = uniq(entity.partialNamesHashes);
+        entity.rootNamesHashes = entity.rootNames.map(name => WikiEntityHelper.nameHash(name, lang));
+        entity.rootNamesHashes = uniq(entity.rootNamesHashes);
 
         return entity;
     }
@@ -149,6 +138,14 @@ export class WikiEntityHelper {
         }
 
         return md5([lang, name].join('_'));
+    }
+
+    static rootName(name: string, lang: string) {
+        return NameHelper.countWords(name) > 1 ? NameHelper.rootName(name, lang) : name;
+    }
+
+    static rootNameHash(name: string, lang: string) {
+        return WikiEntityHelper.nameHash(WikiEntityHelper.rootName(name, lang), lang);
     }
 
     static convertSimpleEntityType(type: SimpleEntityType): WikiEntityType {

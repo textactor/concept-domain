@@ -9,7 +9,7 @@ export interface IWikiEntityWriteRepository extends IWriteRepository<string, Wik
 export interface IWikiEntityReadRepository extends IReadRepository<string, WikiEntity> {
     getByNameHash(hash: string): Promise<WikiEntity[]>
     count(): Promise<number>
-    getByPartialNameHash(hash: string): Promise<WikiEntity[]>
+    getByRootNameHash(hash: string): Promise<WikiEntity[]>
 }
 
 export interface IWikiEntityRepository extends IWikiEntityReadRepository, IWikiEntityWriteRepository {

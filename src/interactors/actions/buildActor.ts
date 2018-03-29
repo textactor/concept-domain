@@ -1,7 +1,7 @@
 
 const debug = require('debug')('textactor:concept-domain');
 
-import { UseCase, uniq, NameHelper, seriesPromise } from "@textactor/domain";
+import { UseCase, uniq, seriesPromise } from "@textactor/domain";
 import { IWikiEntityReadRepository } from "../wikiEntityRepository";
 import { IConceptReadRepository } from "../conceptRepository";
 import { Locale } from "../../types";
@@ -71,7 +71,7 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
 
         let entities: WikiEntityNames[] = []
 
-        await seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByNameHash(nameHash)
+        await seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByRootNameHash(nameHash)
             .then(list => entities = entities.concat(list.map(entity => ({ entity, names: [] })))));
 
         debug(`Found wikientity by names: ${JSON.stringify(conceptNames)}`);
@@ -79,24 +79,28 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
         if (concept.isAbbr && concept.contextName) {
             if (this.getCountryWikiEntities(entities).length === 0) {
                 debug(`finding by contextName: ${concept.contextName}`)
-                const list = await this.wikiEntityRepository.getByNameHash(WikiEntityHelper.nameHash(concept.contextName, this.locale.lang));
+                const names = uniq([concept.contextName, WikiEntityHelper.rootName(concept.contextName, concept.lang)]);
+                const nameHashes = uniq(names.map(name => WikiEntityHelper.nameHash(name, concept.lang)));
+                let list: WikiEntity[] = []
+                await seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByRootNameHash(nameHash)
+                    .then(l => list = list.concat(l.map(entity => ({ entity, names: [] })))));
                 debug(`found by contextName: ${list.map(item => item.name)}`);
-                entities = entities.concat(list.map(entity => ({ entity, names: [concept.contextName] })));
+                entities = entities.concat(list.map(entity => ({ entity, names: names })));
             }
         }
 
-        if (this.getCountryWikiEntities(entities).length === 0) {
-            let names = [concept.name, concept.contextName, concept.rootName].filter(name => !!name && !NameHelper.isAbbr(name));
-            names = uniq(names);
-            if (names.length) {
-                debug(`finding by partial names: ${JSON.stringify(names)}`);
-                let list: WikiEntityNames[] = [];
-                await seriesPromise(names, name => this.wikiEntityRepository.getByPartialNameHash(WikiEntityHelper.nameHash(name, this.locale.lang))
-                    .then(results => list = list.concat(results.map(entity => ({ entity, names: [name] })))));
-                debug(`found by partial names: ${list.map(item => item.entity.name)}`);
-                entities = entities.concat(list);
-            }
-        }
+        // if (this.getCountryWikiEntities(entities).length === 0) {
+        //     let names = [concept.name, concept.contextName, concept.rootName].filter(name => !!name && !NameHelper.isAbbr(name));
+        //     names = uniq(names);
+        //     if (names.length) {
+        //         debug(`finding by partial names: ${JSON.stringify(names)}`);
+        //         let list: WikiEntityNames[] = [];
+        //         await seriesPromise(names, name => this.wikiEntityRepository.getByPartialNameHash(WikiEntityHelper.nameHash(name, this.locale.lang))
+        //             .then(results => list = list.concat(results.map(entity => ({ entity, names: [name] })))));
+        //         debug(`found by partial names: ${list.map(item => item.entity.name)}`);
+        //         entities = entities.concat(list);
+        //     }
+        // }
 
         const entitiesMap: Map<string, WikiEntityNames> = new Map();
         for (let entityName of entities) {
