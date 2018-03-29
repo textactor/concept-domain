@@ -10,6 +10,7 @@ import { SaveWikiEntities } from './saveWikiEntities';
 import { FindWikiTitles } from './findWikiTitles';
 import { WikiEntityHelper } from '../../entities/wikiEntityHelper';
 import { WikiEntity } from '../../entities/wikiEntity';
+import { ConceptHelper } from '../../entities/conceptHelper';
 
 export type ExploreWikiEntitiesResults = {
     countProcessedNames: number
@@ -36,6 +37,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         let skip = 0;
         const limit = 100;
         const self = this;
+        const lang = this.locale.lang;
 
         const results: ExploreWikiEntitiesResults = {
             countExistingEntities: 0,
@@ -45,6 +47,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         };
 
         async function start(): Promise<void> {
+
             const hashes = await self.conceptRepository.getPopularRootNameHashes(self.locale, limit, skip);
 
             if (hashes.length === 0) {
@@ -56,15 +59,17 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
             let ids = hashes.reduce<string[]>((list, hash) => list.concat(hash.ids.splice(0, 2)), []);
             ids = uniq(ids);
 
-            debug(`hashes ids: ${ids}`);
+            // debug(`hashes ids: ${ids}`);
 
             const concepts = await self.conceptRepository.getByIds(ids);
             let names: string[] = [];
             for (let concept of concepts) {
                 names.push(concept.name);
+                // names.push(NameHelper.rootName(concept.name, lang));
                 if (concept.isAbbr && concept.contextName) {
                     debug(`exploring wiki entity by context name: ${concept.contextName}`);
                     names.push(concept.contextName);
+                    names.push(ConceptHelper.rootName(concept.contextName, lang));
                 }
             }
             names = uniq(names);

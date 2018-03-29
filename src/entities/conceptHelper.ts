@@ -69,7 +69,6 @@ export class ConceptHelper {
         name = name.trim();
 
         const isAbbr = NameHelper.isAbbr(name);
-        // const countWords = NameHelper.countWords(name);
 
         if (isAbbr) {
             return name;

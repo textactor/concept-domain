@@ -3,6 +3,7 @@ import { WikiEntity as ExternWikiEntity, convertToSimpleEntity, SimpleEntityType
 import { WikiEntityType, WikiEntity } from './wikiEntity';
 import { NameHelper, uniq, md5 } from '@textactor/domain';
 import { partialName as getPartialName } from 'partial-name';
+import { ConceptHelper } from '../entities/conceptHelper';
 
 export class WikiEntityHelper {
 
@@ -77,19 +78,6 @@ export class WikiEntityHelper {
             }
         }
 
-        // if (entity.simpleName && entity.simpleName.split(/\s+/g).length > 1) {
-        //     entity.names.push(entity.simpleName);
-        // }
-
-        // const simpleNames = entity.names.map(name => {
-        //     const sname = WikiEntityHelper.splitName(name);
-        //     if (sname) {
-        //         return sname.simple;
-        //     }
-        // }).filter(name => !!name && name.trim().split(/\s+/g).length > 1);
-
-        // entity.names = entity.names.concat(simpleNames);
-
         entity.names = entity.names.filter(name => name.trim().length > 1);
         entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
 
@@ -99,15 +87,21 @@ export class WikiEntityHelper {
 
         entity.names = entity.names.concat(partialNames);
 
-        entity.names = uniq(entity.names);
+        entity.names = uniq(entity.names).filter(name => WikiEntityHelper.isValidName(name));
 
-        entity.namesHashes = entity.names.map(item => WikiEntityHelper.nameHash(item, lang));
+        entity.secondaryNames = [];
+
+        entity.names.forEach(name => {
+            let nname = WikiEntityHelper.rootName(name, lang);
+            if (nname !== name && WikiEntityHelper.isValidName(nname)) {
+                entity.secondaryNames.push(nname);
+            }
+        });
+
+        entity.namesHashes = entity.names.concat(entity.secondaryNames)
+            .map(item => WikiEntityHelper.nameHash(item, lang));
+
         entity.namesHashes = uniq(entity.namesHashes);
-
-        entity.rootNames = entity.names.map(name => WikiEntityHelper.rootName(name, lang));
-
-        entity.rootNamesHashes = entity.rootNames.map(name => WikiEntityHelper.nameHash(name, lang));
-        entity.rootNamesHashes = uniq(entity.rootNamesHashes);
 
         return entity;
     }
@@ -127,6 +121,10 @@ export class WikiEntityHelper {
     //     return ConceptHelper.normalizeName(name, entity.lang);
     // }
 
+    static isValidName(name: string) {
+        return name && name.trim().length > 1;
+    }
+
     static nameHash(name: string, lang: string) {
         lang = lang.trim().toLowerCase();
 
@@ -140,8 +138,15 @@ export class WikiEntityHelper {
         return md5([lang, name].join('_'));
     }
 
+    static namesHashes(names: string[], lang: string) {
+        names = names.filter(name => WikiEntityHelper.isValidName(name));
+        const hashes = uniq(names.map(name => WikiEntityHelper.nameHash(name, lang)));
+
+        return hashes;
+    }
+
     static rootName(name: string, lang: string) {
-        return NameHelper.countWords(name) > 1 ? NameHelper.rootName(name, lang) : name;
+        return ConceptHelper.rootName(name, lang);
     }
 
     static rootNameHash(name: string, lang: string) {
