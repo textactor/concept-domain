@@ -20,18 +20,18 @@ export class ConceptHelper {
         const name = data.text.trim();
         const nameLength = name.length;
 
-        const normalName = ConceptHelper.normalizeName(name, lang);
+        const normalName = NameHelper.normalizeName(name, lang);
         const id = ConceptHelper.id(normalName, lang, country);
 
         const nameHash = ConceptHelper.nameHash(normalName, lang, country);
 
         const isAbbr = NameHelper.isAbbr(name);
-        const countWords = name.split(/\s+/g).length;
+        const countWords = NameHelper.countWords(name);
         const isIrregular = NameHelper.isIrregular(name);
         const endsWithNumber = NameHelper.endsWithNumberWord(name);
 
         const rootName = ConceptHelper.rootName(name, lang);
-        const normalRootName = ConceptHelper.normalizeName(rootName, lang);
+        const normalRootName = NameHelper.normalizeName(rootName, lang);
         const rootNameHash = ConceptHelper.nameHash(rootName, lang, country);
 
         const popularity = 1;
@@ -56,7 +56,7 @@ export class ConceptHelper {
         };
 
         const partialName = getPartialName(name, { lang });
-        if (partialName && partialName.split(/\s+/g).length > 1) {
+        if (partialName && NameHelper.countWords(partialName) > 1) {
             concept.partialName = partialName;
             concept.partialNameHash = ConceptHelper.nameHash(concept.partialName, lang, country);
         }
@@ -69,7 +69,7 @@ export class ConceptHelper {
         name = name.trim();
 
         const isAbbr = NameHelper.isAbbr(name);
-        const countWords = name.split(/\s+/g).length;
+        const countWords = NameHelper.countWords(name);
 
         if (isAbbr || countWords === 1) {
             return name;
@@ -77,27 +77,9 @@ export class ConceptHelper {
         return NameHelper.rootName(name, lang);
     }
 
-    /**
-     * Normalize a name: iPhone 5 => iphone 5; CIA => CIA; Chișinău => chișinău
-     * @param name Name to normalize
-     * @param lang Language code
-     */
-    public static normalizeName(name: string, lang: string) {
-        name = name.trim().replace(/\s+/g, ' ').trim();
-        lang = lang.trim().toLowerCase();
-        name = NameHelper.removeSymbols(name);
-        name = NameHelper.standardText(name, lang);
-
-        if (NameHelper.isAbbr(name)) {
-            return name;
-        }
-
-        return name.toLowerCase();
-    }
-
     public static nameHash(name: string, lang: string, country: string) {
         name = name.trim();
-        name = ConceptHelper.normalizeName(name, lang);
+        name = NameHelper.normalizeName(name, lang);
         name = NameHelper.atonic(name);
 
         return ConceptHelper.hash(name, lang, country);
@@ -108,7 +90,7 @@ export class ConceptHelper {
     }
 
     public static id(name: string, lang: string, country: string) {
-        name = ConceptHelper.normalizeName(name, lang);
+        name = NameHelper.normalizeName(name, lang);
         return ConceptHelper.hash(name, lang, country);
     }
 

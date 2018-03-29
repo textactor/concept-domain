@@ -94,7 +94,7 @@ export class WikiEntityHelper {
         entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
 
         entity.partialNames = entity.names.map(name => getPartialName(name, { lang }))
-            .filter(name => !!name && name.trim().split(/\s+/g).length > 1);
+            .filter(name => !!name && NameHelper.countWords(name) > 1);
         entity.partialNames = uniq(entity.partialNames);
 
         entity.names = entity.names.concat(entity.partialNames);
@@ -105,7 +105,7 @@ export class WikiEntityHelper {
         entity.namesHashes = uniq(entity.namesHashes);
 
         entity.partialNames = entity.names.map(name => getPartialName(name, { lang }))
-            .filter(name => !!name && name.trim().split(/\s+/g).length > 1);
+            .filter(name => !!name && NameHelper.countWords(name) > 1);
         entity.partialNames = uniq(entity.partialNames);
 
         if (entity.partialNames.length) {

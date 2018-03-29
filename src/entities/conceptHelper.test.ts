@@ -1,6 +1,7 @@
 
 import test from 'ava';
 import { ConceptHelper } from './conceptHelper';
+import { NameHelper } from '@textactor/domain';
 
 test('#nameHash', t => {
     let hash1 = ConceptHelper.nameHash('text 1', 'en', 'us');
@@ -17,10 +18,10 @@ test('#nameHash', t => {
 })
 
 test('#normalizeName', t => {
-    t.is(ConceptHelper.normalizeName('iPhone 5', 'en'), 'iphone 5');
-    t.is(ConceptHelper.normalizeName('iPHone 5', 'en'), 'iphone 5');
-    t.is(ConceptHelper.normalizeName('PLDM', 'ro'), 'PLDM');
-    t.is(ConceptHelper.normalizeName('Chișinău', 'ro'), 'chișinău');
+    t.is(NameHelper.normalizeName('iPhone 5', 'en'), 'iphone 5');
+    t.is(NameHelper.normalizeName('iPHone 5', 'en'), 'iphone 5');
+    t.is(NameHelper.normalizeName('PLDM', 'ro'), 'PLDM');
+    t.is(NameHelper.normalizeName('Chișinău', 'ro'), 'chișinău');
 })
 
 test('#create', t => {
@@ -37,7 +38,7 @@ test('#create', t => {
 })
 
 test('#rootName', t => {
-    t.is(ConceptHelper.rootName('iPhone 5', 'ro'), 'iPhone 5');
+    t.is(ConceptHelper.rootName('iPhone 5', 'ro'), 'iPhon 5');
     t.is(ConceptHelper.rootName('Ana Balan', 'ro'), 'An Balan');
     t.is(ConceptHelper.rootName('Anei Balan', 'ro'), 'An Balan');
     t.is(ConceptHelper.rootName('PLDM', 'ro'), 'PLDM');
