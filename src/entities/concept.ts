@@ -15,7 +15,7 @@ export type Concept = {
     rootNameHash?: string
 
     abbr?: string
-    abbrLongName?: string
+    abbrLongNames?: string[]
 
     popularity?: number
     countWords?: number
@@ -24,9 +24,9 @@ export type Concept = {
     isAbbr?: boolean
     createdAt?: number
 
-    contextName?: string
-    partialName?: string
+    contextNames?: string[]
+    // partialName?: string
 
-    contextNameHash?: string
-    partialNameHash?: string
+    // contextNameHash?: string
+    // partialNameHash?: string
 }

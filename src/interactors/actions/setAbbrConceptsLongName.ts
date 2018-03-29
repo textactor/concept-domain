@@ -1,7 +1,7 @@
 
 const debug = require('debug')('textactor:concept-domain');
 
-import { UseCase, seriesPromise } from "@textactor/domain";
+import { UseCase, seriesPromise, uniq } from "@textactor/domain";
 import { IConceptRepository } from "../conceptRepository";
 import { Locale } from "../../types";
 import { Concept } from "../../entities/concept";
@@ -34,16 +34,25 @@ export class SetAbbrConceptsLongName extends UseCase<void, Map<string, string>, 
             }
             const id = ConceptHelper.id(concept.abbr, this.locale.lang, this.locale.country);
 
-            return this.conceptRepository.update({
-                item: {
-                    id,
-                    abbrLongName: concept.name
-                }
-            }).then(() => {
-                debug(`Set concept longName: ${concept.abbr}=${concept.name}`);
-                results.set(concept.abbr, concept.name);
-            })
-        })
-            .then(() => results);
+            return this.conceptRepository.getById(id)
+                .then(abbrConcept => {
+                    if (!abbrConcept) {
+                        return;
+                    }
+                    abbrConcept.abbrLongNames = abbrConcept.abbrLongNames || [];
+                    abbrConcept.abbrLongNames.push(concept.name);
+                    abbrConcept.abbrLongNames = uniq(abbrConcept.abbrLongNames);
+
+                    return this.conceptRepository.update({
+                        item: {
+                            id,
+                            abbrLongNames: abbrConcept.abbrLongNames,
+                        }
+                    }).then(() => {
+                        debug(`Set concept longName: ${concept.abbr}=${concept.name}`);
+                        results.set(concept.abbr, concept.name);
+                    })
+                });
+        }).then(() => results);
     }
 }

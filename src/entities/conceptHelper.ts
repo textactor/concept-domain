@@ -1,8 +1,7 @@
 
-import { NameHelper, md5 } from '@textactor/domain';
+import { NameHelper, md5, uniq } from '@textactor/domain';
 import { Concept } from './concept';
 import * as isAbbrOf from 'is-abbr-of';
-import { partialName as getPartialName } from 'partial-name';
 
 export type CreatingConceptData = {
     lang: string
@@ -55,11 +54,11 @@ export class ConceptHelper {
             popularity,
         };
 
-        const partialName = getPartialName(name, { lang });
-        if (partialName && NameHelper.countWords(partialName) > 1) {
-            concept.partialName = partialName;
-            concept.partialNameHash = ConceptHelper.nameHash(concept.partialName, lang, country);
-        }
+        // const partialName = getPartialName(name, { lang });
+        // if (partialName && NameHelper.countWords(partialName) > 1) {
+        //     concept.partialName = partialName;
+        //     concept.partialNameHash = ConceptHelper.nameHash(concept.partialName, lang, country);
+        // }
 
         return concept;
     }
@@ -93,22 +92,51 @@ export class ConceptHelper {
         return ConceptHelper.hash(name, lang, country);
     }
 
-    public static setConceptsContextName(concepts: Concept[]) {
+    public static setConceptsContextNames(concepts: Concept[]) {
         const abbreviations = concepts.filter(item => !!item.isAbbr);
         for (let concept of concepts) {
             if (!concept.isAbbr && concept.countWords > 2 && !concept.endsWithNumber && !concept.abbr) {
                 for (let abbr of abbreviations) {
                     if (isAbbrOf(abbr.name, concept.name)) {
-                        concept.contextName = concept.contextName || abbr.name;
-                        concept.contextNameHash = ConceptHelper.nameHash(concept.contextName, concept.lang, concept.country);
+                        concept.contextNames = concept.contextNames || [];
+                        concept.contextNames.push(abbr.name);
+                        // concept.contextNameHash = ConceptHelper.nameHash(concept.contextName, concept.lang, concept.country);
 
-                        abbr.contextName = abbr.contextName || concept.name;
-                        abbr.contextNameHash = ConceptHelper.nameHash(abbr.contextName, concept.lang, concept.country);
+                        abbr.contextNames = abbr.contextNames || [];
+
+                        abbr.contextNames.push(concept.name);
+                        // abbr.contextNameHash = ConceptHelper.nameHash(abbr.contextName, concept.lang, concept.country);
                     }
                 }
             }
         }
 
         return concepts;
+    }
+
+    public static getConceptsNames(concepts: Concept[], rootNames: boolean): string[] {
+        const concept = concepts[0];
+        const lang = concept.lang;
+        let conceptNames = concepts.map(item => item.name);
+        conceptNames = conceptNames.concat(concepts.reduce<string[]>((list, concept) => {
+            if (concept.isAbbr) {
+                list = list.concat(concept.abbrLongNames || [])
+                list = list.concat(concept.contextNames || [])
+            }
+            return list;
+        }, []));
+        // conceptNames = conceptNames.concat(concepts.map(concept => concept.isAbbr ? concept.contextName : null));
+        conceptNames = conceptNames.filter(name => ConceptHelper.isValidName(name));
+        if (rootNames) {
+            conceptNames = conceptNames.concat(conceptNames.map(name => ConceptHelper.rootName(name, lang)));
+        }
+
+        conceptNames = uniq(conceptNames);
+
+        return conceptNames;
+    }
+
+    static isValidName(name: string) {
+        return name && name.trim().length > 1;
     }
 }

@@ -52,9 +52,9 @@ test('#setConceptsContextName', t => {
         { text: 'CEC', lang: 'ro', country: 'md' },
     ].map(item => ConceptHelper.create(item));
 
-    ConceptHelper.setConceptsContextName(concepts)
+    ConceptHelper.setConceptsContextNames(concepts)
 
-    t.is(concepts[0].contextName, undefined);
-    t.is(concepts[1].contextName, 'CEC');
-    t.is(concepts[2].contextName, 'Comisia Electorala Centrala');
+    t.is(concepts[0].contextNames, undefined);
+    t.deepEqual(concepts[1].contextNames, ['CEC']);
+    t.deepEqual(concepts[2].contextNames, ['Comisia Electorala Centrala']);
 })

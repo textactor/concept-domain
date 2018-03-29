@@ -26,5 +26,5 @@ test('set concept abbrLongName', async t => {
 
     t.is(concept.id, concepts[0].id);
     t.is(concept.isAbbr, true);
-    t.is(concept.abbrLongName, concepts[1].name);
+    t.deepEqual(concept.abbrLongNames, [concepts[1].name]);
 });

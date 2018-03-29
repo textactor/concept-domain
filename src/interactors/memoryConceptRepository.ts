@@ -24,7 +24,7 @@ export class MemoryConceptRepository implements IConceptRepository {
     getAbbrConceptsWithContextName(locale: Locale): Promise<Concept[]> {
         const list: Concept[] = []
         for (let item of this.db.values()) {
-            if (item.country === locale.country && item.lang === locale.lang && item.isAbbr && item.contextName) {
+            if (item.country === locale.country && item.lang === locale.lang && item.isAbbr && item.contextNames) {
                 list.push(item);
             }
         }

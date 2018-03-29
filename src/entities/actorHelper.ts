@@ -2,11 +2,12 @@ import { Concept } from "./concept";
 import { WikiEntity } from "./wikiEntity";
 import { ConceptActor } from "./actor";
 import { NameHelper, uniq, md5 } from "@textactor/domain";
+import { ConceptHelper } from "..";
 
 export class ActorHelper {
-    static create(concepts: Concept[], entity?: WikiEntity, additionalNames?: string[], concept?: Concept): ConceptActor {
+    static create(concepts: Concept[], entity?: WikiEntity): ConceptActor {
 
-        concept = concept || concepts[0];
+        const concept = concepts[0];
 
         const lang = concept.lang.trim().toLowerCase();
         const country = concept.country.trim().toLowerCase();
@@ -34,26 +35,16 @@ export class ActorHelper {
             actor.names = actor.names.concat(entity.names || []);
 
             // set abbreviation
-            entity.abbr = entity.names.find(item => NameHelper.isAbbr(item));
+            actor.abbr = entity.abbr || NameHelper.findAbbr(entity.names);
         }
+
+        actor.names = actor.names.concat(ConceptHelper.getConceptsNames(concepts, false));
+
+        actor.names = uniq(actor.names).filter(name => ConceptHelper.isValidName(name));
 
         if (!actor.abbr) {
-            const abbrConcept = concepts.find(item => NameHelper.isAbbr(item.name) || !!item.abbr);
-            if (abbrConcept) {
-                actor.abbr = abbrConcept.abbr || abbrConcept.name;
-            }
+            actor.abbr = NameHelper.findAbbr(actor.names);
         }
-
-
-        actor.names = actor.names.concat(concepts.map(item => item.name));
-        actor.names.push(concept.name);
-
-        if (additionalNames) {
-            actor.names = actor.names.concat(additionalNames);
-            actor.partialNames = additionalNames;
-        }
-
-        actor.names = uniq(actor.names);
 
         return actor;
     }

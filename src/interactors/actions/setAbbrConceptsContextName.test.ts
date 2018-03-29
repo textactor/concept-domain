@@ -21,7 +21,7 @@ test('set concept contextName', async t => {
     const cecConcept = ConceptHelper.create({ text: 'CEC', ...locale });
 
     let concept = await conceptRepository.getById(cecConcept.id);
-    t.is(concept.contextName, concepts[1].name);
+    t.deepEqual(concept.contextNames, [concepts[1].name]);
 
     await pushConcepts.execute([cecConcept]);
 
@@ -33,5 +33,5 @@ test('set concept contextName', async t => {
 
     t.is(concept.id, concepts[0].id);
     t.is(concept.isAbbr, true);
-    t.is(concept.contextName, concepts[1].name);
+    t.deepEqual(concept.contextNames, [concepts[1].name]);
 });

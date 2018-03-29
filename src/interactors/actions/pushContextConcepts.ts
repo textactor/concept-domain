@@ -10,7 +10,7 @@ export class PushContextConcepts extends UseCase<Concept[], void, void> {
     }
 
     protected innerExecute(concepts: Concept[]): Promise<void> {
-        ConceptHelper.setConceptsContextName(concepts);
+        ConceptHelper.setConceptsContextNames(concepts);
         return Promise.all(concepts.map(concept => this.repository.createOrIncrement(concept)))
             .then(_ => null)
     }

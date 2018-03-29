@@ -10,7 +10,6 @@ import { SaveWikiEntities } from './saveWikiEntities';
 import { FindWikiTitles } from './findWikiTitles';
 import { WikiEntityHelper } from '../../entities/wikiEntityHelper';
 import { WikiEntity } from '../../entities/wikiEntity';
-import { ConceptHelper } from '../../entities/conceptHelper';
 
 export type ExploreWikiEntitiesResults = {
     countProcessedNames: number
@@ -37,7 +36,6 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         let skip = 0;
         const limit = 100;
         const self = this;
-        const lang = this.locale.lang;
 
         const results: ExploreWikiEntitiesResults = {
             countExistingEntities: 0,
@@ -66,13 +64,19 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
             for (let concept of concepts) {
                 names.push(concept.name);
                 // names.push(NameHelper.rootName(concept.name, lang));
-                if (concept.isAbbr && concept.contextName) {
-                    debug(`exploring wiki entity by context name: ${concept.contextName}`);
-                    names.push(concept.contextName);
-                    names.push(ConceptHelper.rootName(concept.contextName, lang));
+                if (concept.isAbbr) {
+                    if (concept.abbrLongNames) {
+                        names = names.concat(concept.abbrLongNames);
+                    }
+                    if (concept.contextNames) {
+                        names = names.concat(concept.contextNames);
+                    }
+                    // names.push(ConceptHelper.rootName(concept.contextName, lang));
                 }
             }
             names = uniq(names);
+
+            debug(`exploring wiki entity by names: ${names}`);
 
             await seriesPromise(names, name => {
                 return self.processName(name, self.locale.lang, results)

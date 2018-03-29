@@ -11,7 +11,6 @@ import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
 import { uniqProp } from "../../utils";
 import { ActorHelper } from "../../entities/actorHelper";
 import { ConceptHelper } from "../../entities/conceptHelper";
-import { Concept } from "../../entities/concept";
 import { WikiEntity } from "../../entities/wikiEntity";
 
 
@@ -26,7 +25,7 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
 
         const lang = this.locale.lang;
         const country = this.locale.country;
-        const conceptNames = getConceptsNames(node.topConcepts);
+        const conceptNames = ConceptHelper.getConceptsNames(node.topConcepts, true);
         const wikiEntity = await this.findPerfectWikiEntity(conceptNames);
 
         let names = conceptNames;
@@ -42,7 +41,7 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
 
         const concepts = await this.conceptRepository.getByIds(conceptsIds);
 
-        const actor = ActorHelper.create(concepts, wikiEntity, names);
+        const actor = ActorHelper.create(concepts, wikiEntity);
 
         debug(`Created actor(${actor.name}): concepts:${JSON.stringify(concepts.map(item => item.name))}, wikiEntity: ${wikiEntity && wikiEntity.name}`);
 
@@ -88,18 +87,4 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
 
         return uniq(entities);
     }
-}
-
-function getConceptsNames(concepts: Concept[]): string[] {
-    const concept = concepts[0];
-    const lang = concept.lang;
-    let conceptNames = concepts.map(item => item.name);
-    conceptNames = conceptNames.concat(concepts.map(concept => concept.isAbbr ? (concept.abbrLongName || concept.contextName) : null));
-    // conceptNames = conceptNames.concat(concepts.map(concept => concept.isAbbr ? concept.contextName : null));
-    conceptNames = conceptNames.filter(name => WikiEntityHelper.isValidName(name));
-    conceptNames = conceptNames.concat(conceptNames.map(name => WikiEntityHelper.rootName(name, lang)));
-
-    conceptNames = uniq(conceptNames);
-
-    return conceptNames;
 }
