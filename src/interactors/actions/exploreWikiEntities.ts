@@ -8,10 +8,11 @@ import { IWikiEntityRepository } from '../wikiEntityRepository';
 import { ExploreWikiEntitiesByTitles } from './exploreWikiEntitiesByTitles';
 import { SaveWikiEntities } from './saveWikiEntities';
 import { FindWikiTitles } from './findWikiTitles';
-import { WikiEntityHelper } from '../../entities/wikiEntityHelper';
 import { WikiEntity } from '../../entities/wikiEntity';
 import { IWikiSearchNameRepository } from '../wikiSearchNameRepository';
 import { WikiSearchNameHelper } from '../../entities/wikiSearchName';
+import { IWikiTitleRepository } from '../wikiTitleRepository';
+import { WikiTitleHelper } from '../../entities/wikiTitle';
 const ms = require('ms');
 
 export type ExploreWikiEntitiesResults = {
@@ -26,9 +27,11 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
     private saveWikiEntities: SaveWikiEntities;
     private findWikiTitles: FindWikiTitles;
 
-    constructor(private locale: Locale, private conceptRepository: IConceptReadRepository,
-        private wikiEntityRepository: IWikiEntityRepository,
-        private wikiSearchNameRepository: IWikiSearchNameRepository) {
+    constructor(private locale: Locale,
+        private conceptRepository: IConceptReadRepository,
+        wikiEntityRepository: IWikiEntityRepository,
+        private wikiSearchNameRepository: IWikiSearchNameRepository,
+        private wikiTitleRepository: IWikiTitleRepository) {
         super()
 
         this.exploreWikiEntitiesByTitles = new ExploreWikiEntitiesByTitles(locale);
@@ -114,34 +117,48 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
             return [];
         }
 
-        const existingWikiEntities = await this.wikiEntityRepository.getByNameHash(WikiEntityHelper.nameHash(name, lang));
-        if (existingWikiEntities.length) {
-            results.countExistingEntities += existingWikiEntities.length;
-            debug(`WikiEntity exists name=${name}`);
-            return existingWikiEntities;
+        await this.wikiSearchNameRepository.createOrUpdate(WikiSearchNameHelper.create({
+            name,
+            lang,
+            country,
+            foundTitles: [],
+        }));
+
+        let initalTitles = await this.findWikiTitles.execute([name]);
+        if (!initalTitles.length) {
+            return [];
         }
-        const titles = await this.findWikiTitles.execute([name]);
-        if (!titles.length) {
+
+        initalTitles = uniq(initalTitles);
+        const titles: string[] = [];
+
+        await seriesPromise(initalTitles, async title => {
+            const wikiTitle = await this.wikiTitleRepository.getById(WikiTitleHelper.createId(title, lang, country));
+            if (wikiTitle && wikiTitle.lastSearchAt.getTime() > Date.now() - ms('30days')) {
+                debug(`WikiTitle=${title} exists!`);
+                return;
+            }
+            titles.push(title);
+        });
+
+        if (titles.length === 0) {
             return [];
         }
 
         const wikiEntities = await this.exploreWikiEntitiesByTitles.execute(titles);
-
-        if (!wikiEntities.length) {
-            return [];
-        }
 
         results.countNewEntities += wikiEntities.length;
 
         debug(`found wiki entities for ${name}==${wikiEntities.length}`);
         await this.saveWikiEntities.execute(wikiEntities);
 
-        await this.wikiSearchNameRepository.createOrUpdate(WikiSearchNameHelper.create({
-            name,
-            lang,
-            country,
-            foundTitles: titles,
-        }));
+        await seriesPromise(titles, async title => {
+            await this.wikiTitleRepository.createOrUpdate(WikiTitleHelper.create({
+                title,
+                lang,
+                country,
+            }));
+        });
 
         return wikiEntities;
     }

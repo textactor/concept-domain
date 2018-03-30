@@ -12,6 +12,7 @@ import { SetAbbrConceptsLongName } from './actions/setAbbrConceptsLongName';
 import { DeleteUnpopularConcepts, DeleteUnpopularConceptsOptions } from './actions/deleteUnpopularConcepts';
 import { ExploreWikiEntities } from './actions/exploreWikiEntities';
 import { IWikiSearchNameRepository } from './wikiSearchNameRepository';
+import { IWikiTitleRepository } from './wikiTitleRepository';
 
 export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 
@@ -23,7 +24,8 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
     constructor(locale: Locale,
         private conceptRepository: IConceptRepository,
         private entityRepository: IWikiEntityRepository,
-        private wikiSearchNameRepository: IWikiSearchNameRepository) {
+        private wikiSearchNameRepository: IWikiSearchNameRepository,
+        private wikiTitleRepository: IWikiTitleRepository) {
         super()
         this.locale = { ...locale };
     }
@@ -39,7 +41,8 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         const exploreWikiEntities = new ExploreWikiEntities(locale,
             this.conceptRepository,
             this.entityRepository,
-            this.wikiSearchNameRepository);
+            this.wikiSearchNameRepository,
+            this.wikiTitleRepository);
         const generateActors = new GenerateActors(locale, this.conceptRepository, this.entityRepository);
 
         debug(`=====> Start setAbbrLongName`);
