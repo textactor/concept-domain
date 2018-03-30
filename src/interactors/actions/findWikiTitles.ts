@@ -1,7 +1,7 @@
 
 const debug = require('debug')('textactor:concept-domain');
 
-import { UseCase, uniq } from "@textactor/domain";
+import { UseCase, uniq, seriesPromise } from "@textactor/domain";
 import { Locale } from "../../types";
 import { findTitles } from 'entity-finder';
 import { delay } from "../../utils";
@@ -19,7 +19,7 @@ export class FindWikiTitles extends UseCase<string[], string[], null> {
         const tags = getWikiTitleTags(this.locale);
         let allTitles: string[] = [];
 
-        for (let name of names) {
+        await seriesPromise(names, async name => {
             debug(`finding wiki titles for ${name}...`);
             const titles = await findTitles(name, this.locale.lang, { limit: 5, tags, orderByTagsLimit: 2 });
             if (titles && titles.length) {
@@ -27,10 +27,12 @@ export class FindWikiTitles extends UseCase<string[], string[], null> {
                 debug(`found wiki titles for ${name}: ${titleNames}`);
                 allTitles = allTitles.concat(titleNames);
             }
-            await delay(1000 * 1)
-        }
+            if (names.length > 1) {
+                await delay(500 * 1);
+            }
+        });
 
-        return Promise.resolve(uniq(allTitles));
+        return uniq(allTitles);
     }
 }
 

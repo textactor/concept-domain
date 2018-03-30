@@ -10,6 +10,9 @@ import { SaveWikiEntities } from './saveWikiEntities';
 import { FindWikiTitles } from './findWikiTitles';
 import { WikiEntityHelper } from '../../entities/wikiEntityHelper';
 import { WikiEntity } from '../../entities/wikiEntity';
+import { IWikiSearchNameRepository } from '../wikiSearchNameRepository';
+import { WikiSearchNameHelper } from '../../entities/wikiSearchName';
+const ms = require('ms');
 
 export type ExploreWikiEntitiesResults = {
     countProcessedNames: number
@@ -24,7 +27,8 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
     private findWikiTitles: FindWikiTitles;
 
     constructor(private locale: Locale, private conceptRepository: IConceptReadRepository,
-        private wikiEntityRepository: IWikiEntityRepository) {
+        private wikiEntityRepository: IWikiEntityRepository,
+        private wikiSearchNameRepository: IWikiSearchNameRepository) {
         super()
 
         this.exploreWikiEntitiesByTitles = new ExploreWikiEntitiesByTitles(locale);
@@ -79,10 +83,12 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
             debug(`exploring wiki entity by names: ${names}`);
 
             await seriesPromise(names, name => {
-                return self.processName(name, self.locale.lang, results)
+                return self.processName(name, results)
                     .then(entities => {
-                        results.lastnames = results.lastnames.concat(entities.map(item => item.lastname)
-                            .filter(item => !!item));
+                        if (entities.length) {
+                            results.lastnames = results.lastnames.concat(entities.map(item => item.lastname)
+                                .filter(item => !!item));
+                        }
                     });
             });
 
@@ -98,7 +104,16 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         return results;
     }
 
-    private async processName(name: string, lang: string, results: ExploreWikiEntitiesResults): Promise<WikiEntity[]> {
+    private async processName(name: string, results: ExploreWikiEntitiesResults): Promise<WikiEntity[]> {
+        const lang = this.locale.lang;
+        const country = this.locale.country;
+
+        const searchName = await this.wikiSearchNameRepository.getById(WikiSearchNameHelper.createId(name, lang, country));
+        if (searchName && searchName.lastSearchAt.getTime() > Date.now() - ms('30days')) {
+            debug(`WikiSearchName=${name} exists!`);
+            return [];
+        }
+
         const existingWikiEntities = await this.wikiEntityRepository.getByNameHash(WikiEntityHelper.nameHash(name, lang));
         if (existingWikiEntities.length) {
             results.countExistingEntities += existingWikiEntities.length;
@@ -120,6 +135,14 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
 
         debug(`found wiki entities for ${name}==${wikiEntities.length}`);
         await this.saveWikiEntities.execute(wikiEntities);
+
+        await this.wikiSearchNameRepository.createOrUpdate(WikiSearchNameHelper.create({
+            name,
+            lang,
+            country,
+            foundTitles: titles,
+        }));
+
         return wikiEntities;
     }
 }

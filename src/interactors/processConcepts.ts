@@ -11,6 +11,7 @@ import { SetAbbrConceptsContextName } from './actions/setAbbrConceptsContextName
 import { SetAbbrConceptsLongName } from './actions/setAbbrConceptsLongName';
 import { DeleteUnpopularConcepts, DeleteUnpopularConceptsOptions } from './actions/deleteUnpopularConcepts';
 import { ExploreWikiEntities } from './actions/exploreWikiEntities';
+import { IWikiSearchNameRepository } from './wikiSearchNameRepository';
 
 export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 
@@ -19,7 +20,10 @@ export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, ProcessConceptsOptions> {
     private locale: Locale;
 
-    constructor(locale: Locale, private conceptRepository: IConceptRepository, private entityRepository: IWikiEntityRepository) {
+    constructor(locale: Locale,
+        private conceptRepository: IConceptRepository,
+        private entityRepository: IWikiEntityRepository,
+        private wikiSearchNameRepository: IWikiSearchNameRepository) {
         super()
         this.locale = { ...locale };
     }
@@ -32,7 +36,10 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         const setAbbrConcextName = new SetAbbrConceptsContextName(locale, this.conceptRepository);
         const setAbbrLongName = new SetAbbrConceptsLongName(locale, this.conceptRepository);
         const deleteUnpopularConcepts = new DeleteUnpopularConcepts(locale, this.conceptRepository);
-        const exploreWikiEntities = new ExploreWikiEntities(locale, this.conceptRepository, this.entityRepository);
+        const exploreWikiEntities = new ExploreWikiEntities(locale,
+            this.conceptRepository,
+            this.entityRepository,
+            this.wikiSearchNameRepository);
         const generateActors = new GenerateActors(locale, this.conceptRepository, this.entityRepository);
 
         debug(`=====> Start setAbbrLongName`);
@@ -61,4 +68,3 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         debug(`<===== End generateActors`);
     }
 }
-
