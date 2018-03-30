@@ -1,8 +1,8 @@
 import { Concept } from "./concept";
 import { WikiEntity } from "./wikiEntity";
 import { ConceptActor } from "./actor";
-import { NameHelper, uniq, md5 } from "@textactor/domain";
-import { ConceptHelper } from "..";
+import { NameHelper, uniq } from "@textactor/domain";
+import { ConceptHelper } from "./conceptHelper";
 
 export class ActorHelper {
     static create(concepts: Concept[], entity?: WikiEntity): ConceptActor {
@@ -11,16 +11,12 @@ export class ActorHelper {
 
         const lang = concept.lang.trim().toLowerCase();
         const country = concept.country.trim().toLowerCase();
-        const name = entity && (entity.simpleName || entity.name) || concept.name;
-        const slug = NameHelper.slug((entity && entity.name || concept.name).toLowerCase());
-        const id = md5([lang, country, slug].join('_'));
+        const name = entity && entity.name || concept.name;
 
         const actor: ConceptActor = {
-            id,
-            name,
             lang,
             country,
-            slug,
+            name,
             wikiEntity: entity,
             names: [],
             concepts,

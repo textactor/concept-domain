@@ -4,10 +4,8 @@ import { Concept } from "./concept";
 
 
 export type ConceptActor = {
-    id: string
     lang: string
     country: string
-    slug: string
     name: string
     names?: string[]
     abbr?: string

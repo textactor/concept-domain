@@ -25,7 +25,6 @@ test('ro-md', async t => {
     const onActor = (actor: ConceptActor) => {
         t.true(!!actor);
         t.true(actor.popularity > 0);
-        t.true(actor.slug.length > 1);
         return Promise.resolve();
     };
 
