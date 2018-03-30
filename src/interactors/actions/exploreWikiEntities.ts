@@ -133,7 +133,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         const titles: string[] = [];
 
         await seriesPromise(initalTitles, async title => {
-            const wikiTitle = await this.wikiTitleRepository.getById(WikiTitleHelper.createId(title, lang, country));
+            const wikiTitle = await this.wikiTitleRepository.getById(WikiTitleHelper.createId(title, lang));
             if (wikiTitle && wikiTitle.lastSearchAt.getTime() > Date.now() - ms('30days')) {
                 debug(`WikiTitle=${title} exists!`);
                 return;
@@ -156,7 +156,6 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
             await this.wikiTitleRepository.createOrUpdate(WikiTitleHelper.create({
                 title,
                 lang,
-                country,
             }));
         });
 

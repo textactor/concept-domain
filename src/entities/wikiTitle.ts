@@ -3,7 +3,6 @@ import { md5, NameHelper } from "@textactor/domain";
 export type WikiTitle = {
     id: string
     lang?: string
-    country?: string
     title?: string
     createdAt?: Date
     lastSearchAt?: Date
@@ -11,7 +10,6 @@ export type WikiTitle = {
 
 export type CreatingWikiTitleData = {
     lang: string
-    country: string
     title: string
     lastSearchAt?: Date
 }
@@ -21,7 +19,6 @@ export class WikiTitleHelper {
 
         const title = data.title.trim();
         const lang = data.lang.trim().toLowerCase();
-        const country = data.country.trim().toLowerCase();
 
         const normalTitle = NameHelper.normalizeName(title, lang);
 
@@ -31,13 +28,12 @@ export class WikiTitleHelper {
 
         const hash = md5(normalTitle);
 
-        const id = [lang, country, hash].join('');
+        const id = [lang, hash].join('');
 
         const wikiTitle: WikiTitle = {
             id,
             title,
             lang,
-            country,
             createdAt: new Date(),
             lastSearchAt: data.lastSearchAt || new Date(),
         };
@@ -45,10 +41,9 @@ export class WikiTitleHelper {
         return wikiTitle;
     }
 
-    static createId(title: string, lang: string, country: string) {
+    static createId(title: string, lang: string) {
         title = title.trim();
         lang = lang.trim().toLowerCase();
-        country = country.trim().toLowerCase();
 
         const normalTitle = NameHelper.normalizeName(title, lang);
 
@@ -58,6 +53,6 @@ export class WikiTitleHelper {
 
         const hash = md5(normalTitle);
 
-        return [lang, country, hash].join('');
+        return [lang, hash].join('');
     }
 }
