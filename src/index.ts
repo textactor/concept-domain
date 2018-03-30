@@ -7,6 +7,8 @@ export { Concept } from './entities/concept';
 export { ConceptHelper, CreatingConceptData } from './entities/conceptHelper';
 export { WikiEntity, WikiEntityType } from './entities/wikiEntity';
 export { WikiEntityHelper } from './entities/wikiEntityHelper';
+export { WikiTitle, WikiTitleHelper } from './entities/wikiTitle';
+export { WikiSearchName, WikiSearchNameHelper } from './entities/wikiSearchName';
 
 export {
     IConceptRepository,
@@ -21,8 +23,22 @@ export {
     IWikiEntityWriteRepository,
 } from './interactors/wikiEntityRepository';
 
+export {
+    IWikiTitleRepository,
+    IWikiTitleReadRepository,
+    IWikiTitleWriteRepository,
+} from './interactors/wikiTitleRepository';
+
+export {
+    IWikiSearchNameRepository,
+    IWikiSearchNameReadRepository,
+    IWikiSearchNameWriteRepository,
+} from './interactors/wikiSearchNameRepository';
+
 export { MemoryConceptRepository } from './interactors/memoryConceptRepository';
 export { MemoryWikiEntityRepository } from './interactors/memoryWikiEntityRepository';
+export { MemoryWikiSearchNameRepository } from './interactors/memoryWikiSearchNameRepository';
+export { MemoryWikiTitleRepository } from './interactors/memoryWikiTitleRepository';
 
 export { PushContextConcepts } from './interactors/actions/pushContextConcepts';
 export {
