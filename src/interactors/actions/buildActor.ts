@@ -15,8 +15,7 @@ import { WikiEntity } from "../../entities/wikiEntity";
 import { INameCorrectionService } from "../nameCorrectionService";
 
 
-
-export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> {
+export class BuildActor extends UseCase<PopularConceptNode, ConceptActor ,void> {
 
     constructor(private locale: Locale,
         private wikiEntityRepository: IWikiEntityReadRepository,
@@ -33,11 +32,11 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> 
         let wikiEntity = await this.findPerfectWikiEntity(conceptNames);
 
         if (!wikiEntity) {
-            const name = conceptNames[0];
-            if (!NameHelper.isAbbr(name)) {
-                const correctName = await this.nameCorrectionService.correct(conceptNames[0], lang, country);
+            const name = conceptNames.find(name => !NameHelper.isAbbr(name));
+            if (name) {
+                const correctName = await this.nameCorrectionService.correct(name, lang, country);
                 if (correctName) {
-                    debug(`Finding entity by Corrected Name: ${conceptNames[0]} => ${correctName}`);
+                    debug(`Finding entity by Corrected Name: ${name} => ${correctName}`);
                     wikiEntity = await this.findPerfectWikiEntity([correctName]);
                     const correctNameCountWords = NameHelper.countWords(correctName);
                     if (wikiEntity) {
