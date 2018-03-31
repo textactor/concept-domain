@@ -13,7 +13,6 @@ import { DeleteUnpopularConcepts, DeleteUnpopularConceptsOptions } from './actio
 import { ExploreWikiEntities } from './actions/exploreWikiEntities';
 import { IWikiSearchNameRepository } from './wikiSearchNameRepository';
 import { IWikiTitleRepository } from './wikiTitleRepository';
-import { INameCorrectionService } from './nameCorrectionService';
 
 export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 
@@ -26,8 +25,7 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         private conceptRepository: IConceptRepository,
         private entityRepository: IWikiEntityRepository,
         private wikiSearchNameRepository: IWikiSearchNameRepository,
-        private wikiTitleRepository: IWikiTitleRepository,
-        private nameCorrectionService: INameCorrectionService) {
+        private wikiTitleRepository: IWikiTitleRepository) {
         super()
         this.locale = { ...locale };
     }
@@ -47,8 +45,7 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
             this.wikiTitleRepository);
         const generateActors = new GenerateActors(locale,
             this.conceptRepository,
-            this.entityRepository,
-            this.nameCorrectionService);
+            this.entityRepository);
 
         debug(`=====> Start setAbbrLongName`);
         const setAbbrLongNameMap = await setAbbrLongName.execute(null);

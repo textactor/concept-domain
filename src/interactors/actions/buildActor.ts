@@ -1,7 +1,7 @@
 
 const debug = require('debug')('textactor:concept-domain');
 
-import { UseCase, uniq, seriesPromise, NameHelper } from "@textactor/domain";
+import { UseCase, uniq, seriesPromise } from "@textactor/domain";
 import { IWikiEntityReadRepository } from "../wikiEntityRepository";
 import { IConceptReadRepository } from "../conceptRepository";
 import { Locale } from "../../types";
@@ -12,15 +12,13 @@ import { uniqProp } from "../../utils";
 import { ActorHelper } from "../../entities/actorHelper";
 import { ConceptHelper } from "../../entities/conceptHelper";
 import { WikiEntity } from "../../entities/wikiEntity";
-import { INameCorrectionService } from "../nameCorrectionService";
 
 
 export class BuildActor extends UseCase<PopularConceptNode, ConceptActor ,void> {
 
     constructor(private locale: Locale,
         private wikiEntityRepository: IWikiEntityReadRepository,
-        private conceptRepository: IConceptReadRepository,
-        private nameCorrectionService: INameCorrectionService) {
+        private conceptRepository: IConceptReadRepository) {
         super()
     }
 
@@ -29,25 +27,7 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor ,void> 
         const lang = this.locale.lang;
         const country = this.locale.country;
         const conceptNames = ConceptHelper.getConceptsNames(node.topConcepts, true);
-        let wikiEntity = await this.findPerfectWikiEntity(conceptNames);
-
-        if (!wikiEntity) {
-            const name = conceptNames.find(name => !NameHelper.isAbbr(name));
-            if (name) {
-                const correctName = await this.nameCorrectionService.correct(name, lang, country);
-                if (correctName) {
-                    debug(`Finding entity by Corrected Name: ${name} => ${correctName}`);
-                    wikiEntity = await this.findPerfectWikiEntity([correctName]);
-                    const correctNameCountWords = NameHelper.countWords(correctName);
-                    if (wikiEntity) {
-                        if (!wikiEntity.names.find(name => NameHelper.countWords(name) === correctNameCountWords)) {
-                            debug(`Dropped entity founded by currect name: ${correctName}`);
-                            wikiEntity = null;
-                        }
-                    }
-                }
-            }
-        }
+        const wikiEntity = await this.findPerfectWikiEntity(conceptNames);
 
         let names = conceptNames;
 
