@@ -50,3 +50,7 @@ export {
     ProcessConcepts,
     ProcessConceptsOptions,
 } from './interactors/processConcepts';
+
+export {
+    INameCorrectionService
+} from './interactors/nameCorrectionService';
