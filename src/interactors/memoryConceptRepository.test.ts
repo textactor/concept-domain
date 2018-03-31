@@ -55,7 +55,7 @@ test('#getPopularRootNameHashes', async t => {
     const concept3 = ConceptHelper.create({ text: 'Виктор Зубков', country: 'ru', lang: 'ru' });
     await repository.createOrIncrement(concept3);
 
-    const popularHashes = await repository.getPopularRootNameHashes({ country: 'ru', lang: 'ru' }, 2);
+    const popularHashes = await repository.getPopularRootNameHashes({ country: 'ru', lang: 'ru' }, 2, 0);
 
     t.is(popularHashes.length, 2);
     t.is(popularHashes[0].hash, concept1.rootNameHash);
@@ -80,7 +80,7 @@ test('#deleteUnpopular', async t => {
     await repository.createOrIncrement(concept3);
 
     await repository.deleteUnpopular({ lang: 'ru', country: 'ru' }, 1);
-    const popularHashes = await repository.getPopularRootNameHashes({ country: 'ru', lang: 'ru' }, 2);
+    const popularHashes = await repository.getPopularRootNameHashes({ country: 'ru', lang: 'ru' }, 2, 0);
 
     t.is(popularHashes.length, 1);
     t.is(popularHashes[0].hash, concept1.rootNameHash);

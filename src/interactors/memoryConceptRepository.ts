@@ -140,12 +140,12 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(list);
     }
-    getPopularRootNameHashes(locale: Locale, limit: number, skip?: number): Promise<PopularConceptHash[]> {
-        skip = skip || 0;
+    getPopularRootNameHashes(locale: Locale, limit: number, skip: number, minCountWords?: number): Promise<PopularConceptHash[]> {
+        minCountWords = minCountWords || 0;
         const map: { [hash: string]: { popularity: number, ids: string[] } } = {}
 
         for (let item of this.db.values()) {
-            if (item.country !== locale.country || item.lang !== locale.lang) {
+            if (item.country !== locale.country || item.lang !== locale.lang || item.countWords < minCountWords) {
                 continue;
             }
 

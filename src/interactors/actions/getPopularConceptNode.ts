@@ -12,6 +12,7 @@ export type PopularConceptNode = {
 }
 
 export class GetPopularConceptNode extends UseCase<null, PopularConceptNode, null> {
+    private minCountWords = 2;
 
     constructor(private locale: Locale, private conceptRepository: IConceptReadRepository) {
         super()
@@ -19,10 +20,14 @@ export class GetPopularConceptNode extends UseCase<null, PopularConceptNode, nul
 
     protected async innerExecute(): Promise<PopularConceptNode> {
 
-        const popularHashes = await this.conceptRepository.getPopularRootNameHashes(this.locale, 1);
+        const popularHashes = await this.conceptRepository.getPopularRootNameHashes(this.locale, 1, 0, this.minCountWords);
 
         if (popularHashes.length < 1) {
-            return null;
+            if (this.minCountWords === 1) {
+                return null;
+            }
+            this.minCountWords = 1;
+            return this.innerExecute();
         }
 
         const popularHash = popularHashes[0];
