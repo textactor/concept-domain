@@ -54,12 +54,6 @@ export class ConceptHelper {
             popularity,
         };
 
-        // const partialName = getPartialName(name, { lang });
-        // if (partialName && NameHelper.countWords(partialName) > 1) {
-        //     concept.partialName = partialName;
-        //     concept.partialNameHash = ConceptHelper.nameHash(concept.partialName, lang, country);
-        // }
-
         return concept;
     }
 
@@ -69,7 +63,7 @@ export class ConceptHelper {
 
         const isAbbr = NameHelper.isAbbr(name);
 
-        if (isAbbr) {
+        if (isAbbr || NameHelper.countWords(name) < 2) {
             return name;
         }
         return NameHelper.rootName(name, lang);
