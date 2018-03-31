@@ -13,13 +13,13 @@ import { IWikiSearchNameRepository } from '../wikiSearchNameRepository';
 import { WikiSearchNameHelper } from '../../entities/wikiSearchName';
 import { IWikiTitleRepository } from '../wikiTitleRepository';
 import { WikiTitleHelper } from '../../entities/wikiTitle';
+import { ConceptHelper } from '../..';
 const ms = require('ms');
 
 export type ExploreWikiEntitiesResults = {
     countProcessedNames: number
     countExistingEntities: number
     countNewEntities: number
-    lastnames: string[]
 }
 
 export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResults, void> {
@@ -48,7 +48,6 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
             countExistingEntities: 0,
             countNewEntities: 0,
             countProcessedNames: 0,
-            lastnames: []
         };
 
         async function start(): Promise<void> {
@@ -67,32 +66,12 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
             // debug(`hashes ids: ${ids}`);
 
             const concepts = await self.conceptRepository.getByIds(ids);
-            let names: string[] = [];
-            for (let concept of concepts) {
-                names.push(concept.name);
-                // names.push(NameHelper.rootName(concept.name, lang));
-                if (concept.isAbbr) {
-                    if (concept.abbrLongNames) {
-                        names = names.concat(concept.abbrLongNames);
-                    }
-                    if (concept.contextNames) {
-                        names = names.concat(concept.contextNames);
-                    }
-                    // names.push(ConceptHelper.rootName(concept.contextName, lang));
-                }
-            }
-            names = uniq(names);
+            const names: string[] = ConceptHelper.getConceptsNames(concepts, true);
 
             debug(`exploring wiki entity by names: ${names}`);
 
             await seriesPromise(names, name => {
-                return self.processName(name, results)
-                    .then(entities => {
-                        if (entities.length) {
-                            results.lastnames = results.lastnames.concat(entities.map(item => item.lastname)
-                                .filter(item => !!item));
-                        }
-                    });
+                return self.processName(name, results);
             });
 
             results.countProcessedNames += names.length;
@@ -101,8 +80,6 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         }
 
         await start();
-
-        results.lastnames = uniq(results.lastnames);
 
         return results;
     }

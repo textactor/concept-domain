@@ -60,12 +60,13 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         debug(`<===== End deleteUnpopularConcepts`);
 
         debug(`=====> Start exploreWikiEntities`);
-        const wikiExploreResults = await exploreWikiEntities.execute(null);
+        await exploreWikiEntities.execute(null);
         debug(`<===== End exploreWikiEntities`);
-        const lastnamesHashes = uniq(wikiExploreResults.lastnames.map(name => ConceptHelper.nameHash(name, locale.lang, locale.country)));
+        const lastnames = await this.entityRepository.getLastnames(this.locale.lang);
+        const lastnamesHashes = uniq(lastnames.map(name => ConceptHelper.nameHash(name, locale.lang, locale.country)));
         debug(`=====> Start deleteByNameHash`);
         await this.conceptRepository.deleteByNameHash(lastnamesHashes);
-        debug(`Deleted lastnames=${JSON.stringify(wikiExploreResults.lastnames)}`);
+        debug(`Deleted lastnames=${JSON.stringify(lastnames)}`);
         debug(`<===== End deleteByNameHash`);
 
         debug(`=====> Start generateActors`);

@@ -1,7 +1,7 @@
 
 import { IWikiEntityRepository } from './wikiEntityRepository';
 import { WikiEntity } from '../entities/wikiEntity';
-import { RepUpdateData } from '@textactor/domain';
+import { RepUpdateData, uniq } from '@textactor/domain';
 
 
 export class MemoryWikiEntityRepository implements IWikiEntityRepository {
@@ -12,6 +12,17 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
         return Promise.resolve(this.db.size);
     }
 
+    getLastnames(lang: string): Promise<string[]> {
+        const list: string[] = []
+        for (let item of this.db.values()) {
+            if (item.lang === lang && item.lastname) {
+                list.push(item.lastname)
+            }
+        }
+
+        return Promise.resolve(list);
+    }
+
     getByNameHash(hash: string): Promise<WikiEntity[]> {
         const list: WikiEntity[] = []
         for (let item of this.db.values()) {
@@ -20,7 +31,7 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
             }
         }
 
-        return Promise.resolve(list);
+        return Promise.resolve(uniq(list));
     }
     getById(id: string): Promise<WikiEntity> {
         return Promise.resolve(this.db.get(id));
