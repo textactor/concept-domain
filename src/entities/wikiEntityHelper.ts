@@ -127,13 +127,10 @@ export class WikiEntityHelper {
 
     static nameHash(name: string, lang: string) {
         lang = lang.trim().toLowerCase();
-
-        name = name.trim().replace(/\s+/g, ' ').trim();
-        name = NameHelper.standardText(name, lang);
-
-        if (!NameHelper.isAbbr(name)) {
-            name = name.toLowerCase();
-        }
+        
+        name = name.trim();
+        name = NameHelper.normalizeName(name, lang);
+        name = NameHelper.atonic(name);
 
         return md5([lang, name].join('_'));
     }
