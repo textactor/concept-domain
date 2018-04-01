@@ -2,6 +2,7 @@
 import { NameHelper, md5, uniq } from '@textactor/domain';
 import { Concept } from './concept';
 import * as isAbbrOf from 'is-abbr-of';
+import { formatRootName } from '../utils';
 
 export type CreatingConceptData = {
     lang: string
@@ -66,7 +67,7 @@ export class ConceptHelper {
         if (isAbbr || NameHelper.countWords(name) < 2) {
             return name;
         }
-        return NameHelper.rootName(name, lang);
+        return formatRootName(name, lang);
     }
 
     public static nameHash(name: string, lang: string, country: string) {
