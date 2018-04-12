@@ -64,9 +64,14 @@ export class ConceptHelper {
 
         const isAbbr = NameHelper.isAbbr(name);
 
-        if (isAbbr || NameHelper.countWords(name) < 2) {
+        if (isAbbr) {
             return name;
         }
+
+        if (NameHelper.countWords(name) < 2) {
+            return formatRootName(name, lang, { accuracy: 2 });
+        }
+        
         return formatRootName(name, lang);
     }
 

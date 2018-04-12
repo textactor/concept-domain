@@ -3,9 +3,7 @@ import rootName from 'root-name';
 import { NameHelper } from '@textactor/domain';
 import { partialName } from 'partial-name';
 
-export function formatRootName(name: string, lang: string) {
-    return rootName(name, lang);
-}
+export { rootName as formatRootName }
 
 export function delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));

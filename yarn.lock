@@ -1015,9 +1015,9 @@ empower-core@^0.6.1:
     call-signature "0.0.2"
     core-js "^2.0.0"
 
-entity-finder@^0.5.1:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/entity-finder/-/entity-finder-0.5.1.tgz#bf5a3dc8671c9607c524523868b44fe0a3255cd5"
+entity-finder@^0.5.2:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/entity-finder/-/entity-finder-0.5.2.tgz#0a3ec6d484c63e006fdfc8af8119b3fef4831bed"
   dependencies:
     atonic "^1.0.4"
     request "^2.85.0"
@@ -2527,9 +2527,9 @@ rimraf@2, rimraf@^2.5.1, rimraf@^2.6.1, rimraf@^2.6.2:
   dependencies:
     glob "^7.0.5"
 
-root-name@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/root-name/-/root-name-0.1.2.tgz#a2cc48cd9ef66a12132bd0dcb31a4bee9e8116fb"
+root-name@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/root-name/-/root-name-0.1.3.tgz#0b8d3ca8c46d41710f5da9760e40894e7f8f2ab2"
 
 safe-buffer@^5.0.1, safe-buffer@^5.1.1, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.1"
