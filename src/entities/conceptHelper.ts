@@ -71,7 +71,7 @@ export class ConceptHelper {
         if (NameHelper.countWords(name) < 2) {
             return formatRootName(name, lang, { accuracy: 2 });
         }
-        
+
         return formatRootName(name, lang);
     }
 
@@ -126,7 +126,7 @@ export class ConceptHelper {
             return list;
         }, []));
         // conceptNames = conceptNames.concat(concepts.map(concept => concept.isAbbr ? concept.contextName : null));
-        conceptNames = conceptNames.filter(name => ConceptHelper.isValidName(name));
+        conceptNames = conceptNames.filter(name => ConceptHelper.isValidName(name, lang));
         if (rootNames) {
             conceptNames = conceptNames.concat(conceptNames.map(name => ConceptHelper.rootName(name, lang)));
         }
@@ -136,7 +136,11 @@ export class ConceptHelper {
         return conceptNames;
     }
 
-    static isValidName(name: string) {
-        return name && name.trim().length > 1;
+    static isValidName(name: string, lang: string) {
+        return name && name.trim().length > 1 && NameHelper.normalizeName(name, lang).length > 1;
+    }
+
+    static isValid(concept: Concept) {
+        return ConceptHelper.isValidName(concept.name, concept.lang);
     }
 }

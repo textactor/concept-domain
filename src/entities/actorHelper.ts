@@ -36,10 +36,14 @@ export class ActorHelper {
 
         actor.names = actor.names.concat(ConceptHelper.getConceptsNames(concepts, false));
 
-        actor.names = uniq(actor.names).filter(name => ConceptHelper.isValidName(name));
+        actor.names = uniq(actor.names).filter(name => ConceptHelper.isValidName(name, lang));
 
         if (!actor.abbr) {
             actor.abbr = NameHelper.findAbbr(actor.names);
+        }
+
+        if (actor.abbr && !ConceptHelper.isValidName(actor.abbr, lang)) {
+            delete actor.abbr;
         }
 
         return actor;
