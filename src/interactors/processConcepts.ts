@@ -1,9 +1,8 @@
 
 const debug = require('debug')('textactor:concept-domain');
 
-import { UseCase, uniq } from '@textactor/domain';
+import { UseCase } from '@textactor/domain';
 import { IConceptRepository } from './conceptRepository';
-import { ConceptHelper } from '../entities/conceptHelper';
 import { Locale } from '../types';
 import { OnGenerateActorCallback, GenerateActors } from './actions/generateActors';
 import { IWikiEntityRepository } from './wikiEntityRepository';
@@ -13,6 +12,7 @@ import { DeleteUnpopularConcepts, DeleteUnpopularConceptsOptions } from './actio
 import { ExploreWikiEntities } from './actions/exploreWikiEntities';
 import { IWikiSearchNameRepository } from './wikiSearchNameRepository';
 import { IWikiTitleRepository } from './wikiTitleRepository';
+import { DeletePartialConcepts } from './actions/deletePartialConcepts';
 
 export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 
@@ -38,6 +38,7 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         const setAbbrConcextName = new SetAbbrConceptsContextName(locale, this.conceptRepository);
         const setAbbrLongName = new SetAbbrConceptsLongName(locale, this.conceptRepository);
         const deleteUnpopularConcepts = new DeleteUnpopularConcepts(locale, this.conceptRepository);
+        const deletePartialConcepts = new DeletePartialConcepts(locale, this.conceptRepository, this.entityRepository);
         const exploreWikiEntities = new ExploreWikiEntities(locale,
             this.conceptRepository,
             this.entityRepository,
@@ -62,12 +63,10 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         debug(`=====> Start exploreWikiEntities`);
         await exploreWikiEntities.execute(null);
         debug(`<===== End exploreWikiEntities`);
-        const lastnames = await this.entityRepository.getLastnames(this.locale.lang);
-        const lastnamesHashes = uniq(lastnames.map(name => ConceptHelper.nameHash(name, locale.lang, locale.country)));
-        debug(`=====> Start deleteByNameHash`);
-        await this.conceptRepository.deleteByNameHash(lastnamesHashes);
-        debug(`Deleted lastnames=${JSON.stringify(lastnames)}`);
-        debug(`<===== End deleteByNameHash`);
+
+        debug(`<===== Start deletePartialConcepts`);
+        await deletePartialConcepts.execute(null);
+        debug(`<===== End deletePartialConcepts`);
 
         debug(`=====> Start generateActors`);
         await generateActors.execute(callback);
