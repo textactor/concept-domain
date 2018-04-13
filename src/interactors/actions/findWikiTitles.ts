@@ -49,4 +49,7 @@ const LOCALE_COUNTRY_TAGS: { [country: string]: { [lang: string]: string[] } } =
     ro: {
         ro: ['românia', 'româniei'],
     },
+    ru: {
+        ru: ['Россия', 'РФ', 'России', 'Российской'],
+    },
 }

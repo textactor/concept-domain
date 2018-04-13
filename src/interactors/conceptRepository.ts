@@ -16,12 +16,12 @@ export interface IConceptWriteRepository extends IWriteRepository<string, Concep
     deleteAll(locale: Locale): Promise<number>
     deleteIds(ids: string[]): Promise<number>
     deleteByNameHash(hashes: string[]): Promise<number>
-    incrementPopularity(id: string): Promise<number>
+    // incrementPopularity(id: string): Promise<number>
     /**
      * Create a new concept or update existing with new fields and increment popularity
      * @param concept Concept to process
      */
-    createOrIncrement(concept: Concept): Promise<Concept>
+    createOrUpdate(concept: Concept): Promise<Concept>
 }
 
 export interface IConceptReadRepository extends IReadRepository<string, Concept> {

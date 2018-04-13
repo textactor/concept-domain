@@ -47,13 +47,13 @@ test('#getPopularRootNameHashes', async t => {
     const repository = new MemoryConceptRepository();
 
     const concept1 = ConceptHelper.create({ text: 'Владимир Путин', country: 'ru', lang: 'ru' });
-    await repository.createOrIncrement(concept1);
+    await repository.createOrUpdate(concept1);
 
     const concept2 = ConceptHelper.create({ text: 'Владимира Путина', country: 'ru', lang: 'ru' });
-    await repository.createOrIncrement(concept2);
+    await repository.createOrUpdate(concept2);
 
     const concept3 = ConceptHelper.create({ text: 'Виктор Зубков', country: 'ru', lang: 'ru' });
-    await repository.createOrIncrement(concept3);
+    await repository.createOrUpdate(concept3);
 
     const popularHashes = await repository.getPopularRootNameHashes({ country: 'ru', lang: 'ru' }, 2, 0);
 
@@ -70,14 +70,14 @@ test('#deleteUnpopular', async t => {
     const repository = new MemoryConceptRepository();
 
     const concept1 = ConceptHelper.create({ text: 'Владимир Путин', country: 'ru', lang: 'ru' });
-    await repository.createOrIncrement(concept1);
-    await repository.createOrIncrement(concept1);
+    await repository.createOrUpdate(concept1);
+    await repository.createOrUpdate(concept1);
 
     const concept2 = ConceptHelper.create({ text: 'Владимира Путина', country: 'ru', lang: 'ru' });
-    await repository.createOrIncrement(concept2);
+    await repository.createOrUpdate(concept2);
 
     const concept3 = ConceptHelper.create({ text: 'Виктор Зубков', country: 'ru', lang: 'ru' });
-    await repository.createOrIncrement(concept3);
+    await repository.createOrUpdate(concept3);
 
     await repository.deleteUnpopular({ lang: 'ru', country: 'ru' }, 1);
     const popularHashes = await repository.getPopularRootNameHashes({ country: 'ru', lang: 'ru' }, 2, 0);

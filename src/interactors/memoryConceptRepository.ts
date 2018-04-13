@@ -231,15 +231,13 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(item.popularity);
     }
-    async createOrIncrement(concept: Concept): Promise<Concept> {
+    async createOrUpdate(concept: Concept): Promise<Concept> {
         concept = { ...concept };
         const id = concept.id;
         let item = this.db.get(id);
         if (!item) {
             await this.create(concept);
         } else {
-            // delete concept.popularity;
-            // item = await this.update({ item: concept });
             item.popularity++;
         }
 
