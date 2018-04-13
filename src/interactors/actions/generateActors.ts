@@ -5,7 +5,6 @@ import { IWikiEntityRepository } from '../wikiEntityRepository';
 import { IConceptRepository } from '../conceptRepository';
 import { ConceptActor } from '../../entities/actor';
 import { BuildActor } from './buildActor';
-import { GetPopularConceptNode } from './getPopularConceptNode';
 import { DeleteActorConcepts } from './deleteActorConcepts';
 import { IConceptRootNameRepository } from '../conceptRootNameRepository';
 
@@ -14,8 +13,8 @@ export interface OnGenerateActorCallback {
 }
 
 export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void> {
+    private minCountWords = 2
     private buildActor: BuildActor
-    private getPopularConceptNode: GetPopularConceptNode
     private deleteActorConcepts: DeleteActorConcepts
 
     constructor(private locale: Locale,
@@ -25,7 +24,6 @@ export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void>
         super()
 
         this.buildActor = new BuildActor(locale, wikiEntityRep, conceptRep);
-        this.getPopularConceptNode = new GetPopularConceptNode(locale, conceptRep, rootNameRep);
         this.deleteActorConcepts = new DeleteActorConcepts(conceptRep, rootNameRep);
     }
 
@@ -34,15 +32,15 @@ export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void>
 
         while (true) {
             try {
-                const node = await this.getPopularConceptNode.execute(null);
+                const rootId = await this.getNextPopularRootId();
 
-                if (!node) {
+                if (!rootId) {
                     await this.conceptRep.deleteAll(this.locale);
                     await this.rootNameRep.deleteAll(this.locale);
                     return;
                 }
 
-                actor = await this.buildActor.execute(node);
+                actor = await this.buildActor.execute(rootId);
                 await this.deleteActorConcepts.execute(actor);
 
             } catch (e) {
@@ -53,5 +51,19 @@ export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void>
                 await callback(actor);
             }
         }
+    }
+
+    private async getNextPopularRootId(): Promise<string> {
+        const rootIds = await this.rootNameRep.getMostPopularIds(this.locale, 1, 0, this.minCountWords);
+
+        if (rootIds.length < 1) {
+            if (this.minCountWords === 1) {
+                return null;
+            }
+            this.minCountWords = 1;
+            return this.getNextPopularRootId();
+        }
+
+        return rootIds[0];
     }
 }

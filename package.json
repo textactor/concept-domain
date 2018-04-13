@@ -46,7 +46,7 @@
     "is-abbr-of": "^0.1.1",
     "ms": "^2.1.1",
     "partial-name": "^0.1.3",
-    "root-name": "^0.1.4",
+    "root-name": "^0.1.5",
     "wiki-entity": "^0.3.3"
   }
 }
