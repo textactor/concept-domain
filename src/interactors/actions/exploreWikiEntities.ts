@@ -14,6 +14,7 @@ import { WikiSearchNameHelper } from '../../entities/wikiSearchName';
 import { IWikiTitleRepository } from '../wikiTitleRepository';
 import { WikiTitleHelper } from '../../entities/wikiTitle';
 import { ConceptHelper } from '../..';
+import { IConceptRootNameRepository } from '../conceptRootNameRepository';
 const ms = require('ms');
 
 export type ExploreWikiEntitiesResults = {
@@ -28,14 +29,15 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
     private findWikiTitles: FindWikiTitles;
 
     constructor(private locale: Locale,
-        private conceptRepository: IConceptReadRepository,
-        wikiEntityRepository: IWikiEntityRepository,
-        private wikiSearchNameRepository: IWikiSearchNameRepository,
-        private wikiTitleRepository: IWikiTitleRepository) {
+        private conceptRep: IConceptReadRepository,
+        private rootNameRep: IConceptRootNameRepository,
+        entityRep: IWikiEntityRepository,
+        private wikiSearchNameRep: IWikiSearchNameRepository,
+        private wikiTitleRep: IWikiTitleRepository) {
         super()
 
         this.exploreWikiEntitiesByTitles = new ExploreWikiEntitiesByTitles(locale);
-        this.saveWikiEntities = new SaveWikiEntities(wikiEntityRepository);
+        this.saveWikiEntities = new SaveWikiEntities(entityRep);
         this.findWikiTitles = new FindWikiTitles(locale);
     }
 
@@ -52,20 +54,15 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
 
         async function start(): Promise<void> {
 
-            const hashes = await self.conceptRepository.getPopularRootNameHashes(self.locale, limit, skip);
+            const rootIds = await self.rootNameRep.getMostPopularIds(self.locale, limit, skip);
 
-            if (hashes.length === 0) {
-                debug(`concepts hashes==0`);
+            if (rootIds.length === 0) {
+                debug(`concepts rootIds==0`);
                 return;
             }
             skip += limit;
 
-            let ids = hashes.reduce<string[]>((list, hash) => list.concat(hash.ids.splice(0, 2)), []);
-            ids = uniq(ids);
-
-            // debug(`hashes ids: ${ids}`);
-
-            const concepts = await self.conceptRepository.getByIds(ids);
+            const concepts = await self.conceptRep.getByRootNameIds(rootIds);
             const names: string[] = ConceptHelper.getConceptsNames(concepts, true);
 
             debug(`exploring wiki entity by names: ${names}`);
@@ -88,13 +85,13 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         const lang = this.locale.lang;
         const country = this.locale.country;
 
-        const searchName = await this.wikiSearchNameRepository.getById(WikiSearchNameHelper.createId(name, lang, country));
+        const searchName = await this.wikiSearchNameRep.getById(WikiSearchNameHelper.createId(name, lang, country));
         if (searchName && searchName.lastSearchAt.getTime() > Date.now() - ms('30days')) {
             debug(`WikiSearchName=${name} exists!`);
             return [];
         }
 
-        await this.wikiSearchNameRepository.createOrUpdate(WikiSearchNameHelper.create({
+        await this.wikiSearchNameRep.createOrUpdate(WikiSearchNameHelper.create({
             name,
             lang,
             country,
@@ -110,7 +107,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         const titles: string[] = [];
 
         await seriesPromise(initalTitles, async title => {
-            const wikiTitle = await this.wikiTitleRepository.getById(WikiTitleHelper.createId(title, lang));
+            const wikiTitle = await this.wikiTitleRep.getById(WikiTitleHelper.createId(title, lang));
             if (wikiTitle && wikiTitle.lastSearchAt.getTime() > Date.now() - ms('30days')) {
                 debug(`WikiTitle=${title} exists!`);
                 return;
@@ -130,7 +127,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         await this.saveWikiEntities.execute(wikiEntities);
 
         await seriesPromise(titles, async title => {
-            await this.wikiTitleRepository.createOrUpdate(WikiTitleHelper.create({
+            await this.wikiTitleRep.createOrUpdate(WikiTitleHelper.create({
                 title,
                 lang,
             }));

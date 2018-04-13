@@ -2,7 +2,7 @@
 import { NameHelper, md5, uniq } from '@textactor/domain';
 import { Concept } from './concept';
 import * as isAbbrOf from 'is-abbr-of';
-import { formatRootName } from '../utils';
+import { RootNameHelper } from './rootNameHelper';
 
 export type CreatingConceptData = {
     lang: string
@@ -29,10 +29,7 @@ export class ConceptHelper {
         const countWords = NameHelper.countWords(name);
         const isIrregular = NameHelper.isIrregular(name);
         const endsWithNumber = NameHelper.endsWithNumberWord(name);
-
-        const rootName = ConceptHelper.rootName(name, lang);
-        const normalRootName = NameHelper.normalizeName(rootName, lang);
-        const rootNameHash = ConceptHelper.nameHash(rootName, lang, country);
+        const rootNameId = RootNameHelper.idFromName(name, lang, country);
 
         const popularity = 1;
 
@@ -49,30 +46,11 @@ export class ConceptHelper {
             isIrregular,
             endsWithNumber,
             abbr: data.abbr,
-            rootName,
-            normalRootName,
-            rootNameHash,
+            rootNameId,
             popularity,
         };
 
         return concept;
-    }
-
-    public static rootName(name: string, lang: string) {
-        lang = lang.trim();
-        name = name.trim();
-
-        const isAbbr = NameHelper.isAbbr(name);
-
-        if (isAbbr) {
-            return name;
-        }
-
-        if (NameHelper.countWords(name) < 2) {
-            return formatRootName(name, lang, { accuracy: 2 });
-        }
-
-        return formatRootName(name, lang);
     }
 
     public static nameHash(name: string, lang: string, country: string) {
@@ -115,8 +93,7 @@ export class ConceptHelper {
     }
 
     public static getConceptsNames(concepts: Concept[], rootNames: boolean): string[] {
-        const concept = concepts[0];
-        const lang = concept.lang;
+        const { lang } = concepts[0];
         let conceptNames = concepts.map(item => item.name);
         conceptNames = conceptNames.concat(concepts.reduce<string[]>((list, concept) => {
             if (concept.isAbbr) {
@@ -125,10 +102,10 @@ export class ConceptHelper {
             }
             return list;
         }, []));
-        // conceptNames = conceptNames.concat(concepts.map(concept => concept.isAbbr ? concept.contextName : null));
+
         conceptNames = conceptNames.filter(name => ConceptHelper.isValidName(name, lang));
         if (rootNames) {
-            conceptNames = conceptNames.concat(conceptNames.map(name => ConceptHelper.rootName(name, lang)));
+            conceptNames = conceptNames.concat(conceptNames.map(name => RootNameHelper.rootName(name, lang)));
         }
 
         conceptNames = uniq(conceptNames);

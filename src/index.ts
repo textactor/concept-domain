@@ -5,6 +5,8 @@ export { ConceptActor } from './entities/actor';
 export { ActorHelper } from './entities/actorHelper';
 export { Concept } from './entities/concept';
 export { ConceptHelper, CreatingConceptData } from './entities/conceptHelper';
+export { RootName } from './entities/rootName';
+export { RootNameHelper, CreatingRootNameData } from './entities/rootNameHelper';
 export { WikiEntity, WikiEntityType } from './entities/wikiEntity';
 export { WikiEntityHelper } from './entities/wikiEntityHelper';
 export { WikiTitle, WikiTitleHelper } from './entities/wikiTitle';
@@ -14,8 +16,13 @@ export {
     IConceptRepository,
     IConceptReadRepository,
     IConceptWriteRepository,
-    PopularConceptHash,
 } from './interactors/conceptRepository';
+
+export {
+    IConceptRootNameRepository,
+    IConceptRootNameReadRepository,
+    IConceptRootNameWriteRepository,
+} from './interactors/conceptRootNameRepository';
 
 export {
     IWikiEntityRepository,
@@ -36,6 +43,7 @@ export {
 } from './interactors/wikiSearchNameRepository';
 
 export { MemoryConceptRepository } from './interactors/memoryConceptRepository';
+export { MemoryRootNameRepository } from './interactors/memoryRootNameRepository';
 export { MemoryWikiEntityRepository } from './interactors/memoryWikiEntityRepository';
 export { MemoryWikiSearchNameRepository } from './interactors/memoryWikiSearchNameRepository';
 export { MemoryWikiTitleRepository } from './interactors/memoryWikiTitleRepository';
@@ -43,7 +51,6 @@ export { MemoryWikiTitleRepository } from './interactors/memoryWikiTitleReposito
 export { PushContextConcepts } from './interactors/actions/pushContextConcepts';
 export {
     DeleteUnpopularConcepts,
-    createDeleteUnpopularConceptsOptions,
 } from './interactors/actions/deleteUnpopularConcepts';
 
 export {

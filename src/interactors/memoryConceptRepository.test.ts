@@ -43,51 +43,6 @@ test('#getByIds', async t => {
     t.is(concepts[1].id, concept2.id);
 })
 
-test('#getPopularRootNameHashes', async t => {
-    const repository = new MemoryConceptRepository();
-
-    const concept1 = ConceptHelper.create({ text: 'Владимир Путин', country: 'ru', lang: 'ru' });
-    await repository.createOrUpdate(concept1);
-
-    const concept2 = ConceptHelper.create({ text: 'Владимира Путина', country: 'ru', lang: 'ru' });
-    await repository.createOrUpdate(concept2);
-
-    const concept3 = ConceptHelper.create({ text: 'Виктор Зубков', country: 'ru', lang: 'ru' });
-    await repository.createOrUpdate(concept3);
-
-    const popularHashes = await repository.getPopularRootNameHashes({ country: 'ru', lang: 'ru' }, 2, 0);
-
-    t.is(popularHashes.length, 2);
-    t.is(popularHashes[0].hash, concept1.rootNameHash);
-    t.is(popularHashes[0].popularity, 2);
-    t.is(popularHashes[0].ids.length, 2);
-    t.is(popularHashes[1].hash, concept3.rootNameHash);
-    t.is(popularHashes[1].popularity, 1);
-})
-
-
-test('#deleteUnpopular', async t => {
-    const repository = new MemoryConceptRepository();
-
-    const concept1 = ConceptHelper.create({ text: 'Владимир Путин', country: 'ru', lang: 'ru' });
-    await repository.createOrUpdate(concept1);
-    await repository.createOrUpdate(concept1);
-
-    const concept2 = ConceptHelper.create({ text: 'Владимира Путина', country: 'ru', lang: 'ru' });
-    await repository.createOrUpdate(concept2);
-
-    const concept3 = ConceptHelper.create({ text: 'Виктор Зубков', country: 'ru', lang: 'ru' });
-    await repository.createOrUpdate(concept3);
-
-    await repository.deleteUnpopular({ lang: 'ru', country: 'ru' }, 1);
-    const popularHashes = await repository.getPopularRootNameHashes({ country: 'ru', lang: 'ru' }, 2, 0);
-
-    t.is(popularHashes.length, 1);
-    t.is(popularHashes[0].hash, concept1.rootNameHash);
-    t.is(popularHashes[0].popularity, 2);
-    t.is(popularHashes[0].ids.length, 1);
-})
-
 test('#deleteByNameHash', async t => {
     const repository = new MemoryConceptRepository();
 

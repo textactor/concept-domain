@@ -12,9 +12,10 @@ import { uniqProp } from "../../utils";
 import { ActorHelper } from "../../entities/actorHelper";
 import { ConceptHelper } from "../../entities/conceptHelper";
 import { WikiEntity } from "../../entities/wikiEntity";
+import { RootNameHelper } from "../..";
 
 
-export class BuildActor extends UseCase<PopularConceptNode, ConceptActor ,void> {
+export class BuildActor extends UseCase<PopularConceptNode, ConceptActor, void> {
 
     constructor(private locale: Locale,
         private wikiEntityRepository: IWikiEntityReadRepository,
@@ -26,21 +27,23 @@ export class BuildActor extends UseCase<PopularConceptNode, ConceptActor ,void> 
 
         const lang = this.locale.lang;
         const country = this.locale.country;
-        const conceptNames = ConceptHelper.getConceptsNames(node.topConcepts, true);
+        const conceptNames = ConceptHelper.getConceptsNames(node.concepts, true);
         const wikiEntity = await this.findPerfectWikiEntity(conceptNames);
 
         let names = conceptNames;
 
         if (wikiEntity) {
             names = names.concat(wikiEntity.names);
-            names = names.concat(wikiEntity.secondaryNames);
+            // names = names.concat(wikiEntity.secondaryNames);
+        } else {
+            // debug(JSON.stringify(node));
         }
 
         names = uniq(names).filter(name => WikiEntityHelper.isValidName(name));
 
-        const conceptsIds = uniq(names.map(name => ConceptHelper.id(name, lang, country)));
+        const rootIds = uniq(names.map(name => RootNameHelper.idFromName(name, lang, country)));
 
-        const concepts = await this.conceptRepository.getByIds(conceptsIds);
+        const concepts = await this.conceptRepository.getByRootNameIds(rootIds);
 
         const actor = ActorHelper.create(concepts, wikiEntity);
 

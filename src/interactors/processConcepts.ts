@@ -13,6 +13,7 @@ import { ExploreWikiEntities } from './actions/exploreWikiEntities';
 import { IWikiSearchNameRepository } from './wikiSearchNameRepository';
 import { IWikiTitleRepository } from './wikiTitleRepository';
 import { DeletePartialConcepts } from './actions/deletePartialConcepts';
+import { IConceptRootNameRepository } from './conceptRootNameRepository';
 
 export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 
@@ -23,6 +24,7 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
 
     constructor(locale: Locale,
         private conceptRepository: IConceptRepository,
+        private rootNameRep: IConceptRootNameRepository,
         private entityRepository: IWikiEntityRepository,
         private wikiSearchNameRepository: IWikiSearchNameRepository,
         private wikiTitleRepository: IWikiTitleRepository) {
@@ -37,15 +39,17 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
 
         const setAbbrConcextName = new SetAbbrConceptsContextName(locale, this.conceptRepository);
         const setAbbrLongName = new SetAbbrConceptsLongName(locale, this.conceptRepository);
-        const deleteUnpopularConcepts = new DeleteUnpopularConcepts(locale, this.conceptRepository);
-        const deletePartialConcepts = new DeletePartialConcepts(locale, this.conceptRepository, this.entityRepository);
+        const deleteUnpopularConcepts = new DeleteUnpopularConcepts(locale, this.conceptRepository, this.rootNameRep);
+        const deletePartialConcepts = new DeletePartialConcepts(locale, this.conceptRepository, this.rootNameRep, this.entityRepository);
         const exploreWikiEntities = new ExploreWikiEntities(locale,
             this.conceptRepository,
+            this.rootNameRep,
             this.entityRepository,
             this.wikiSearchNameRepository,
             this.wikiTitleRepository);
         const generateActors = new GenerateActors(locale,
             this.conceptRepository,
+            this.rootNameRep,
             this.entityRepository);
 
         debug(`=====> Start setAbbrLongName`);

@@ -7,13 +7,15 @@ import { Locale } from '../../types';
 import { PushContextConcepts } from './pushContextConcepts';
 import { ConceptHelper } from '../../entities/conceptHelper';
 import { ConceptActor } from '../../entities/actor';
+import { MemoryRootNameRepository } from '../memoryRootNameRepository';
 
 test('ro-md', async t => {
     const conceptRepository = new MemoryConceptRepository();
     const wikiEntityRepository = new MemoryWikiEntityRepository();
-    const pushConcepts = new PushContextConcepts(conceptRepository);
+    const rootNameRep = new MemoryRootNameRepository();
+    const pushConcepts = new PushContextConcepts(conceptRepository, rootNameRep);
     const locale: Locale = { lang: 'ro', country: 'md' };
-    const actorsGenerator = new GenerateActors(locale, conceptRepository, wikiEntityRepository);
+    const actorsGenerator = new GenerateActors(locale, conceptRepository, rootNameRep, wikiEntityRepository);
 
     const conceptTexts: string[] = ['R. Moldova', 'Republica Moldova', 'Moldova', 'Republicii Moldova', 'Chișinău', 'Chisinau', 'Chisinaului', 'Adrian Ursu', 'Partidul Liberal', 'PDM', 'Partidul Democrat', 'PSRM'];
 

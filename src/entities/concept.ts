@@ -8,11 +8,8 @@ export type Concept = {
     nameLength?: number
     /** normalized text hash */
     nameHash?: string
-    normalName?: string;
-    rootName?: string
-    normalRootName?: string;
-    /** normalized root text hash */
-    rootNameHash?: string
+    normalName?: string
+    rootNameId?: string
 
     abbr?: string
     abbrLongNames?: string[]
@@ -25,8 +22,4 @@ export type Concept = {
     createdAt?: number
 
     contextNames?: string[]
-    // partialName?: string
-
-    // contextNameHash?: string
-    // partialNameHash?: string
 }

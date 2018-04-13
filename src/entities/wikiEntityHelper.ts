@@ -2,8 +2,8 @@
 import { WikiEntity as ExternWikiEntity, convertToSimpleEntity, SimpleEntityType } from 'wiki-entity';
 import { WikiEntityType, WikiEntity } from './wikiEntity';
 import { NameHelper, uniq, md5 } from '@textactor/domain';
-import { ConceptHelper } from '../entities/conceptHelper';
 import { getPartialName } from '../utils';
+import { RootNameHelper } from './rootNameHelper';
 
 export class WikiEntityHelper {
 
@@ -128,7 +128,7 @@ export class WikiEntityHelper {
     }
 
     static rootName(name: string, lang: string) {
-        return ConceptHelper.rootName(name, lang);
+        return RootNameHelper.rootName(name, lang);
     }
 
     static rootNameHash(name: string, lang: string) {

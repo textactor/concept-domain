@@ -8,16 +8,19 @@ import { ConceptHelper } from '../../entities/conceptHelper';
 import { PushContextConcepts } from './pushContextConcepts';
 import { MemoryWikiSearchNameRepository } from '../memoryWikiSearchNameRepository';
 import { MemoryWikiTitleRepository } from '../memoryWikiTitleRepository';
+import { MemoryRootNameRepository } from '../memoryRootNameRepository';
 
 test('ro-md', async t => {
     const conceptRepository = new MemoryConceptRepository();
     const wikiEntityRepository = new MemoryWikiEntityRepository();
     const wikiSearchNameRepository = new MemoryWikiSearchNameRepository();
     const wikiTitleRepository = new MemoryWikiTitleRepository();
-    const pushConcepts = new PushContextConcepts(conceptRepository);
+    const rootNameRep = new MemoryRootNameRepository();
+    const pushConcepts = new PushContextConcepts(conceptRepository, rootNameRep);
     const locale: Locale = { lang: 'ro', country: 'md' };
     const exploreWikiEntities = new ExploreWikiEntities(locale,
         conceptRepository,
+        rootNameRep,
         wikiEntityRepository,
         wikiSearchNameRepository,
         wikiTitleRepository);

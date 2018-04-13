@@ -3,26 +3,29 @@ import { UseCase, uniq } from "@textactor/domain";
 import { IConceptReadRepository } from "../conceptRepository";
 import { Locale } from "../../types";
 import { Concept } from "../../entities/concept";
+import { IConceptRootNameRepository } from "../conceptRootNameRepository";
 
 export type PopularConceptNode = {
-    hash: string
+    rootId: string
     ids: string[]
-    popularity: number
-    topConcepts?: Concept[]
+    // popularity: number
+    concepts?: Concept[]
 }
 
 export class GetPopularConceptNode extends UseCase<null, PopularConceptNode, null> {
     private minCountWords = 2;
 
-    constructor(private locale: Locale, private conceptRepository: IConceptReadRepository) {
+    constructor(private locale: Locale,
+        private conceptRep: IConceptReadRepository,
+        private rootNameRep: IConceptRootNameRepository) {
         super()
     }
 
     protected async innerExecute(): Promise<PopularConceptNode> {
 
-        const popularHashes = await this.conceptRepository.getPopularRootNameHashes(this.locale, 1, 0, this.minCountWords);
+        const rootIds = await this.rootNameRep.getMostPopularIds(this.locale, 1, 0, this.minCountWords);
 
-        if (popularHashes.length < 1) {
+        if (rootIds.length < 1) {
             if (this.minCountWords === 1) {
                 return null;
             }
@@ -30,16 +33,21 @@ export class GetPopularConceptNode extends UseCase<null, PopularConceptNode, nul
             return this.innerExecute();
         }
 
-        const popularHash = popularHashes[0];
+        const rootId = rootIds[0];
 
-        const node: PopularConceptNode = { ...popularHash };
+        const concepts = await this.conceptRep.getByRootNameId(rootId);
+        const ids = uniq(concepts.map(item => item.id));
 
-        node.topConcepts = await this.conceptRepository.getByIds(node.ids.slice(0, 5));
+        const node: PopularConceptNode = {
+            rootId,
+            ids,
+            concepts,
+        };
 
         return node;
     }
 
     static getTopConceptsNames(node: PopularConceptNode, limit: number): string[] {
-        return uniq(node.topConcepts.map(item => item.name)).slice(0, limit);
+        return uniq(node.concepts.map(item => item.name)).slice(0, limit);
     }
 }

@@ -9,14 +9,14 @@ import { ConceptHelper } from "../../entities/conceptHelper";
 
 export class SetAbbrConceptsLongName extends UseCase<void, Map<string, string>, void> {
 
-    constructor(private locale: Locale, private conceptRepository: IConceptRepository) {
+    constructor(private locale: Locale, private conceptRep: IConceptRepository) {
         super()
     }
 
     protected async innerExecute(): Promise<Map<string, string>> {
         const results: Map<string, string> = new Map();
 
-        let concepts = await this.conceptRepository.getConceptsWithAbbr(this.locale);
+        let concepts = await this.conceptRep.getConceptsWithAbbr(this.locale);
 
         await this.setConceptsLongName(concepts, results);
 
@@ -34,7 +34,7 @@ export class SetAbbrConceptsLongName extends UseCase<void, Map<string, string>, 
             }
             const id = ConceptHelper.id(concept.abbr, this.locale.lang, this.locale.country);
 
-            return this.conceptRepository.getById(id)
+            return this.conceptRep.getById(id)
                 .then(abbrConcept => {
                     if (!abbrConcept) {
                         return;
@@ -43,7 +43,7 @@ export class SetAbbrConceptsLongName extends UseCase<void, Map<string, string>, 
                     abbrConcept.abbrLongNames.push(concept.name);
                     abbrConcept.abbrLongNames = uniq(abbrConcept.abbrLongNames);
 
-                    return this.conceptRepository.update({
+                    return this.conceptRep.update({
                         item: {
                             id,
                             abbrLongNames: abbrConcept.abbrLongNames,

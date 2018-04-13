@@ -5,10 +5,12 @@ import { MemoryConceptRepository } from '../memoryConceptRepository';
 import { PushContextConcepts } from './pushContextConcepts';
 import { Locale } from '../../types';
 import { ConceptHelper } from '../../entities/conceptHelper';
+import { MemoryRootNameRepository } from '../memoryRootNameRepository';
 
 test('set concept abbrLongName', async t => {
     const conceptRepository = new MemoryConceptRepository();
-    const pushConcepts = new PushContextConcepts(conceptRepository);
+    const rootNameRep = new MemoryRootNameRepository();
+    const pushConcepts = new PushContextConcepts(conceptRepository, rootNameRep);
     const locale: Locale = { lang: 'ro', country: 'md' };
 
     const concepts = [

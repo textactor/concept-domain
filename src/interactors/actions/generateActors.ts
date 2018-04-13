@@ -7,6 +7,7 @@ import { ConceptActor } from '../../entities/actor';
 import { BuildActor } from './buildActor';
 import { GetPopularConceptNode } from './getPopularConceptNode';
 import { DeleteActorConcepts } from './deleteActorConcepts';
+import { IConceptRootNameRepository } from '../conceptRootNameRepository';
 
 export interface OnGenerateActorCallback {
     (actor: ConceptActor): Promise<any>
@@ -18,13 +19,14 @@ export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void>
     private deleteActorConcepts: DeleteActorConcepts
 
     constructor(private locale: Locale,
-        private conceptRepository: IConceptRepository,
-        wikiEntityRepository: IWikiEntityRepository) {
+        private conceptRep: IConceptRepository,
+        private rootNameRep: IConceptRootNameRepository,
+        wikiEntityRep: IWikiEntityRepository) {
         super()
 
-        this.buildActor = new BuildActor(locale, wikiEntityRepository, conceptRepository);
-        this.getPopularConceptNode = new GetPopularConceptNode(locale, conceptRepository);
-        this.deleteActorConcepts = new DeleteActorConcepts(conceptRepository);
+        this.buildActor = new BuildActor(locale, wikiEntityRep, conceptRep);
+        this.getPopularConceptNode = new GetPopularConceptNode(locale, conceptRep, rootNameRep);
+        this.deleteActorConcepts = new DeleteActorConcepts(conceptRep, rootNameRep);
     }
 
     protected async innerExecute(callback: OnGenerateActorCallback): Promise<void> {
@@ -35,7 +37,8 @@ export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void>
                 const node = await this.getPopularConceptNode.execute(null);
 
                 if (!node) {
-                    await this.conceptRepository.deleteAll(this.locale);
+                    await this.conceptRep.deleteAll(this.locale);
+                    await this.rootNameRep.deleteAll(this.locale);
                     return;
                 }
 

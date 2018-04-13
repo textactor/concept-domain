@@ -9,14 +9,14 @@ import { ConceptHelper } from "../../entities/conceptHelper";
 
 export class SetAbbrConceptsContextName extends UseCase<void, Map<string, string[]>, void> {
 
-    constructor(private locale: Locale, private conceptRepository: IConceptRepository) {
+    constructor(private locale: Locale, private conceptRep: IConceptRepository) {
         super()
     }
 
     protected async innerExecute(): Promise<Map<string, string[]>> {
         const results: Map<string, string[]> = new Map();
 
-        let concepts = await this.conceptRepository.getAbbrConceptsWithContextName(this.locale);
+        let concepts = await this.conceptRep.getAbbrConceptsWithContextName(this.locale);
 
         await this.setConceptsContextName(concepts, results);
 
@@ -34,12 +34,12 @@ export class SetAbbrConceptsContextName extends UseCase<void, Map<string, string
             }
             const id = ConceptHelper.id(concept.name, this.locale.lang, this.locale.country);
 
-            return this.conceptRepository.getById(id)
+            return this.conceptRep.getById(id)
                 .then(abbrConcept => {
                     if (!abbrConcept) {
                         return;
                     }
-                    return this.conceptRepository.update({
+                    return this.conceptRep.update({
                         item: {
                             id,
                             contextNames: uniq((abbrConcept.contextNames || []).concat(concept.contextNames))

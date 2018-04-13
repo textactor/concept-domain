@@ -34,15 +34,6 @@ test('#create', t => {
     t.is(c1.isAbbr, false)
     t.is(c1.isIrregular, false)
     t.is(c1.normalName, 'moldova 1')
-    t.is(c1.rootName, 'Moldov 1')
-})
-
-test('#rootName', t => {
-    t.is(ConceptHelper.rootName('iPhone 5', 'ro'), 'iPhon 5');
-    t.is(ConceptHelper.rootName('Ana Balan', 'ro'), 'An Balan');
-    t.is(ConceptHelper.rootName('Anei Balan', 'ro'), 'An Balan');
-    t.is(ConceptHelper.rootName('PLDM', 'ro'), 'PLDM');
-    t.is(ConceptHelper.rootName('Владимира Путина', 'ru'), 'Владимир Путин');
 })
 
 test('#setConceptsContextName', t => {
