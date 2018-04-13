@@ -17,7 +17,7 @@ export class ExploreWikiEntitiesByTitles extends UseCase<string[], WikiEntity[],
 
         debug(`exploring wiki entities for ${titles.join('|')}`);
 
-        const wikiEntities = await getEntities({
+        let wikiEntities = await getEntities({
             titles: titles.join('|'),
             claims: 'item',
             categories: true,
@@ -26,8 +26,10 @@ export class ExploreWikiEntitiesByTitles extends UseCase<string[], WikiEntity[],
             redirects: true,
             types: true,
         });
+        wikiEntities = wikiEntities || [];
+        wikiEntities = wikiEntities.filter(item => !!item);
 
-        if (!wikiEntities || wikiEntities.length === 0) {
+        if (wikiEntities.length === 0) {
             debug(`NO wiki entities found for ${titles.join('|')}`);
             return []
         } else {
