@@ -27,7 +27,7 @@ test('#convert', async t => {
 
     t.not(wikiEntity, null);
 
-    const entity = WikiEntityHelper.convert(wikiEntity, lang);
+    const entity = WikiEntityHelper.convert(wikiEntity, lang, 'us');
 
     t.is(entity.name, wikiEntity.label)
     t.is(entity.type, WikiEntityType.ORG)
@@ -39,7 +39,7 @@ test('#convert', async t => {
 test('#isDisambiguation', async t => {
     const wikiEntity = (await getEntities({ titles: 'Adrian Ursu', language: 'ro', claims: 'item', extract: 3, types: true, redirects: true }))[0];
 
-    const entity = WikiEntityHelper.convert(wikiEntity, 'ro');
+    const entity = WikiEntityHelper.convert(wikiEntity, 'ro', 'ro');
 
     t.is(WikiEntityHelper.isDisambiguation(entity), true);
 })
@@ -58,7 +58,7 @@ test('lastname', async t => {
 
     t.not(wikiEntity, null);
 
-    const entity = WikiEntityHelper.convert(wikiEntity, lang);
+    const entity = WikiEntityHelper.convert(wikiEntity, lang, 'us');
 
     t.is(entity.name, wikiEntity.label)
     t.is(entity.type, WikiEntityType.PERSON)

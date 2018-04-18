@@ -36,7 +36,7 @@ export class ExploreWikiEntitiesByTitles extends UseCase<string[], WikiEntity[],
             debug(`Found wiki entities for ${titles.join('|')}: ${wikiEntities.map(item => item.label)}`);
         }
 
-        let entities = wikiEntities.map(item => WikiEntityHelper.convert(item, this.locale.lang));
+        let entities = wikiEntities.map(item => WikiEntityHelper.convert(item, this.locale.lang, this.locale.country));
 
         entities = entities.filter(item => !WikiEntityHelper.isDisambiguation(item));
 

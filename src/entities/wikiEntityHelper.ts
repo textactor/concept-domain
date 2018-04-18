@@ -7,8 +7,9 @@ import { RootNameHelper } from './rootNameHelper';
 
 export class WikiEntityHelper {
 
-    static convert(wikiEntity: ExternWikiEntity, lang: string): WikiEntity {
+    static convert(wikiEntity: ExternWikiEntity, lang: string, country: string): WikiEntity {
         lang = lang.trim().toLowerCase();
+        country = country.trim().toLowerCase();
         const simpleEntity = convertToSimpleEntity(wikiEntity, lang);
         const wikiSplittedName = WikiEntityHelper.splitName(simpleEntity.wikiPageTitle);
         const name = simpleEntity.name || wikiSplittedName && wikiSplittedName.simple || simpleEntity.wikiPageTitle;
@@ -81,8 +82,9 @@ export class WikiEntityHelper {
         entity.names = entity.names.filter(name => name.trim().length > 1);
         entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
 
-        let partialNames = entity.names.map(name => getPartialName(name, lang, entity.countryCode))
+        let partialNames = entity.names.map(name => getPartialName(name, lang, country))
             .filter(name => !!name && NameHelper.countWords(name) > 1);
+
         partialNames = uniq(partialNames);
 
         entity.names = entity.names.concat(partialNames);

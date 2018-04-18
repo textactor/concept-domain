@@ -37,13 +37,13 @@ export function getPartialName(name: string, lang: string, country?: string): st
         }
     }
 
-    const names = name.split(/\s*[;,(]/);
-    if (names.length > 1) {
-        partial = names[0];
-        if (partial && NameHelper.countWords(partial) > 1) {
-            return partial;
-        }
-    }
+    // const names = name.split(/\s*[;,(]/);
+    // if (names.length > 1) {
+    //     partial = names[0];
+    //     if (partial && NameHelper.countWords(partial) > 1) {
+    //         return partial;
+    //     }
+    // }
 
     return null;
 }

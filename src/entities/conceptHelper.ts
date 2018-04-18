@@ -104,8 +104,10 @@ export class ConceptHelper {
         }, []));
 
         conceptNames = conceptNames.filter(name => ConceptHelper.isValidName(name, lang));
+
         if (rootNames) {
             conceptNames = conceptNames.concat(conceptNames.map(name => RootNameHelper.rootName(name, lang)));
+            conceptNames = conceptNames.filter(name => ConceptHelper.isValidName(name, lang));
         }
 
         conceptNames = uniq(conceptNames);
