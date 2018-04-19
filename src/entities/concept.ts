@@ -22,4 +22,6 @@ export type Concept = {
     createdAt?: number
 
     contextNames?: string[]
+
+    knownName?: string
 }

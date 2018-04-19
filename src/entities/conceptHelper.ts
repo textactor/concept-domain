@@ -3,12 +3,14 @@ import { NameHelper, md5, uniq } from '@textactor/domain';
 import { Concept } from './concept';
 import * as isAbbrOf from 'is-abbr-of';
 import { RootNameHelper } from './rootNameHelper';
+import { getConceptKnownName } from './conceptKnownNames';
 
 export type CreatingConceptData = {
     lang: string
     country: string
     text: string
     abbr?: string
+    knownName?: string
 }
 
 export class ConceptHelper {
@@ -49,6 +51,15 @@ export class ConceptHelper {
             rootNameId,
             popularity,
         };
+
+        if (data.knownName) {
+            concept.knownName = data.knownName;
+        } else {
+            const knownName = getConceptKnownName(name, lang, country);
+            if (knownName) {
+                concept.knownName = knownName;
+            }
+        }
 
         return concept;
     }
@@ -94,7 +105,8 @@ export class ConceptHelper {
 
     public static getConceptsNames(concepts: Concept[], rootNames: boolean): string[] {
         const { lang } = concepts[0];
-        let conceptNames = concepts.map(item => item.name);
+        let conceptNames = concepts.map(item => item.knownName).filter(name => !!name);
+        conceptNames = conceptNames.concat(concepts.map(item => item.name));
         conceptNames = conceptNames.concat(concepts.reduce<string[]>((list, concept) => {
             if (concept.isAbbr) {
                 list = list.concat(concept.abbrLongNames || [])
