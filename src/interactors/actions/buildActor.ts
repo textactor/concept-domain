@@ -27,10 +27,11 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         const lang = this.locale.lang;
         const country = this.locale.country;
         const rootIdConcepts = await this.conceptRepository.getByRootNameId(rootId);
+        if (rootIdConcepts.length === 0) {
+            debug(`NO root concepts for ${rootId}`);
+            return null;
+        }
         const conceptNames = ConceptHelper.getConceptsNames(rootIdConcepts, true);
-//         if (conceptNames.length === 0) {
-// debug(`NO concept names for `)
-//         }
         const wikiEntity = await this.findPerfectWikiEntity(conceptNames);
 
         let concepts: Concept[]

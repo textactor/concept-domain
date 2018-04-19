@@ -39,15 +39,18 @@ export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void>
                     await this.rootNameRep.deleteAll(this.locale);
                     return;
                 }
-
                 actor = await this.buildActor.execute(rootId);
-                await this.deleteActorConcepts.execute(actor);
+                if (actor) {
+                    await this.deleteActorConcepts.execute(actor);
+                } else {
+                    await this.rootNameRep.deleteIds([rootId]);
+                }
 
             } catch (e) {
                 return Promise.reject(e);
             }
 
-            if (callback) {
+            if (callback && actor) {
                 await callback(actor);
             }
         }
