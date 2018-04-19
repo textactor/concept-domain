@@ -36,6 +36,10 @@ export class WikiEntityHelper {
             rank: 1,
         };
 
+        if (!entity.countryCode) {
+            entity.countryCode = getCountryByTitle([entity.wikiPageTitle, entity.name], lang);
+        }
+
         if (simpleEntity.type) {
             entity.type = WikiEntityHelper.convertSimpleEntityType(simpleEntity.type);
 
@@ -184,5 +188,31 @@ export class WikiEntityHelper {
         if (!NameHelper.isAbbr(lastname) && !NameHelper.isIrregular(lastname)) {
             return lastname;
         }
+    }
+}
+
+function getCountryByTitle(titles: string[], lang: string): string {
+    if (!COUNTRY_NAMES[lang]) {
+        return;
+    }
+    const title = titles.filter(item => !!item).join('; ');
+    for (let country of Object.keys(COUNTRY_NAMES[lang])) {
+        const names = COUNTRY_NAMES[lang][country];
+        for (let name of names) {
+            if (title.indexOf(name) > 0) {
+                return country;
+            }
+        }
+    }
+}
+
+const COUNTRY_NAMES: { [lang: string]: { [country: string]: string[] } } = {
+    ro: {
+        ro: ['România', 'României'],
+        md: ['Republica Moldova', 'Moldova', 'Moldovei'],
+    },
+    ru: {
+        ru: ['Россия', 'Российская Федерация', 'России', 'Российской Федерации'],
+        md: ['Молдова', 'Молдавия', 'Молдавии'],
     }
 }
