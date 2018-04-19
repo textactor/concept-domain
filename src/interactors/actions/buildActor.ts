@@ -28,6 +28,9 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         const country = this.locale.country;
         const rootIdConcepts = await this.conceptRepository.getByRootNameId(rootId);
         const conceptNames = ConceptHelper.getConceptsNames(rootIdConcepts, true);
+//         if (conceptNames.length === 0) {
+// debug(`NO concept names for `)
+//         }
         const wikiEntity = await this.findPerfectWikiEntity(conceptNames);
 
         let concepts: Concept[]
@@ -63,10 +66,13 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
             debug(`Found wikientity by names: ${JSON.stringify(conceptNames)}`);
         } else {
             debug(`NOT Found wikientity by names: ${JSON.stringify(conceptNames)}`);
+        }
 
+        if (entities.length === 0 || this.countryWikiEntities(entities).length === 0) {
             await seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByPartialNameHash(nameHash)
                 .then(list => entities = entities.concat(list)));
-            if (!entities.length) {
+
+            if (entities.length === 0) {
                 debug(`NOT Found wikientity by partial names: ${JSON.stringify(conceptNames)}`);
                 return null;
             }
@@ -96,5 +102,12 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         }
 
         return uniq(entities);
+    }
+
+    private countryWikiEntities(entities: WikiEntity[]): WikiEntity[] {
+        if (!entities.length) {
+            return entities;
+        }
+        return entities.filter(item => item.countryCode === this.locale.country);
     }
 }
