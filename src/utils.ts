@@ -23,19 +23,12 @@ export function uniqProp<T>(items: T[], prop: keyof T): T[] {
     return list;
 }
 
-export function getPartialName(name: string, lang: string, country?: string): string {
+export function getPartialName(name: string, lang: string, _country?: string): string {
     if (!name || NameHelper.countWords(name) < 2) {
         return null;
     }
 
     let partial: string;
-
-    if (country) {
-        partial = partialName(name, { lang, country });
-        if (partial && NameHelper.countWords(partial) > 1) {
-            return partial;
-        }
-    }
 
     const names = name.split(/\s*[;(]/);
     if (names.length > 1) {
@@ -44,6 +37,13 @@ export function getPartialName(name: string, lang: string, country?: string): st
             return partial;
         }
     }
+
+    // if (country) {
+    partial = partialName(name, { lang });
+    if (partial && NameHelper.countWords(partial) > 1) {
+        return partial;
+    }
+    // }
 
     return null;
 }

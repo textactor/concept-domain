@@ -18,6 +18,8 @@ export type WikiEntity = {
     nameHash?: string
     names?: string[]
     namesHashes?: string[]
+    partialNames?: string[]
+    partialNamesHashes?: string[]
     secondaryNames?: string[]
     abbr?: string
     description?: string

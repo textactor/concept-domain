@@ -23,6 +23,17 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
         return Promise.resolve(list);
     }
 
+    getByPartialNameHash(hash: string): Promise<WikiEntity[]> {
+        const list: WikiEntity[] = []
+        for (let item of this.db.values()) {
+            if (~item.partialNamesHashes.indexOf(hash)) {
+                list.push(item)
+            }
+        }
+
+        return Promise.resolve(uniq(list));
+    }
+
     getByNameHash(hash: string): Promise<WikiEntity[]> {
         const list: WikiEntity[] = []
         for (let item of this.db.values()) {

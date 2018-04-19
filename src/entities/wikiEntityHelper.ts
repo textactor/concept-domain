@@ -83,16 +83,8 @@ export class WikiEntityHelper {
             }
         }
 
-        entity.names = entity.names.filter(name => name.trim().length > 1);
+        entity.names = entity.names.filter(name => WikiEntityHelper.isValidName(name));
         entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
-
-        let partialNames = entity.names.map(name => getPartialName(name, lang, country))
-            .filter(name => !!name && NameHelper.countWords(name) > 1);
-
-        partialNames = uniq(partialNames);
-
-        entity.names = entity.names.concat(partialNames);
-
         entity.names = uniq(entity.names).filter(name => WikiEntityHelper.isValidName(name));
 
         entity.secondaryNames = [];
@@ -108,6 +100,18 @@ export class WikiEntityHelper {
             .map(item => WikiEntityHelper.nameHash(item, lang));
 
         entity.namesHashes = uniq(entity.namesHashes);
+
+        let partialNames = entity.names.map(name => getPartialName(name, lang, country))
+            .filter(name => !!name && NameHelper.countWords(name) > 1);
+
+        partialNames = uniq(partialNames);
+
+        entity.partialNames = partialNames;
+
+        entity.partialNamesHashes = entity.partialNames
+            .map(item => WikiEntityHelper.nameHash(item, lang));
+
+        entity.partialNamesHashes = uniq(entity.partialNamesHashes);
 
         return entity;
     }
@@ -208,11 +212,11 @@ function getCountryByTitle(titles: string[], lang: string): string {
 
 const COUNTRY_NAMES: { [lang: string]: { [country: string]: string[] } } = {
     ro: {
-        ro: ['România', 'României'],
-        md: ['Republica Moldova', 'Moldova', 'Moldovei'],
+        ro: ['România', 'României', 'București'],
+        md: ['Republica Moldova', 'Moldova', 'Moldovei', 'Chișinău'],
     },
     ru: {
         ru: ['Россия', 'Российская Федерация', 'России', 'Российской Федерации'],
-        md: ['Молдова', 'Молдавия', 'Молдавии'],
+        md: ['Молдова', 'Молдавия', 'Молдавии', 'Кишинёв', 'Кишинёве', 'Кишинёва'],
     }
 }

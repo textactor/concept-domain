@@ -63,7 +63,13 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
             debug(`Found wikientity by names: ${JSON.stringify(conceptNames)}`);
         } else {
             debug(`NOT Found wikientity by names: ${JSON.stringify(conceptNames)}`);
-            return null;
+
+            await seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByPartialNameHash(nameHash)
+                .then(list => entities = entities.concat(list)));
+            if (!entities.length) {
+                debug(`NOT Found wikientity by partial names: ${JSON.stringify(conceptNames)}`);
+                return null;
+            }
         }
 
         entities = uniqProp(entities, 'id');
