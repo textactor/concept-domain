@@ -70,8 +70,15 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         }
 
         if (entities.length === 0 || this.countryWikiEntities(entities).length === 0) {
+            let entitiesByPartialNames: WikiEntity[] = []
             await seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByPartialNameHash(nameHash)
-                .then(list => entities = entities.concat(list)));
+                .then(list => entitiesByPartialNames = entitiesByPartialNames.concat(list)));
+
+            entitiesByPartialNames = entitiesByPartialNames.filter(item => item.countryCode === this.locale.country);
+            if (entitiesByPartialNames.length) {
+                debug(`found locale entities by partial name: ${entitiesByPartialNames.map(item => item.name)}`);
+                entities = entities.concat(entitiesByPartialNames);
+            }
 
             if (entities.length === 0) {
                 debug(`NOT Found wikientity by partial names: ${JSON.stringify(conceptNames)}`);
