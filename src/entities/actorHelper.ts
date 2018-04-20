@@ -1,7 +1,7 @@
 import { Concept } from "./concept";
 import { WikiEntity } from "./wikiEntity";
 import { ConceptActor } from "./actor";
-import { NameHelper, uniq } from "@textactor/domain";
+import { uniq } from "@textactor/domain";
 import { ConceptHelper } from "./conceptHelper";
 
 export class ActorHelper {
@@ -29,22 +29,14 @@ export class ActorHelper {
                 actor.names.push(entity.wikiPageTitle);
             }
             actor.names = actor.names.concat(entity.names || []);
-
-            // set abbreviation
-            actor.abbr = entity.abbr || NameHelper.findAbbr(entity.names);
         }
 
         actor.names = actor.names.concat(ConceptHelper.getConceptsNames(concepts, false));
+        if (entity && entity.countryCode === country) {
+            actor.names = actor.names.concat(entity.partialNames);
+        }
 
         actor.names = uniq(actor.names).filter(name => ConceptHelper.isValidName(name, lang));
-
-        if (!actor.abbr) {
-            actor.abbr = NameHelper.findAbbr(actor.names);
-        }
-
-        if (actor.abbr && !ConceptHelper.isValidName(actor.abbr, lang)) {
-            delete actor.abbr;
-        }
 
         return actor;
     }

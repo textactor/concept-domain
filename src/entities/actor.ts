@@ -8,12 +8,9 @@ export type ConceptActor = {
     country: string
     name: string
     names?: string[]
-    abbr?: string
     
     wikiEntity?: WikiEntity
     concepts?: Concept[]
 
     popularity?: number
-
-    partialNames?: string[]
 }
