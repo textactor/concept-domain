@@ -111,6 +111,12 @@ export class WikiEntityHelper {
         entity.partialNamesHashes = entity.partialNames
             .map(item => WikiEntityHelper.nameHash(item, lang));
 
+
+        const partialNamesRoot = partialNames.map(name => RootNameHelper.rootName(name, lang));
+        const partialNamesRootHashes = WikiEntityHelper.namesHashes(partialNamesRoot, lang);
+
+        entity.partialNamesHashes = entity.partialNamesHashes.concat(partialNamesRootHashes);
+
         entity.partialNamesHashes = uniq(entity.partialNamesHashes);
 
         return entity;
