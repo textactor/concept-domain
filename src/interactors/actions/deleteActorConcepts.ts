@@ -2,7 +2,7 @@
 import { UseCase, uniq } from "@textactor/domain";
 import { IConceptWriteRepository } from "../conceptRepository";
 import { ConceptActor } from "../../entities/actor";
-import { ConceptHelper } from "../../entities/conceptHelper";
+// import { ConceptHelper } from "../../entities/conceptHelper";
 import { IConceptRootNameWriteRepository } from "../conceptRootNameRepository";
 
 export class DeleteActorConcepts extends UseCase<ConceptActor, ConceptActor, void> {
@@ -18,9 +18,9 @@ export class DeleteActorConcepts extends UseCase<ConceptActor, ConceptActor, voi
         await this.conceptRep.deleteIds(ids);
         await this.rootNameRep.deleteIds(rootIds);
 
-        if (actor.partialNames && actor.partialNames.length) {
-            await this.conceptRep.deleteIds(actor.partialNames.map(name => ConceptHelper.id(name, actor.lang, actor.country)));
-        }
+        // if (actor.wikiEntity && actor.wikiEntity.partialNames && actor.wikiEntity.partialNames.length) {
+        //     await this.conceptRep.deleteIds(actor.wikiEntity.partialNames.map(name => ConceptHelper.id(name, actor.lang, actor.country)));
+        // }
 
         return actor;
     }
