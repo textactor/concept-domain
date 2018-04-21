@@ -6,16 +6,15 @@ import { ConceptHelper } from '../../entities/conceptHelper';
 import { IConceptRootNameRepository } from '../conceptRootNameRepository';
 import { RootNameHelper } from '../../entities/rootNameHelper';
 
-export class PushContextConcepts extends UseCase<Concept[], void, void> {
+export class PushContextConcepts extends UseCase<Concept[], Concept[], void> {
     constructor(private conceptRep: IConceptWriteRepository, private rootNameRep: IConceptRootNameRepository) {
         super()
     }
 
-    protected innerExecute(concepts: Concept[]): Promise<void> {
+    protected innerExecute(concepts: Concept[]): Promise<Concept[]> {
         concepts = concepts.filter(concept => ConceptHelper.isValid(concept));
         ConceptHelper.setConceptsContextNames(concepts);
-        return Promise.all(concepts.map(concept => this.pushConcept(concept)))
-            .then(_ => null)
+        return Promise.all(concepts.map(concept => this.pushConcept(concept)));
     }
 
     private async pushConcept(concept: Concept): Promise<Concept> {

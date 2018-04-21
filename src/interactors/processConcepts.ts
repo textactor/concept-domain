@@ -20,16 +20,13 @@ export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 }
 
 export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, ProcessConceptsOptions> {
-    private locale: Locale;
-
-    constructor(locale: Locale,
+    constructor(private locale: Locale,
         private conceptRepository: IConceptRepository,
         private rootNameRep: IConceptRootNameRepository,
         private entityRepository: IWikiEntityRepository,
         private wikiSearchNameRepository: IWikiSearchNameRepository,
         private wikiTitleRepository: IWikiTitleRepository) {
         super()
-        this.locale = { ...locale };
     }
 
     protected async innerExecute(callback: OnGenerateActorCallback, options: ProcessConceptsOptions): Promise<void> {
