@@ -10,7 +10,7 @@ import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
 import { uniqProp } from "../../utils";
 import { ActorHelper } from "../../entities/actorHelper";
 import { ConceptHelper } from "../../entities/conceptHelper";
-import { WikiEntity } from "../../entities/wikiEntity";
+import { WikiEntity, WikiEntityType } from "../../entities/wikiEntity";
 import { RootNameHelper, Concept } from "../..";
 
 
@@ -69,6 +69,8 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
             debug(`NOT Found wikientity by names: ${JSON.stringify(conceptNames)}`);
         }
 
+        let foundByPartial = false;
+
         if (entities.length === 0 || this.countryWikiEntities(entities).length === 0) {
             let entitiesByPartialNames: WikiEntity[] = []
             await seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByPartialNameHash(nameHash)
@@ -76,6 +78,7 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
 
             entitiesByPartialNames = entitiesByPartialNames.filter(item => item.countryCode === this.locale.country);
             if (entitiesByPartialNames.length) {
+                foundByPartial = true;
                 debug(`found locale entities by partial name: ${entitiesByPartialNames.map(item => item.name)}`);
                 entities = entities.concat(entitiesByPartialNames);
             }
@@ -88,14 +91,14 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
 
         entities = uniqProp(entities, 'id');
 
-        entities = this.sortWikiEntities(entities);
+        entities = this.sortWikiEntities(entities, foundByPartial);
 
         const entity = entities[0];
 
         return entity;
     }
 
-    private sortWikiEntities(entities: WikiEntity[]): WikiEntity[] {
+    private sortWikiEntities(entities: WikiEntity[], foundByPartial: boolean): WikiEntity[] {
         if (!entities.length) {
             return entities;
         }
@@ -105,11 +108,26 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         const topEntity = entities[0];
 
         const countryEntities = entities.filter(item => item.countryCode === this.locale.country);
-        if (countryEntities.length && countryEntities[0].rank > topEntity.rank / 4) {
-            entities = countryEntities.concat(entities);
+        if (countryEntities.length) {
+            let useCountryEntity = false;
+            if (foundByPartial) {
+                if ([WikiEntityType.ORG, WikiEntityType.PERSON, WikiEntityType.PLACE].indexOf(countryEntities[0].type) > -1) {
+                    useCountryEntity = true;
+                } else {
+                    if (countryEntities[0].rank > topEntity.rank / 4) {
+                        useCountryEntity = true;
+                    }
+                }
+            } else {
+                useCountryEntity = true;
+            }
+
+            if (useCountryEntity) {
+                entities = countryEntities.concat(entities);
+            }
         }
 
-        return uniq(entities);
+        return uniqProp(entities, 'id');
     }
 
     private countryWikiEntities(entities: WikiEntity[]): WikiEntity[] {
