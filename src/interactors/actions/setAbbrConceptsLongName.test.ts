@@ -14,8 +14,8 @@ test('set concept abbrLongName', async t => {
     const locale: Locale = { lang: 'ro', country: 'md' };
 
     const concepts = [
-        ConceptHelper.create({ text: 'CEC', ...locale }),
-        ConceptHelper.create({ text: 'Comisia Electorală Centrală', abbr: 'CEC', ...locale }),
+        ConceptHelper.create({ name: 'CEC', ...locale }),
+        ConceptHelper.create({ name: 'Comisia Electorală Centrală', abbr: 'CEC', ...locale }),
     ];
 
     await pushConcepts.execute(concepts);

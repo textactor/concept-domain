@@ -8,9 +8,10 @@ import { getConceptKnownName } from './conceptKnownNames';
 export type CreatingConceptData = {
     lang: string
     country: string
-    text: string
+    name: string
     abbr?: string
     knownName?: string
+    context?: string
 }
 
 export class ConceptHelper {
@@ -19,7 +20,7 @@ export class ConceptHelper {
 
         const lang = data.lang.trim().toLowerCase();
         const country = data.country.trim().toLowerCase();
-        const name = data.text.trim();
+        const name = data.name.trim();
         const nameLength = name.length;
 
         const normalName = NameHelper.normalizeName(name, lang);
@@ -50,6 +51,7 @@ export class ConceptHelper {
             abbr: data.abbr,
             rootNameId,
             popularity,
+            context: data.context,
         };
 
         if (data.knownName) {

@@ -13,4 +13,5 @@ export type ConceptActor = {
     concepts?: Concept[]
 
     popularity?: number
+    context?: string
 }

@@ -28,7 +28,7 @@ test('ro-md', async t => {
     const conceptTexts: string[] = ['R. Moldova', 'Chișinău', 'Chisinau', 'Republica Moldova', 'Moldova', 'Chisinau'];
 
     const concepts = conceptTexts
-        .map(text => ConceptHelper.create({ text, ...locale }));
+        .map(name => ConceptHelper.create({ name, ...locale }));
 
     await pushConcepts.execute(concepts);
 
