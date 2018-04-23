@@ -4,14 +4,14 @@ export type WikiTitle = {
     id: string
     lang?: string
     title?: string
-    createdAt?: Date
-    lastSearchAt?: Date
+    createdAt?: number
+    lastSearchAt?: number
 }
 
 export type CreatingWikiTitleData = {
     lang: string
     title: string
-    lastSearchAt?: Date
+    lastSearchAt?: number
 }
 
 export class WikiTitleHelper {
@@ -34,8 +34,8 @@ export class WikiTitleHelper {
             id,
             title,
             lang,
-            createdAt: new Date(),
-            lastSearchAt: data.lastSearchAt || new Date(),
+            createdAt: Math.round(Date.now() / 1000),
+            lastSearchAt: data.lastSearchAt || Math.round(Date.now() / 1000),
         };
 
         return wikiTitle;

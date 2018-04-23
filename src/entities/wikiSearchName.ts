@@ -5,9 +5,9 @@ export type WikiSearchName = {
     lang?: string
     country?: string
     name?: string
-    createdAt?: Date
+    createdAt?: number
     foundTitles?: string[]
-    lastSearchAt?: Date
+    lastSearchAt?: number
 }
 
 export type CreatingWikiSearchNameData = {
@@ -15,7 +15,7 @@ export type CreatingWikiSearchNameData = {
     country: string
     name: string
     foundTitles: string[]
-    lastSearchAt?: Date
+    lastSearchAt?: number
 }
 
 export class WikiSearchNameHelper {
@@ -41,9 +41,9 @@ export class WikiSearchNameHelper {
             name,
             lang,
             country,
-            createdAt: new Date(),
+            createdAt: Math.round(Date.now() / 1000),
             foundTitles,
-            lastSearchAt: data.lastSearchAt || new Date(),
+            lastSearchAt: data.lastSearchAt || Math.round(Date.now() / 1000),
         };
 
         return searchName;
