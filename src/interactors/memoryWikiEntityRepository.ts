@@ -89,4 +89,10 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
 
         return Promise.resolve(item);
     }
+    createOrUpdate(data: WikiEntity): Promise<WikiEntity> {
+        if (!!this.db.get(data.id)) {
+            return this.update({ item: data });
+        }
+        return this.create(data);
+    }
 }

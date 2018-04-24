@@ -106,6 +106,9 @@ export class ConceptHelper {
     }
 
     public static getConceptsNames(concepts: Concept[], rootNames: boolean): string[] {
+        if (concepts.length === 0) {
+            return [];
+        }
         const { lang } = concepts[0];
         let conceptNames = concepts.map(item => item.knownName).filter(name => !!name);
         conceptNames = conceptNames.concat(concepts.map(item => item.name));
