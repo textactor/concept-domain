@@ -43,7 +43,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
 
     protected async innerExecute(): Promise<ExploreWikiEntitiesResults> {
         let skip = 0;
-        const limit = 100;
+        const limit = 10;
         const self = this;
 
         const results: ExploreWikiEntitiesResults = {
@@ -67,9 +67,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
 
             debug(`exploring wiki entity by names: ${names}`);
 
-            await seriesPromise(names, name => {
-                return self.processName(name, results);
-            });
+            await seriesPromise(names, name => self.processName(name, results));
 
             results.countProcessedNames += names.length;
 
