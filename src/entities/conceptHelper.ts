@@ -3,7 +3,6 @@ import { NameHelper, md5, uniq } from '@textactor/domain';
 import { Concept } from './concept';
 import * as isAbbrOf from 'is-abbr-of';
 import { RootNameHelper } from './rootNameHelper';
-import { getConceptKnownName } from './conceptKnownNames';
 
 export type CreatingConceptData = {
     lang: string
@@ -54,13 +53,8 @@ export class ConceptHelper {
             context: data.context,
         };
 
-        if (data.knownName) {
-            concept.knownName = data.knownName;
-        } else {
-            const knownName = getConceptKnownName(name, lang, country);
-            if (knownName) {
-                concept.knownName = knownName;
-            }
+        if (data.knownName && ConceptHelper.isValidName(data.knownName, lang)) {
+            concept.knownName = data.knownName.trim();
         }
 
         return concept;
