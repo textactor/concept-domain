@@ -2527,9 +2527,9 @@ rimraf@2, rimraf@^2.5.1, rimraf@^2.6.1, rimraf@^2.6.2:
   dependencies:
     glob "^7.0.5"
 
-root-name@^0.1.7:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/root-name/-/root-name-0.1.7.tgz#4512804b05eb3dd72c102364936608d0d3effc9d"
+root-name@^0.1.8:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/root-name/-/root-name-0.1.8.tgz#00eec8892d9de1941468c3db6687f878761fed03"
 
 safe-buffer@^5.0.1, safe-buffer@^5.1.1, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.1"
