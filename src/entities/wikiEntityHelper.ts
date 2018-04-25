@@ -199,6 +199,35 @@ export class WikiEntityHelper {
             return lastname;
         }
     }
+
+    static getPopularity(rank: number): EntityPopularity {
+        if (!rank || rank < 0) {
+            return EntityPopularity.UNKNOWN;
+        }
+        const r = rank / 10;
+        if (r < 2) {
+            return EntityPopularity.UNKNOWN;
+        }
+        if (r < 4) {
+            return EntityPopularity.LOW;
+        }
+        if (r < 6) {
+            return EntityPopularity.NORMAL;
+        }
+        if (r < 8) {
+            return EntityPopularity.HIGH;
+        }
+
+        return EntityPopularity.POPULAR;
+    }
+}
+
+export enum EntityPopularity {
+    UNKNOWN = 1,
+    LOW = 2,
+    NORMAL = 3,
+    HIGH = 4,
+    POPULAR = 5,
 }
 
 function getCountryByTitle(titles: string[], lang: string): string {

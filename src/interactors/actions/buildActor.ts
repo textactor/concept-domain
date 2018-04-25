@@ -6,11 +6,11 @@ import { IWikiEntityReadRepository } from "../wikiEntityRepository";
 import { IConceptReadRepository } from "../conceptRepository";
 import { Locale } from "../../types";
 import { ConceptActor } from "../../entities/actor";
-import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
+import { WikiEntityHelper, EntityPopularity } from "../../entities/wikiEntityHelper";
 import { uniqProp } from "../../utils";
 import { ActorHelper } from "../../entities/actorHelper";
 import { ConceptHelper } from "../../entities/conceptHelper";
-import { WikiEntity, WikiEntityType } from "../../entities/wikiEntity";
+import { WikiEntity } from "../../entities/wikiEntity";
 import { RootNameHelper, Concept } from "../..";
 
 
@@ -111,12 +111,11 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         if (countryEntities.length) {
             let useCountryEntity = false;
             if (foundByPartial) {
-                if ([WikiEntityType.ORG, WikiEntityType.PERSON, WikiEntityType.PLACE].indexOf(countryEntities[0].type) > -1) {
+                const topEntityPopularity = WikiEntityHelper.getPopularity(topEntity.rank);
+                // const countryEntityPopularity = WikiEntityHelper.getPopularity(countryEntities[0].rank);
+
+                if (topEntityPopularity < EntityPopularity.HIGH) {
                     useCountryEntity = true;
-                } else {
-                    if (countryEntities[0].rank > topEntity.rank / 4) {
-                        useCountryEntity = true;
-                    }
                 }
             } else {
                 useCountryEntity = true;
