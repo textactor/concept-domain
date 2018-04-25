@@ -51,6 +51,9 @@ export class RootNameHelper {
         }
 
         if (NameHelper.countWords(name) < 2) {
+            if (name.length < 7) {
+                return name;
+            }
             return formatRootName(name, lang, { accuracy: 2 });
         }
 
