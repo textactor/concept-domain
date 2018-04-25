@@ -84,7 +84,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         const country = this.locale.country;
 
         const searchName = await this.wikiSearchNameRep.getById(WikiSearchNameHelper.createId(name, lang, country));
-        if (searchName && searchName.lastSearchAt * 1000 > Date.now() - ms('30days')) {
+        if (searchName && searchName.updatedAt * 1000 > Date.now() - ms('30days')) {
             debug(`WikiSearchName=${name} exists!`);
             return [];
         }
@@ -93,7 +93,6 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
             name,
             lang,
             country,
-            foundTitles: [],
         }));
 
         let initalTitles = await this.findWikiTitles.execute([name]);
@@ -106,7 +105,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
 
         await seriesPromise(initalTitles, async title => {
             const wikiTitle = await this.wikiTitleRep.getById(WikiTitleHelper.createId(title, lang));
-            if (wikiTitle && wikiTitle.lastSearchAt * 1000 > Date.now() - ms('30days')) {
+            if (wikiTitle && wikiTitle.updatedAt * 1000 > Date.now() - ms('30days')) {
                 debug(`WikiTitle=${title} exists!`);
                 return;
             }

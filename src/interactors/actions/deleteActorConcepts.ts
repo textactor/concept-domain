@@ -16,6 +16,7 @@ export class DeleteActorConcepts extends UseCase<ConceptActor, ConceptActor, voi
         const ids = actor.concepts.map(item => item.id);
         const rootIds = uniq(actor.concepts.map(item => item.rootNameId));
         await this.conceptRep.deleteIds(ids);
+        await this.conceptRep.deleteByRootNameIds(rootIds);
         await this.rootNameRep.deleteIds(rootIds);
 
         // if (actor.wikiEntity && actor.wikiEntity.partialNames && actor.wikiEntity.partialNames.length) {

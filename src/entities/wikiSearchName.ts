@@ -1,4 +1,4 @@
-import { md5, NameHelper, uniq } from "@textactor/domain";
+import { md5, NameHelper } from "@textactor/domain";
 
 export type WikiSearchName = {
     id: string
@@ -6,16 +6,14 @@ export type WikiSearchName = {
     country?: string
     name?: string
     createdAt?: number
-    foundTitles?: string[]
-    lastSearchAt?: number
+    updatedAt?: number
 }
 
 export type CreatingWikiSearchNameData = {
     lang: string
     country: string
     name: string
-    foundTitles: string[]
-    lastSearchAt?: number
+    updatedAt?: number
 }
 
 export class WikiSearchNameHelper {
@@ -24,7 +22,6 @@ export class WikiSearchNameHelper {
         const name = data.name.trim();
         const lang = data.lang.trim().toLowerCase();
         const country = data.country.trim().toLowerCase();
-        const foundTitles = uniq(data.foundTitles);
 
         const normalName = NameHelper.normalizeName(name, lang);
 
@@ -42,8 +39,7 @@ export class WikiSearchNameHelper {
             lang,
             country,
             createdAt: Math.round(Date.now() / 1000),
-            foundTitles,
-            lastSearchAt: data.lastSearchAt || Math.round(Date.now() / 1000),
+            updatedAt: data.updatedAt || Math.round(Date.now() / 1000),
         };
 
         return searchName;

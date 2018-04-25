@@ -9,7 +9,7 @@ export interface IConceptWriteRepository extends IWriteRepository<string, Concep
     deleteUnpopularOneWorlds(locale: Locale, popularity: number): Promise<number>
     deleteAll(locale: Locale): Promise<number>
     deleteIds(ids: string[]): Promise<number>
-    deleteByNameHash(hashes: string[]): Promise<number>
+    // deleteByNameHash(hashes: string[]): Promise<number>
     deleteByRootNameIds(ids: string[]): Promise<number>
     // incrementPopularity(id: string): Promise<number>
     /**
@@ -20,7 +20,7 @@ export interface IConceptWriteRepository extends IWriteRepository<string, Concep
 }
 
 export interface IConceptReadRepository extends IReadRepository<string, Concept> {
-    getByNameHash(hash: string): Promise<Concept[]>
+    // getByNameHash(hash: string): Promise<Concept[]>
     getByRootNameId(id: string): Promise<Concept[]>
     getByRootNameIds(ids: string[]): Promise<Concept[]>
     list(locale: Locale, limit: number, skip?: number): Promise<Concept[]>

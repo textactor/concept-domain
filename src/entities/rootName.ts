@@ -11,4 +11,5 @@ export type RootName = {
     countWords?: number
     isAbbr?: boolean
     createdAt?: number
+    updatedAt?: number
 }

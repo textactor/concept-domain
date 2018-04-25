@@ -36,6 +36,7 @@ export type WikiEntity = {
     categories?: string[]
 
     createdAt?: number
+    updatedAt?: number
 
     /**
      * Permanent redirect to entity id

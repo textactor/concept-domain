@@ -20,6 +20,7 @@ export type Concept = {
     isIrregular?: boolean
     isAbbr?: boolean
     createdAt?: number
+    updatedAt?: number
 
     contextNames?: string[]
 

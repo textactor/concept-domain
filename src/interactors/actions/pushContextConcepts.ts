@@ -14,7 +14,10 @@ export class PushContextConcepts extends UseCase<Concept[], Concept[], void> {
     protected innerExecute(concepts: Concept[]): Promise<Concept[]> {
         concepts = concepts.filter(concept => ConceptHelper.isValid(concept));
         ConceptHelper.setConceptsContextNames(concepts);
+        // const list: Concept[] = []
         return Promise.all(concepts.map(concept => this.pushConcept(concept)));
+        // return seriesPromise(concepts, concept => this.pushConcept(concept).then(item => list.push(item)))
+        //     .then(() => list);
     }
 
     private async pushConcept(concept: Concept): Promise<Concept> {
@@ -22,6 +25,6 @@ export class PushContextConcepts extends UseCase<Concept[], Concept[], void> {
 
         await this.rootNameRep.createOrUpdate(rootName);
 
-        return this.conceptRep.createOrUpdate(concept);
+        return await this.conceptRep.createOrUpdate(concept);
     }
 }

@@ -23,20 +23,14 @@ export class DeleteUnpopularConcepts extends UseCase<DeleteUnpopularConceptsOpti
     }
 
     protected async innerExecute(options: DeleteUnpopularConceptsOptions): Promise<void> {
+        debug(`Deleting unpopular concepts: ${JSON.stringify(options)}`);
 
-        try {
-            debug(`Deleting unpopular concepts: ${JSON.stringify(options)}`);
+        await this.conceptRep.deleteUnpopular(this.locale, options.minConceptPopularity);
+        await this.conceptRep.deleteUnpopularAbbreviations(this.locale, options.minAbbrConceptPopularity);
+        await this.conceptRep.deleteUnpopularOneWorlds(this.locale, options.minOneWordConceptPopularity);
 
-            await this.conceptRep.deleteUnpopular(this.locale, options.minConceptPopularity);
-            await this.conceptRep.deleteUnpopularAbbreviations(this.locale, options.minAbbrConceptPopularity);
-            await this.conceptRep.deleteUnpopularOneWorlds(this.locale, options.minOneWordConceptPopularity);
-
-            await this.rootNameRep.deleteUnpopular(this.locale, options.minRootConceptPopularity);
-            await this.rootNameRep.deleteUnpopularAbbreviations(this.locale, options.minRootAbbrConceptPopularity);
-            await this.rootNameRep.deleteUnpopularOneWorlds(this.locale, options.minRootOneWordConceptPopularity);
-        } catch (e) {
-            return Promise.reject(e);
-        }
-
+        await this.rootNameRep.deleteUnpopular(this.locale, options.minRootConceptPopularity);
+        await this.rootNameRep.deleteUnpopularAbbreviations(this.locale, options.minRootAbbrConceptPopularity);
+        await this.rootNameRep.deleteUnpopularOneWorlds(this.locale, options.minRootOneWordConceptPopularity);
     }
 }
