@@ -1,7 +1,7 @@
 
 import { IWikiEntityRepository } from './wikiEntityRepository';
-import { WikiEntity } from '../entities/wikiEntity';
-import { RepUpdateData, uniq } from '@textactor/domain';
+import { WikiEntity, WikiEntityType } from '../entities/wikiEntity';
+import { RepUpdateData, uniq, NameHelper } from '@textactor/domain';
 
 
 export class MemoryWikiEntityRepository implements IWikiEntityRepository {
@@ -12,15 +12,23 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
         return Promise.resolve(this.db.size);
     }
 
-    getLastnames(lang: string): Promise<string[]> {
-        const list: string[] = []
+    getInvalidPartialNames(lang: string): Promise<string[]> {
+        const container: { [index: string]: boolean } = {}
         for (let item of this.db.values()) {
-            if (item.lang === lang && item.lastname) {
-                list.push(item.lastname)
+            if (item.lang === lang && item.type === WikiEntityType.PERSON) {
+                item.names.forEach(name => {
+                    if (NameHelper.countWords(name) < 2 || NameHelper.isAbbr(name)) {
+                        return
+                    }
+                    const parts = name.split(/\s+/g).filter(it => !NameHelper.isAbbr(it) && it.length > 1);
+                    for (let it of parts) {
+                        container[it] = true;
+                    }
+                });
             }
         }
 
-        return Promise.resolve(list);
+        return Promise.resolve(Object.keys(container));
     }
 
     getByPartialNameHash(hash: string): Promise<WikiEntity[]> {

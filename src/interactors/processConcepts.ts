@@ -12,8 +12,8 @@ import { DeleteUnpopularConcepts, DeleteUnpopularConceptsOptions } from './actio
 import { ExploreWikiEntities } from './actions/exploreWikiEntities';
 import { IWikiSearchNameRepository } from './wikiSearchNameRepository';
 import { IWikiTitleRepository } from './wikiTitleRepository';
-import { DeletePartialConcepts } from './actions/deletePartialConcepts';
 import { IConceptRootNameRepository } from './conceptRootNameRepository';
+import { DeleteInvalidConcepts } from './actions/deleteInvalidConcepts';
 
 export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 
@@ -37,7 +37,8 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         const setAbbrConcextName = new SetAbbrConceptsContextName(locale, this.conceptRepository);
         const setAbbrLongName = new SetAbbrConceptsLongName(locale, this.conceptRepository);
         const deleteUnpopularConcepts = new DeleteUnpopularConcepts(locale, this.conceptRepository, this.rootNameRep);
-        const deletePartialConcepts = new DeletePartialConcepts(locale, this.conceptRepository, this.rootNameRep, this.entityRepository);
+        // const deletePartialConcepts = new DeletePartialConcepts(locale, this.conceptRepository, this.rootNameRep, this.entityRepository);
+        const deleteInvalidConcepts = new DeleteInvalidConcepts(locale, this.conceptRepository, this.entityRepository);
         const exploreWikiEntities = new ExploreWikiEntities(locale,
             this.conceptRepository,
             this.rootNameRep,
@@ -48,6 +49,10 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
             this.conceptRepository,
             this.rootNameRep,
             this.entityRepository);
+
+        debug(`<===== Start deleteInvalidConcepts`);
+        await deleteInvalidConcepts.execute(null);
+        debug(`<===== End deleteInvalidConcepts`);
 
         debug(`=====> Start setAbbrLongName`);
         const setAbbrLongNameMap = await setAbbrLongName.execute(null);
@@ -65,9 +70,9 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         await exploreWikiEntities.execute(null);
         debug(`<===== End exploreWikiEntities`);
 
-        debug(`<===== Start deletePartialConcepts`);
-        await deletePartialConcepts.execute(null);
-        debug(`<===== End deletePartialConcepts`);
+        debug(`<===== Start deleteInvalidConcepts`);
+        await deleteInvalidConcepts.execute(null);
+        debug(`<===== End deleteInvalidConcepts`);
 
         debug(`=====> Start generateActors`);
         await generateActors.execute(callback);
