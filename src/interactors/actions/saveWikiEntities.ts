@@ -1,8 +1,9 @@
 
+// const debug = require('debug')('textactor:concept-domain');
+
 import { UseCase, seriesPromise } from "@textactor/domain";
 import { WikiEntity } from "../../entities/wikiEntity";
 import { IWikiEntityRepository } from "../wikiEntityRepository";
-
 
 export class SaveWikiEntities extends UseCase<WikiEntity[], boolean, null> {
 

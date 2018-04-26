@@ -38,7 +38,7 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         const setAbbrLongName = new SetAbbrConceptsLongName(locale, this.conceptRepository);
         const deleteUnpopularConcepts = new DeleteUnpopularConcepts(locale, this.conceptRepository, this.rootNameRep);
         // const deletePartialConcepts = new DeletePartialConcepts(locale, this.conceptRepository, this.rootNameRep, this.entityRepository);
-        const deleteInvalidConcepts = new DeleteInvalidConcepts(locale, this.conceptRepository, this.entityRepository);
+        const deleteInvalidConcepts = new DeleteInvalidConcepts(locale, this.conceptRepository, this.rootNameRep, this.entityRepository);
         const exploreWikiEntities = new ExploreWikiEntities(locale,
             this.conceptRepository,
             this.rootNameRep,

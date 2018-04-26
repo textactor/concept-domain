@@ -22,16 +22,7 @@ export class WikiSearchNameHelper {
         const name = data.name.trim();
         const lang = data.lang.trim().toLowerCase();
         const country = data.country.trim().toLowerCase();
-
-        const normalName = NameHelper.normalizeName(name, lang);
-
-        if (normalName.length < 2) {
-            throw new Error(`Invalid name: ${name}`);
-        }
-
-        const hash = md5(normalName);
-
-        const id = [lang, country, hash].join('');
+        const id = WikiSearchNameHelper.createId(name, lang, country);
 
         const searchName: WikiSearchName = {
             id,

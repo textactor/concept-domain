@@ -42,10 +42,6 @@ export class WikiEntityHelper {
 
         if (simpleEntity.type) {
             entity.type = WikiEntityHelper.convertSimpleEntityType(simpleEntity.type);
-
-            if (entity.type === WikiEntityType.PERSON) {
-                entity.lastname = WikiEntityHelper.getLastname(name);
-            }
         }
 
         if (simpleEntity.abbr) {
@@ -83,9 +79,9 @@ export class WikiEntityHelper {
             }
         }
 
-        entity.names = entity.names.filter(name => WikiEntityHelper.isValidName(name));
         entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
-        entity.names = uniq(entity.names).filter(name => WikiEntityHelper.isValidName(name));
+        entity.names = entity.names.filter(name => WikiEntityHelper.isValidName(name));
+        entity.names = uniq(entity.names);
 
         entity.secondaryNames = [];
 
@@ -96,8 +92,7 @@ export class WikiEntityHelper {
             }
         });
 
-        entity.namesHashes = entity.names.concat(entity.secondaryNames)
-            .map(item => WikiEntityHelper.nameHash(item, lang));
+        entity.namesHashes = WikiEntityHelper.namesHashes(entity.names.concat(entity.secondaryNames), lang);
 
         entity.namesHashes = uniq(entity.namesHashes);
 
@@ -108,9 +103,7 @@ export class WikiEntityHelper {
 
         entity.partialNames = partialNames;
 
-        entity.partialNamesHashes = entity.partialNames
-            .map(item => WikiEntityHelper.nameHash(item, lang));
-
+        entity.partialNamesHashes = WikiEntityHelper.namesHashes(entity.partialNames, lang);
 
         const partialNamesRoot = partialNames.map(name => RootNameHelper.rootName(name, lang));
         const partialNamesRootHashes = WikiEntityHelper.namesHashes(partialNamesRoot, lang);

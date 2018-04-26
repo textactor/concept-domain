@@ -103,18 +103,23 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
             return entities;
         }
 
-        entities = entities.sort((a, b) => b.rank - a.rank);
+        entities = sortEntities(entities);
 
         const topEntity = entities[0];
 
-        const countryEntities = entities.filter(item => item.countryCode === this.locale.country);
+        if (topEntity.countryCode === this.locale.country) {
+            return uniqProp(entities, 'id');
+        }
+
+
+        const countryEntities = sortEntities(entities.filter(item => item.countryCode === this.locale.country));
         if (countryEntities.length) {
             let useCountryEntity = false;
             if (foundByPartial) {
                 const topEntityPopularity = WikiEntityHelper.getPopularity(topEntity.rank);
                 // const countryEntityPopularity = WikiEntityHelper.getPopularity(countryEntities[0].rank);
 
-                if (topEntityPopularity < EntityPopularity.HIGH) {
+                if (topEntityPopularity < EntityPopularity.POPULAR) {
                     useCountryEntity = true;
                 }
             } else {
@@ -135,4 +140,16 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         }
         return entities.filter(item => item.countryCode === this.locale.country);
     }
+}
+
+function sortEntities(entities: WikiEntity[]) {
+    if (!entities.length) {
+        return entities;
+    }
+
+    entities = entities.sort((a, b) => b.rank - a.rank);
+    const typeEntities = entities.filter(item => !!item.type);
+    const notTypeEntities = entities.filter(item => !item.type);
+
+    return typeEntities.concat(notTypeEntities);
 }

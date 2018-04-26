@@ -1,5 +1,5 @@
 
-import { NameHelper, md5 } from '@textactor/domain';
+import { NameHelper, md5, uniq } from '@textactor/domain';
 import { formatRootName } from '../utils';
 import { RootName } from './rootName';
 
@@ -66,5 +66,10 @@ export class RootNameHelper {
         name = NameHelper.atonic(name);
 
         return md5([lang.trim().toLowerCase(), country.trim().toLowerCase(), name.trim()].join('_'))
+    }
+
+    static idsFromNames(names: string[], lang: string, country: string) {
+        names = names.filter(name => name && name.trim().length > 1);
+        return uniq(names.map(name => RootNameHelper.idFromName(name, lang, country)));
     }
 }

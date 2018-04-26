@@ -20,15 +20,7 @@ export class WikiTitleHelper {
         const title = data.title.trim();
         const lang = data.lang.trim().toLowerCase();
 
-        const normalTitle = NameHelper.normalizeName(title, lang);
-
-        if (normalTitle.length < 2) {
-            throw new Error(`Invalid title: ${title}`);
-        }
-
-        const hash = md5(normalTitle);
-
-        const id = [lang, hash].join('');
+        const id = WikiTitleHelper.createId(title, lang);
 
         const wikiTitle: WikiTitle = {
             id,
