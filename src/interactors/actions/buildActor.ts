@@ -56,7 +56,7 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
     }
 
     private async findPerfectWikiEntity(conceptNames: string[]): Promise<WikiEntity> {
-        const nameHashes = uniq(conceptNames.map(name => WikiEntityHelper.nameHash(name, this.locale.lang)));
+        const nameHashes = WikiEntityHelper.namesHashes(conceptNames, this.locale.lang);
 
         let entities: WikiEntity[] = []
 
@@ -98,7 +98,7 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         return entity;
     }
 
-    private sortWikiEntities(entities: WikiEntity[], foundByPartial: boolean): WikiEntity[] {
+    private sortWikiEntities(entities: WikiEntity[], _foundByPartial: boolean): WikiEntity[] {
         if (!entities.length) {
             return entities;
         }
@@ -115,16 +115,16 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         const countryEntities = sortEntities(entities.filter(item => item.countryCode === this.locale.country));
         if (countryEntities.length) {
             let useCountryEntity = false;
-            if (foundByPartial) {
-                const topEntityPopularity = WikiEntityHelper.getPopularity(topEntity.rank);
-                // const countryEntityPopularity = WikiEntityHelper.getPopularity(countryEntities[0].rank);
+            // if (foundByPartial) {
+            const topEntityPopularity = WikiEntityHelper.getPopularity(topEntity.rank);
+            // const countryEntityPopularity = WikiEntityHelper.getPopularity(countryEntities[0].rank);
 
-                if (topEntityPopularity < EntityPopularity.POPULAR) {
-                    useCountryEntity = true;
-                }
-            } else {
+            if (topEntityPopularity < EntityPopularity.POPULAR) {
                 useCountryEntity = true;
             }
+            // } else {
+            //     useCountryEntity = true;
+            // }
 
             if (useCountryEntity) {
                 entities = countryEntities.concat(entities);
@@ -148,8 +148,10 @@ function sortEntities(entities: WikiEntity[]) {
     }
 
     entities = entities.sort((a, b) => b.rank - a.rank);
-    const typeEntities = entities.filter(item => !!item.type);
-    const notTypeEntities = entities.filter(item => !item.type);
 
-    return typeEntities.concat(notTypeEntities);
+    return entities;
+    // const typeEntities = entities.filter(item => !!item.type);
+    // const notTypeEntities = entities.filter(item => !item.type);
+
+    // return typeEntities.concat(notTypeEntities);
 }

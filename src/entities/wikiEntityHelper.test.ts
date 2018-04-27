@@ -11,7 +11,11 @@ test('#nameHash', t => {
 
     hash1 = WikiEntityHelper.nameHash('text 1', 'en');
     hash2 = WikiEntityHelper.nameHash('text 1', 'en');
+
     t.is(hash1, hash2)
+
+    const usHash = WikiEntityHelper.nameHash('Statele Unite', 'ro');
+    t.is(usHash, '0848168a5a32634a5d6e102b81682821');
 })
 
 test('#splitName', t => {

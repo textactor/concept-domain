@@ -25,6 +25,13 @@ export class PushContextConcepts extends UseCase<Concept[], Concept[], void> {
 
         await this.rootNameRep.createOrUpdate(rootName);
 
+        if (concept.knownName) {
+            const knownRootName = RootNameHelper.create({ name: concept.knownName, lang: concept.lang, country: concept.country });
+            if (knownRootName.id !== rootName.id) {
+                await this.rootNameRep.createOrUpdate(knownRootName);
+            }
+        }
+
         return await this.conceptRep.createOrUpdate(concept);
     }
 }

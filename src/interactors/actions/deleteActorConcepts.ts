@@ -15,7 +15,8 @@ export class DeleteActorConcepts extends UseCase<ConceptActor, ConceptActor, voi
     protected async innerExecute(actor: ConceptActor): Promise<ConceptActor> {
 
         const ids = actor.concepts.map(item => item.id);
-        const rootIds = uniq(actor.concepts.map(item => item.rootNameId));
+        let rootIds: string[] = actor.concepts.reduce<string[]>((list, item) => list.concat(item.rootNameIds), []);
+        rootIds = uniq(rootIds);
 
         await this.conceptRep.deleteIds(ids);
         await this.conceptRep.deleteByRootNameIds(rootIds);

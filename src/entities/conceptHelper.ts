@@ -31,7 +31,7 @@ export class ConceptHelper {
         const countWords = NameHelper.countWords(name);
         const isIrregular = NameHelper.isIrregular(name);
         const endsWithNumber = NameHelper.endsWithNumberWord(name);
-        const rootNameId = RootNameHelper.idFromName(name, lang, country);
+        const rootNameIds = RootNameHelper.idsFromNames([data.knownName, name], lang, country);
 
         const popularity = 1;
 
@@ -48,7 +48,7 @@ export class ConceptHelper {
             isIrregular,
             endsWithNumber,
             abbr: data.abbr,
-            rootNameId,
+            rootNameIds,
             popularity,
             context: data.context,
         };

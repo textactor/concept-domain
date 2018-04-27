@@ -64,15 +64,12 @@ export class MemoryConceptRepository implements IConceptRepository {
         return Promise.resolve(count);
     }
 
-    deleteByRootNameIds(ids: string[]): Promise<number> {
-        let count = 0;
-        for (let id of ids) {
-            const list = this.filterByFieldValue('rootNameId', id);
-            count += list.length;
+    async deleteByRootNameIds(ids: string[]): Promise<number> {
 
-            for (let item of list) {
-                this.db.delete(item.id);
-            }
+        const list = await this.getByRootNameIds(ids);
+        let count = list.length;
+        for (let item of list) {
+            this.db.delete(item.id);
         }
 
         return Promise.resolve(count);
@@ -157,7 +154,12 @@ export class MemoryConceptRepository implements IConceptRepository {
         return Promise.resolve(list);
     }
     getByRootNameId(id: string): Promise<Concept[]> {
-        const list = this.filterByFieldValue('rootNameId', id);
+        const list: Concept[] = []
+        for (let item of this.db.values()) {
+            if (~item.rootNameIds.indexOf(id)) {
+                list.push(item)
+            }
+        }
 
         return Promise.resolve(list);
     }

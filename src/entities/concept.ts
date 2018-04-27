@@ -9,7 +9,7 @@ export type Concept = {
     /** normalized text hash */
     nameHash?: string
     normalName?: string
-    rootNameId?: string
+    rootNameIds?: string[]
 
     abbr?: string
     abbrLongNames?: string[]
