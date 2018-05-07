@@ -47,6 +47,6 @@
     "ms": "^2.1.1",
     "partial-name": "^0.1.4",
     "root-name": "^0.1.8",
-    "wiki-entity": "^0.3.3"
+    "wiki-entity": "^0.3.4"
   }
 }

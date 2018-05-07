@@ -30,14 +30,20 @@ export class WikiEntityHelper {
             wikiPageId: simpleEntity.wikiPageId,
             wikiPageTitle: simpleEntity.wikiPageTitle,
             types: simpleEntity.types,
-            countryCode: simpleEntity.countryCode && simpleEntity.countryCode.trim().toLowerCase(),
+            countryCodes: simpleEntity.countryCodes,
             data: simpleEntity.data,
             categories: simpleEntity.categories,
             rank: 1,
         };
+        if (entity.countryCodes && entity.countryCodes.length === 0) {
+            delete entity.countryCodes;
+        }
 
-        if (!entity.countryCode) {
-            entity.countryCode = getCountryByTitle([entity.wikiPageTitle, entity.name], lang);
+        if (!entity.countryCodes) {
+            const code = getCountryByTitle([entity.wikiPageTitle, entity.name], lang);
+            if (code) {
+                entity.countryCodes = [code];
+            }
         }
 
         if (simpleEntity.type) {
@@ -151,6 +157,7 @@ export class WikiEntityHelper {
             case SimpleEntityType.PERSON: return WikiEntityType.PERSON;
             case SimpleEntityType.PLACE: return WikiEntityType.PLACE;
             case SimpleEntityType.PRODUCT: return WikiEntityType.PRODUCT;
+            case SimpleEntityType.WORK: return WikiEntityType.WORK;
         }
     }
 

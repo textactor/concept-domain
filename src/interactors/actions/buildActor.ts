@@ -76,7 +76,7 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
             await seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByPartialNameHash(nameHash)
                 .then(list => entitiesByPartialNames = entitiesByPartialNames.concat(list)));
 
-            entitiesByPartialNames = entitiesByPartialNames.filter(item => item.countryCode === this.locale.country);
+            entitiesByPartialNames = this.countryWikiEntities(entitiesByPartialNames);
             if (entitiesByPartialNames.length) {
                 foundByPartial = true;
                 debug(`found locale entities by partial name: ${entitiesByPartialNames.map(item => item.name)}`);
@@ -107,12 +107,12 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
 
         const topEntity = entities[0];
 
-        if (topEntity.countryCode === this.locale.country) {
+        if (topEntity.countryCodes && topEntity.countryCodes.indexOf(this.locale.country) > -1) {
             return uniqProp(entities, 'id');
         }
 
 
-        const countryEntities = sortEntities(entities.filter(item => item.countryCode === this.locale.country));
+        const countryEntities = this.countryWikiEntities(entities);
         if (countryEntities.length) {
             let useCountryEntity = false;
             // if (foundByPartial) {
@@ -138,7 +138,7 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         if (!entities.length) {
             return entities;
         }
-        return entities.filter(item => item.countryCode === this.locale.country);
+        return entities.filter(item => item.countryCodes && item.countryCodes.indexOf(this.locale.country) > -1);
     }
 }
 

@@ -5,6 +5,7 @@ export enum WikiEntityType {
     PERSON = 'H',
     PLACE = 'P',
     PRODUCT = 'R',
+    WORK = 'W',
 }
 
 export type WikiEntityData = { [prop: string]: string[] }
@@ -30,7 +31,7 @@ export type WikiEntity = {
     wikiPageTitle?: string
     type?: WikiEntityType
     types?: string[]
-    countryCode?: string
+    countryCodes?: string[]
     rank?: number
     data?: WikiEntityData
     categories?: string[]

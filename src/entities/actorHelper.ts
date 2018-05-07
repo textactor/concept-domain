@@ -33,7 +33,7 @@ export class ActorHelper {
         }
 
         actor.names = actor.names.concat(ConceptHelper.getConceptsNames(concepts, false));
-        if (entity && entity.countryCode === country) {
+        if (entity && entity.countryCodes && entity.countryCodes.indexOf(country) > -1) {
             actor.names = actor.names.concat(entity.partialNames);
         }
 

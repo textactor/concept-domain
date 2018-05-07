@@ -35,7 +35,7 @@ test('#convert', async t => {
 
     t.is(entity.name, wikiEntity.label)
     t.is(entity.type, WikiEntityType.ORG)
-    t.is(entity.countryCode, 'us')
+    t.is(entity.countryCodes.indexOf('us') > -1, true)
     t.is(entity.abbr, 'CIA')
     t.is(entity.wikiDataId, 'Q37230')
 })
