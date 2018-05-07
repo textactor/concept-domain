@@ -108,6 +108,7 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         const topEntity = entities[0];
 
         if (topEntity.countryCodes && topEntity.countryCodes.indexOf(this.locale.country) > -1) {
+            debug(`Top entity has country=${this.locale.country}: ${topEntity.name}`);
             return uniqProp(entities, 'id');
         }
 
@@ -128,10 +129,13 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
 
             if (useCountryEntity) {
                 entities = countryEntities.concat(entities);
+                debug(`using country entity: ${entities[0].name}`);
             }
         }
 
-        return uniqProp(entities, 'id');
+        entities = uniqProp(entities, 'id');
+
+        return entities;
     }
 
     private countryWikiEntities(entities: WikiEntity[]): WikiEntity[] {

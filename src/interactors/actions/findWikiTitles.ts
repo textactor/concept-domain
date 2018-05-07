@@ -21,7 +21,24 @@ export class FindWikiTitles extends UseCase<string[], string[], null> {
 
         await seriesPromise(names, async name => {
             debug(`finding wiki titles for ${name}...`);
-            const titles = await findTitles(name, this.locale.lang, { limit: 5, tags, orderByTagsLimit: 2 });
+            let titles: {
+                title: string;
+                simple?: string;
+                special?: string;
+                description?: string;
+                categories?: string[];
+            }[];
+            try {
+                titles = await findTitles(name, this.locale.lang, { limit: 5, tags, orderByTagsLimit: 2 });
+            } catch (e) {
+                if (e.code === 'ETIMEDOUT') {
+                    debug(`ETIMEDOUT retring after 3 sec...`);
+                    await delay(1000 * 3);
+                    titles = await findTitles(name, this.locale.lang, { limit: 5, tags, orderByTagsLimit: 2 });
+                } else {
+                    throw e;
+                }
+            }
             if (titles && titles.length) {
                 const titleNames = titles.map(item => item.title).filter(item => item && item.trim().length >= 2);
                 debug(`found wiki titles for ${name}: ${titleNames}`);
