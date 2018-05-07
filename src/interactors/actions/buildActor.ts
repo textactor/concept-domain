@@ -117,14 +117,14 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
             let useCountryEntity = false;
             // if (foundByPartial) {
             const topEntityPopularity = WikiEntityHelper.getPopularity(topEntity.rank);
-            // const countryEntityPopularity = WikiEntityHelper.getPopularity(countryEntities[0].rank);
+            const countryEntityPopularity = WikiEntityHelper.getPopularity(countryEntities[0].rank);
 
-            if (topEntityPopularity < EntityPopularity.POPULAR) {
+            if (topEntityPopularity < EntityPopularity.POPULAR || (topEntityPopularity - countryEntityPopularity) < 2) {
                 useCountryEntity = true;
             }
-            // } else {
-            //     useCountryEntity = true;
-            // }
+            else {
+                debug(`using POPULAR entity: ${topEntity.name}(${topEntity.rank}-${topEntityPopularity})>${countryEntities[0].rank}-(${countryEntityPopularity})`);
+            }
 
             if (useCountryEntity) {
                 entities = countryEntities.concat(entities);
