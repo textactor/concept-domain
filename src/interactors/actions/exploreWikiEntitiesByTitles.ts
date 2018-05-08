@@ -4,8 +4,9 @@ const debug = require('debug')('textactor:concept-domain');
 import { UseCase } from "@textactor/domain";
 import { Locale } from "../../types";
 import { WikiEntity } from "../../entities/wikiEntity";
-import { getEntities } from 'wiki-entity';
+import { getEntities, WikiEntitiesParams, WikiEntity as ExternWikiEntity } from 'wiki-entity';
 import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
+import { isTimeoutError, delay } from "../../utils";
 
 export class ExploreWikiEntitiesByTitles extends UseCase<string[], WikiEntity[], null> {
 
@@ -17,7 +18,7 @@ export class ExploreWikiEntitiesByTitles extends UseCase<string[], WikiEntity[],
 
         debug(`exploring wiki entities for ${titles.join('|')}`);
 
-        let wikiEntities = await getEntities({
+        const findOptions: WikiEntitiesParams = {
             titles: titles.join('|'),
             claims: 'item',
             categories: true,
@@ -25,7 +26,18 @@ export class ExploreWikiEntitiesByTitles extends UseCase<string[], WikiEntity[],
             language: this.locale.lang,
             redirects: true,
             types: true,
-        });
+        };
+
+        let wikiEntities: ExternWikiEntity[];
+        try {
+            wikiEntities = await getEntities(findOptions);
+        } catch (e) {
+            if (isTimeoutError(e)) {
+                debug(`ETIMEDOUT retring after 3 sec...`);
+                await delay(1000 * 3);
+                wikiEntities = await getEntities(findOptions);
+            }
+        }
         wikiEntities = wikiEntities || [];
         wikiEntities = wikiEntities.filter(item => !!item);
 

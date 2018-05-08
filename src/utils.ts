@@ -47,3 +47,7 @@ export function getPartialName(name: string, lang: string, _country?: string): s
 
     return null;
 }
+
+export function isTimeoutError(error: any) {
+    return error && error.code && ['ESOCKETTIMEDOUT', 'ETIMEDOUT'].indexOf(error.code) > -1;
+}

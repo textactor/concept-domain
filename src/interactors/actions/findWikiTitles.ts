@@ -4,7 +4,7 @@ const debug = require('debug')('textactor:concept-domain');
 import { UseCase, uniq, seriesPromise } from "@textactor/domain";
 import { Locale } from "../../types";
 import { findTitles } from 'entity-finder';
-import { delay } from "../../utils";
+import { delay, isTimeoutError } from "../../utils";
 
 export class FindWikiTitles extends UseCase<string[], string[], null> {
 
@@ -28,13 +28,14 @@ export class FindWikiTitles extends UseCase<string[], string[], null> {
                 description?: string;
                 categories?: string[];
             }[];
+            const findOptions = { limit: 5, tags, orderByTagsLimit: 2 };
             try {
-                titles = await findTitles(name, this.locale.lang, { limit: 5, tags, orderByTagsLimit: 2 });
+                titles = await findTitles(name, this.locale.lang, findOptions);
             } catch (e) {
-                if (e.code === 'ETIMEDOUT') {
+                if (isTimeoutError(e)) {
                     debug(`ETIMEDOUT retring after 3 sec...`);
                     await delay(1000 * 3);
-                    titles = await findTitles(name, this.locale.lang, { limit: 5, tags, orderByTagsLimit: 2 });
+                    titles = await findTitles(name, this.locale.lang, findOptions);
                 } else {
                     throw e;
                 }

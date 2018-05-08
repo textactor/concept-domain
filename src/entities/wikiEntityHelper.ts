@@ -11,8 +11,7 @@ export class WikiEntityHelper {
         lang = lang.trim().toLowerCase();
         country = country.trim().toLowerCase();
         const simpleEntity = convertToSimpleEntity(wikiEntity, lang);
-        const wikiSplittedName = WikiEntityHelper.splitName(simpleEntity.wikiPageTitle);
-        const name = simpleEntity.name || wikiSplittedName && wikiSplittedName.simple || simpleEntity.wikiPageTitle;
+        const name = NameHelper.standardText(simpleEntity.name || simpleEntity.wikiPageTitle, lang);
 
         if (!name) {
             throw new Error(`Entity has no name! ${simpleEntity.wikiDataId}`);
@@ -20,7 +19,7 @@ export class WikiEntityHelper {
 
         const entity: WikiEntity = {
             id: `${simpleEntity.lang.trim().toUpperCase()}${simpleEntity.wikiDataId}`,
-            name: NameHelper.standardText(name, lang),
+            name: name,
             nameHash: WikiEntityHelper.nameHash(name, lang),
             lang: lang,
             description: simpleEntity.description,
@@ -62,28 +61,31 @@ export class WikiEntityHelper {
             entity.rank += Object.keys(entity.data).length;
         }
 
-        const splittedName = WikiEntityHelper.splitName(entity.name);
+        let splittedName = WikiEntityHelper.splitName(entity.name);
         if (splittedName) {
             entity.specialName = splittedName.special;
             entity.simpleName = splittedName.simple;
         } else if (entity.wikiPageTitle) {
-            const splittedName = WikiEntityHelper.splitName(entity.wikiPageTitle);
+            splittedName = WikiEntityHelper.splitName(entity.wikiPageTitle);
             if (splittedName) {
                 entity.specialName = splittedName.special;
                 entity.simpleName = splittedName.simple;
             }
         }
 
-        entity.names = [entity.name];
-        if (entity.wikiPageTitle) {
-            entity.names.push(entity.wikiPageTitle);
-        }
+        entity.names = [entity.name, simpleEntity.name, entity.wikiPageTitle]
+            .filter(name => WikiEntityHelper.isValidName(name));
+
         if (wikiEntity.redirects && wikiEntity.redirects.length) {
             entity.names = entity.names.concat(wikiEntity.redirects);
             if (!entity.abbr) {
                 entity.abbr = NameHelper.findAbbr(wikiEntity.redirects);
             }
         }
+
+        // if (splittedName && NameHelper.countWords(splittedName.simple) > 1) {
+        //     entity.names.push(splittedName.simple);
+        // }
 
         entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
         entity.names = entity.names.filter(name => WikiEntityHelper.isValidName(name));
