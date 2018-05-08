@@ -61,3 +61,7 @@ export {
 export {
     INameCorrectionService
 } from './interactors/nameCorrectionService';
+
+export {
+    ICountryTagsService
+} from './interactors/actions/findWikiTitles';

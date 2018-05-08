@@ -9,6 +9,7 @@ import { PushContextConcepts } from './pushContextConcepts';
 import { MemoryWikiSearchNameRepository } from '../memoryWikiSearchNameRepository';
 import { MemoryWikiTitleRepository } from '../memoryWikiTitleRepository';
 import { MemoryRootNameRepository } from '../memoryRootNameRepository';
+import { ICountryTagsService } from './findWikiTitles';
 
 test('ro-md', async t => {
     const conceptRepository = new MemoryConceptRepository();
@@ -23,7 +24,8 @@ test('ro-md', async t => {
         rootNameRep,
         wikiEntityRepository,
         wikiSearchNameRepository,
-        wikiTitleRepository);
+        wikiTitleRepository,
+        new CountryTags());
 
     const conceptTexts: string[] = ['R. Moldova', 'Chișinău', 'Chisinau', 'Republica Moldova', 'Moldova', 'Chisinau'];
 
@@ -43,3 +45,23 @@ test('ro-md', async t => {
     t.true(countEntities > 0, 'many wiki entities in DB');
 });
 
+class CountryTags implements ICountryTagsService {
+    getTags(country: string, lang: string): string[] {
+
+        const LOCALE_COUNTRY_TAGS: { [country: string]: { [lang: string]: string[] } } = {
+            md: {
+                ro: ['republica moldova', 'moldova'],
+            },
+            ro: {
+                ro: ['românia', 'româniei'],
+            },
+            ru: {
+                ru: ['Россия', 'РФ', 'России', 'Российской'],
+            },
+        }
+
+        if (LOCALE_COUNTRY_TAGS[country]) {
+            return LOCALE_COUNTRY_TAGS[country][lang];
+        }
+    }
+}

@@ -7,7 +7,7 @@ import { Locale } from '../../types';
 import { IWikiEntityRepository } from '../wikiEntityRepository';
 import { ExploreWikiEntitiesByTitles } from './exploreWikiEntitiesByTitles';
 import { SaveWikiEntities } from './saveWikiEntities';
-import { FindWikiTitles } from './findWikiTitles';
+import { FindWikiTitles, ICountryTagsService } from './findWikiTitles';
 import { WikiEntity } from '../../entities/wikiEntity';
 import { IWikiSearchNameRepository } from '../wikiSearchNameRepository';
 import { WikiSearchNameHelper } from '../../entities/wikiSearchName';
@@ -33,12 +33,13 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         private rootNameRep: IConceptRootNameRepository,
         entityRep: IWikiEntityRepository,
         private wikiSearchNameRep: IWikiSearchNameRepository,
-        private wikiTitleRep: IWikiTitleRepository) {
+        private wikiTitleRep: IWikiTitleRepository,
+        countryTags: ICountryTagsService) {
         super()
 
         this.exploreWikiEntitiesByTitles = new ExploreWikiEntitiesByTitles(locale);
         this.saveWikiEntities = new SaveWikiEntities(entityRep);
-        this.findWikiTitles = new FindWikiTitles(locale);
+        this.findWikiTitles = new FindWikiTitles(locale, countryTags);
     }
 
     protected async innerExecute(): Promise<ExploreWikiEntitiesResults> {
@@ -84,7 +85,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         const country = this.locale.country;
 
         const searchName = await this.wikiSearchNameRep.getById(WikiSearchNameHelper.createId(name, lang, country));
-        if (searchName && searchName.updatedAt * 1000 > Date.now() - ms('30days')) {
+        if (searchName && searchName.updatedAt * 1000 > Date.now() - ms('7days')) {
             debug(`WikiSearchName=${name} exists!`);
             return [];
         }
@@ -105,7 +106,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
 
         await seriesPromise(initalTitles, async title => {
             const wikiTitle = await this.wikiTitleRep.getById(WikiTitleHelper.createId(title, lang));
-            if (wikiTitle && wikiTitle.updatedAt * 1000 > Date.now() - ms('30days')) {
+            if (wikiTitle && wikiTitle.updatedAt * 1000 > Date.now() - ms('10days')) {
                 debug(`WikiTitle=${title} exists!`);
                 return;
             }
@@ -120,15 +121,14 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
 
         results.countNewEntities += wikiEntities.length;
 
-        debug(`found wiki entities for ${name}==${wikiEntities.length}`);
-        await this.saveWikiEntities.execute(wikiEntities);
+        if (wikiEntities.length) {
+            debug(`found wiki entities for ${name}==${wikiEntities.length}`);
+            await this.saveWikiEntities.execute(wikiEntities);
+        } else {
+            debug(`Not found wiki entities for ${name}`);
+        }
 
-        await seriesPromise(titles, async title => {
-            await this.wikiTitleRep.createOrUpdate(WikiTitleHelper.create({
-                title,
-                lang,
-            }));
-        });
+        await seriesPromise(titles, title => this.wikiTitleRep.createOrUpdate(WikiTitleHelper.create({ title, lang, })));
 
         return wikiEntities;
     }

@@ -1,7 +1,7 @@
 
 import { BuildActor } from './buildActor';
 import test from 'ava';
-import { Locale, MemoryWikiEntityRepository, MemoryConceptRepository, PushContextConcepts, MemoryRootNameRepository, ConceptHelper, MemoryWikiSearchNameRepository, MemoryWikiTitleRepository, WikiEntityHelper } from '../..';
+import { Locale, MemoryWikiEntityRepository, MemoryConceptRepository, PushContextConcepts, MemoryRootNameRepository, ConceptHelper, MemoryWikiSearchNameRepository, MemoryWikiTitleRepository, WikiEntityHelper, ICountryTagsService } from '../..';
 import { ExploreWikiEntities } from './exploreWikiEntities';
 
 test('ro-md: partial name: Biblioteca Națională', async t => {
@@ -18,7 +18,7 @@ test('ro-md: partial name: Biblioteca Națională', async t => {
     await pushConcepts.execute([bibliotecaNationala]);
 
     const exploreEntities = new ExploreWikiEntities(locale, conceptRep, rootConceptRep, entityRep,
-        new MemoryWikiSearchNameRepository(), new MemoryWikiTitleRepository());
+        new MemoryWikiSearchNameRepository(), new MemoryWikiTitleRepository(), new CountryTags());
 
     await exploreEntities.execute(null);
 
@@ -35,3 +35,24 @@ test('ro-md: partial name: Biblioteca Națională', async t => {
 
     t.is(actor.name, 'Biblioteca Națională a Republicii Moldova');
 });
+
+class CountryTags implements ICountryTagsService {
+    getTags(country: string, lang: string): string[] {
+
+        const LOCALE_COUNTRY_TAGS: { [country: string]: { [lang: string]: string[] } } = {
+            md: {
+                ro: ['republica moldova', 'moldova'],
+            },
+            ro: {
+                ro: ['românia', 'româniei'],
+            },
+            ru: {
+                ru: ['Россия', 'РФ', 'России', 'Российской'],
+            },
+        }
+
+        if (LOCALE_COUNTRY_TAGS[country]) {
+            return LOCALE_COUNTRY_TAGS[country][lang];
+        }
+    }
+}

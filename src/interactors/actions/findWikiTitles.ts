@@ -8,15 +8,18 @@ import { delay, isTimeoutError } from "../../utils";
 
 export class FindWikiTitles extends UseCase<string[], string[], null> {
 
-    constructor(private locale: Locale) {
+    constructor(private locale: Locale, private countryTags: ICountryTagsService) {
         super()
     }
 
     protected async innerExecute(names: string[]): Promise<string[]> {
 
+        const lang = this.locale.lang;
+        const country = this.locale.country;
+
         names = uniq(names);
 
-        const tags = getWikiTitleTags(this.locale);
+        const tags = this.countryTags.getTags(country, lang);
         let allTitles: string[] = [];
 
         await seriesPromise(names, async name => {
@@ -54,20 +57,6 @@ export class FindWikiTitles extends UseCase<string[], string[], null> {
     }
 }
 
-function getWikiTitleTags(locale: Locale) {
-    if (LOCALE_COUNTRY_TAGS[locale.country]) {
-        return LOCALE_COUNTRY_TAGS[locale.country][locale.lang];
-    }
-}
-
-const LOCALE_COUNTRY_TAGS: { [country: string]: { [lang: string]: string[] } } = {
-    md: {
-        ro: ['republica moldova', 'moldova'],
-    },
-    ro: {
-        ro: ['românia', 'româniei'],
-    },
-    ru: {
-        ru: ['Россия', 'РФ', 'России', 'Российской'],
-    },
+export interface ICountryTagsService {
+    getTags(country: string, lang: string): string[]
 }

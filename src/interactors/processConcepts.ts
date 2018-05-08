@@ -14,6 +14,7 @@ import { IWikiSearchNameRepository } from './wikiSearchNameRepository';
 import { IWikiTitleRepository } from './wikiTitleRepository';
 import { IConceptRootNameRepository } from './conceptRootNameRepository';
 import { DeleteInvalidConcepts } from './actions/deleteInvalidConcepts';
+import { ICountryTagsService } from '..';
 
 export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 
@@ -25,7 +26,8 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         private rootNameRep: IConceptRootNameRepository,
         private entityRepository: IWikiEntityRepository,
         private wikiSearchNameRepository: IWikiSearchNameRepository,
-        private wikiTitleRepository: IWikiTitleRepository) {
+        private wikiTitleRepository: IWikiTitleRepository,
+        private countryTags: ICountryTagsService) {
         super()
     }
 
@@ -44,7 +46,8 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
             this.rootNameRep,
             this.entityRepository,
             this.wikiSearchNameRepository,
-            this.wikiTitleRepository);
+            this.wikiTitleRepository,
+            this.countryTags);
         const generateActors = new GenerateActors(locale,
             this.conceptRepository,
             this.rootNameRep,
