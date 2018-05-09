@@ -6,7 +6,7 @@ export type ConceptContainerKnownData = {
     country: string
     name: string
     uniqueName: string
-    ownerId?: string
+    ownerId: string
 }
 
 export class ConceptContainerHelper {
@@ -18,11 +18,8 @@ export class ConceptContainerHelper {
             uniqueName: data.uniqueName,
             lang: data.lang,
             country: data.country,
+            ownerId: data.ownerId,
         };
-
-        if (data.ownerId) {
-            container.ownerId = data.ownerId;
-        }
 
         return container;
     }
