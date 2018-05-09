@@ -13,6 +13,7 @@ export class ConceptContainerHelper {
     static build(data: ConceptContainerKnownData): ConceptContainer {
         const container: ConceptContainer = {
             id: generateNewId(),
+            status: ConceptContainerStatus.NEW,
             name: data.name,
             uniqueName: data.uniqueName,
             lang: data.lang,
