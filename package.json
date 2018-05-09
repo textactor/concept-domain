@@ -36,6 +36,7 @@
   "homepage": "https://github.com/textactor/concept-domain#readme",
   "devDependencies": {
     "@types/node": "latest",
+    "@types/shortid": "^0.0.29",
     "ava": "^0.23.0",
     "rimraf": "^2.6.2",
     "typescript": "latest"
@@ -47,6 +48,7 @@
     "ms": "^2.1.1",
     "partial-name": "^0.1.4",
     "root-name": "^0.1.8",
+    "shortid": "^2.2.8",
     "wiki-entity": "^0.3.6"
   }
 }
