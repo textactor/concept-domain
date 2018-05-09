@@ -3,20 +3,20 @@ const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase, seriesPromise, uniq } from "@textactor/domain";
 import { IConceptRepository } from "../conceptRepository";
-import { Locale } from "../../types";
 import { Concept } from "../../entities/concept";
 import { ConceptHelper } from "../../entities/conceptHelper";
+import { ConceptContainer } from "../../entities/conceptContainer";
 
 export class SetAbbrConceptsLongName extends UseCase<void, Map<string, string>, void> {
 
-    constructor(private locale: Locale, private conceptRep: IConceptRepository) {
+    constructor(private container: ConceptContainer, private conceptRep: IConceptRepository) {
         super()
     }
 
     protected async innerExecute(): Promise<Map<string, string>> {
         const results: Map<string, string> = new Map();
 
-        let concepts = await this.conceptRep.getConceptsWithAbbr(this.locale);
+        let concepts = await this.conceptRep.getConceptsWithAbbr(this.container.id);
 
         await this.setConceptsLongName(concepts, results);
 
@@ -32,7 +32,7 @@ export class SetAbbrConceptsLongName extends UseCase<void, Map<string, string>, 
             if (results.has(concept.abbr)) {
                 return Promise.resolve();
             }
-            const id = ConceptHelper.id(concept.abbr, this.locale.lang, this.locale.country);
+            const id = ConceptHelper.id(concept.abbr, this.container.lang, this.container.country, this.container.id);
 
             return this.conceptRep.getById(id)
                 .then(abbrConcept => {

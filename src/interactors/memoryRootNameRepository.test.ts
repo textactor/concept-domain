@@ -4,7 +4,7 @@ import { MemoryRootNameRepository, RootNameHelper } from '..';
 
 test('#create', async t => {
     const repository = new MemoryRootNameRepository();
-    const rootName = RootNameHelper.create({ name: 'New York', country: 'us', lang: 'en' });
+    const rootName = RootNameHelper.create({ name: 'New York', country: 'us', lang: 'en', containerId: '1' });
 
     const createdConcept = await repository.create(rootName);
 
@@ -19,7 +19,7 @@ test('#create', async t => {
 
 test('#getById', async t => {
     const repository = new MemoryRootNameRepository();
-    const rootName = RootNameHelper.create({ name: 'New York', country: 'us', lang: 'en' });
+    const rootName = RootNameHelper.create({ name: 'New York', country: 'us', lang: 'en', containerId: '1' });
     await repository.create(rootName);
     const concept1 = await repository.getById(rootName.id);
     t.true(!!concept1);
@@ -30,9 +30,9 @@ test('#getById', async t => {
 
 test('#getByIds', async t => {
     const repository = new MemoryRootNameRepository();
-    const concept1 = RootNameHelper.create({ name: 'New York', country: 'us', lang: 'en' });
+    const concept1 = RootNameHelper.create({ name: 'New York', country: 'us', lang: 'en', containerId: '1' });
     await repository.create(concept1);
-    const concept2 = RootNameHelper.create({ name: 'New York City', country: 'us', lang: 'en' });
+    const concept2 = RootNameHelper.create({ name: 'New York City', country: 'us', lang: 'en', containerId: '1' });
     await repository.create(concept2);
     const concepts = await repository.getByIds([concept1.id, concept2.id]);
 
@@ -44,16 +44,16 @@ test('#getByIds', async t => {
 test('#getPopularRootNameHashes', async t => {
     const repository = new MemoryRootNameRepository();
 
-    const concept1 = RootNameHelper.create({ name: 'Владимир Путин', country: 'ru', lang: 'ru' });
+    const concept1 = RootNameHelper.create({ name: 'Владимир Путин', country: 'ru', lang: 'ru', containerId: '1' });
     await repository.createOrUpdate(concept1);
 
-    const concept2 = RootNameHelper.create({ name: 'Владимира Путина', country: 'ru', lang: 'ru' });
+    const concept2 = RootNameHelper.create({ name: 'Владимира Путина', country: 'ru', lang: 'ru', containerId: '1' });
     await repository.createOrUpdate(concept2);
 
-    const concept3 = RootNameHelper.create({ name: 'Виктор Зубков', country: 'ru', lang: 'ru' });
+    const concept3 = RootNameHelper.create({ name: 'Виктор Зубков', country: 'ru', lang: 'ru', containerId: '1' });
     await repository.createOrUpdate(concept3);
 
-    const popularIds = await repository.getMostPopularIds({ country: 'ru', lang: 'ru' }, 2, 0);
+    const popularIds = await repository.getMostPopularIds('1', 2, 0);
     const popularRootNames = await repository.getByIds(popularIds);
 
     t.is(popularRootNames.length, 2);
@@ -65,19 +65,19 @@ test('#getPopularRootNameHashes', async t => {
 test('#deleteUnpopular', async t => {
     const repository = new MemoryRootNameRepository();
 
-    const concept1 = RootNameHelper.create({ name: 'Владимир Путин', country: 'ru', lang: 'ru' });
+    const concept1 = RootNameHelper.create({ name: 'Владимир Путин', country: 'ru', lang: 'ru', containerId: '1' });
     await repository.createOrUpdate(concept1);
     await repository.createOrUpdate(concept1);
 
-    const concept2 = RootNameHelper.create({ name: 'Владимира Путина', country: 'ru', lang: 'ru' });
+    const concept2 = RootNameHelper.create({ name: 'Владимира Путина', country: 'ru', lang: 'ru', containerId: '1' });
     await repository.createOrUpdate(concept2);
 
-    const concept3 = RootNameHelper.create({ name: 'Виктор Зубков', country: 'ru', lang: 'ru' });
+    const concept3 = RootNameHelper.create({ name: 'Виктор Зубков', country: 'ru', lang: 'ru', containerId: '1' });
     await repository.createOrUpdate(concept3);
 
-    await repository.deleteUnpopular({ lang: 'ru', country: 'ru' }, 1);
-    
-    const popularIds = await repository.getMostPopularIds({ country: 'ru', lang: 'ru' }, 2, 0);
+    await repository.deleteUnpopular('1', 1);
+
+    const popularIds = await repository.getMostPopularIds('1', 2, 0);
     const popularRootNames = await repository.getByIds(popularIds);
 
     t.is(popularRootNames.length, 1);

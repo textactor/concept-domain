@@ -15,6 +15,7 @@ import { IWikiTitleRepository } from '../wikiTitleRepository';
 import { WikiTitleHelper } from '../../entities/wikiTitle';
 import { ConceptHelper } from '../..';
 import { IConceptRootNameRepository } from '../conceptRootNameRepository';
+import { ConceptContainer } from '../../entities/conceptContainer';
 const ms = require('ms');
 
 export type ExploreWikiEntitiesResults = {
@@ -28,7 +29,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
     private saveWikiEntities: SaveWikiEntities;
     private findWikiTitles: FindWikiTitles;
 
-    constructor(private locale: Locale,
+    constructor(private container: ConceptContainer,
         private conceptRep: IConceptReadRepository,
         private rootNameRep: IConceptRootNameRepository,
         entityRep: IWikiEntityRepository,
@@ -36,6 +37,11 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
         private wikiTitleRep: IWikiTitleRepository,
         countryTags: ICountryTagsService) {
         super()
+
+        const locale: Locale = {
+            lang: container.lang,
+            country: container.country,
+        };
 
         this.exploreWikiEntitiesByTitles = new ExploreWikiEntitiesByTitles(locale);
         this.saveWikiEntities = new SaveWikiEntities(entityRep);
@@ -55,7 +61,7 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
 
         async function start(): Promise<void> {
 
-            const rootIds = await self.rootNameRep.getMostPopularIds(self.locale, limit, skip);
+            const rootIds = await self.rootNameRep.getMostPopularIds(self.container.id, limit, skip);
 
             if (rootIds.length === 0) {
                 debug(`concepts rootIds==0`);
@@ -81,8 +87,8 @@ export class ExploreWikiEntities extends UseCase<void, ExploreWikiEntitiesResult
     }
 
     private async processName(name: string, results: ExploreWikiEntitiesResults): Promise<WikiEntity[]> {
-        const lang = this.locale.lang;
-        const country = this.locale.country;
+        const lang = this.container.lang;
+        const country = this.container.country;
 
         const searchName = await this.wikiSearchNameRep.getById(WikiSearchNameHelper.createId(name, lang, country));
         if (searchName && searchName.updatedAt * 1000 > Date.now() - ms('7days')) {

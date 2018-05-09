@@ -4,6 +4,8 @@ export type Concept = {
     lang?: string
     country?: string
 
+    containerId?: string
+
     name?: string
     nameLength?: number
     /** normalized text hash */

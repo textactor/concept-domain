@@ -5,7 +5,7 @@ import { ConceptHelper } from '../entities/conceptHelper';
 
 test('#create', async t => {
     const repository = new MemoryConceptRepository();
-    const concept = ConceptHelper.create({ name: 'New York', abbr: 'NY', country: 'us', lang: 'en' });
+    const concept = ConceptHelper.create({ name: 'New York', abbr: 'NY', country: 'us', lang: 'en', containerId: '1' });
 
     const createdConcept = await repository.create(concept);
 
@@ -21,7 +21,7 @@ test('#create', async t => {
 
 test('#getById', async t => {
     const repository = new MemoryConceptRepository();
-    const concept = ConceptHelper.create({ name: 'New York', abbr: 'NY', country: 'us', lang: 'en' });
+    const concept = ConceptHelper.create({ name: 'New York', abbr: 'NY', country: 'us', lang: 'en', containerId: '1' });
     await repository.create(concept);
     const concept1 = await repository.getById(concept.id);
     t.true(!!concept1);
@@ -32,9 +32,9 @@ test('#getById', async t => {
 
 test('#getByIds', async t => {
     const repository = new MemoryConceptRepository();
-    const concept1 = ConceptHelper.create({ name: 'New York', abbr: 'NY', country: 'us', lang: 'en' });
+    const concept1 = ConceptHelper.create({ name: 'New York', abbr: 'NY', country: 'us', lang: 'en', containerId: '1' });
     await repository.create(concept1);
-    const concept2 = ConceptHelper.create({ name: 'New York City', abbr: 'NY', country: 'us', lang: 'en' });
+    const concept2 = ConceptHelper.create({ name: 'New York City', abbr: 'NY', country: 'us', lang: 'en', containerId: '1' });
     await repository.create(concept2);
     const concepts = await repository.getByIds([concept1.id, concept2.id]);
 
@@ -46,7 +46,7 @@ test('#getByIds', async t => {
 test('#deleteByNameHash', async t => {
     const repository = new MemoryConceptRepository();
 
-    const concept1 = ConceptHelper.create({ name: 'Владимир Путин', country: 'ru', lang: 'ru' });
+    const concept1 = ConceptHelper.create({ name: 'Владимир Путин', country: 'ru', lang: 'ru', containerId: '1' });
     await repository.deleteByNameHash([concept1.nameHash]);
     const concepts = await repository.getByNameHash(concept1.nameHash);
 

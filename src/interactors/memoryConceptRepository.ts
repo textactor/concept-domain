@@ -28,10 +28,10 @@ export class MemoryConceptRepository implements IConceptRepository {
         return Promise.resolve(count);
     }
 
-    getAbbrConceptsWithContextName(locale: Locale): Promise<Concept[]> {
+    getAbbrConceptsWithContextName(containerId: string): Promise<Concept[]> {
         const list: Concept[] = []
         for (let item of this.db.values()) {
-            if (item.country === locale.country && item.lang === locale.lang && item.isAbbr && item.contextNames) {
+            if (item.containerId === containerId && item.isAbbr && item.contextNames) {
                 list.push(item);
             }
         }
@@ -39,10 +39,10 @@ export class MemoryConceptRepository implements IConceptRepository {
         return Promise.resolve(list);
     }
 
-    getConceptsWithAbbr(locale: Locale): Promise<Concept[]> {
+    getConceptsWithAbbr(containerId: string): Promise<Concept[]> {
         const list: Concept[] = []
         for (let item of this.db.values()) {
-            if (item.country === locale.country && item.lang === locale.lang && !item.isAbbr && item.abbr) {
+            if (item.containerId === containerId && !item.isAbbr && item.abbr) {
                 list.push(item);
             }
         }
@@ -163,10 +163,10 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(list);
     }
-    deleteUnpopular(locale: Locale, popularity: number): Promise<number> {
+    deleteUnpopular(containerId: string, popularity: number): Promise<number> {
         let count = 0;
         for (let item of this.db.values()) {
-            if (item.country !== locale.country || item.lang !== locale.lang) {
+            if (item.containerId !== containerId) {
                 continue;
             }
             if (item.popularity <= popularity) {
@@ -176,10 +176,10 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(count);
     }
-    deleteUnpopularAbbreviations(locale: Locale, popularity: number): Promise<number> {
+    deleteUnpopularAbbreviations(containerId: string, popularity: number): Promise<number> {
         let count = 0;
         for (let item of this.db.values()) {
-            if (item.country !== locale.country || item.lang !== locale.lang) {
+            if (item.containerId !== containerId) {
                 continue;
             }
             if (item.isAbbr && item.popularity <= popularity) {
@@ -189,10 +189,10 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(count);
     }
-    deleteUnpopularOneWorlds(locale: Locale, popularity: number): Promise<number> {
+    deleteUnpopularOneWorlds(containerId: string, popularity: number): Promise<number> {
         let count = 0;
         for (let item of this.db.values()) {
-            if (item.country !== locale.country || item.lang !== locale.lang) {
+            if (item.containerId !== containerId) {
                 continue;
             }
             if (item.countWords === 1 && item.popularity <= popularity) {
@@ -202,10 +202,10 @@ export class MemoryConceptRepository implements IConceptRepository {
 
         return Promise.resolve(count);
     }
-    deleteAll(locale: Locale): Promise<number> {
+    deleteAll(containerId: string): Promise<number> {
         let count = 0;
         for (let item of this.db.values()) {
-            if (item.country !== locale.country || item.lang !== locale.lang) {
+            if (item.containerId !== containerId) {
                 continue;
             }
 

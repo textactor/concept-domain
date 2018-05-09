@@ -10,6 +10,7 @@ import { MemoryWikiSearchNameRepository } from '../memoryWikiSearchNameRepositor
 import { MemoryWikiTitleRepository } from '../memoryWikiTitleRepository';
 import { MemoryRootNameRepository } from '../memoryRootNameRepository';
 import { ICountryTagsService } from './findWikiTitles';
+import { ConceptContainer } from '../../entities/conceptContainer';
 
 test('ro-md', async t => {
     const conceptRepository = new MemoryConceptRepository();
@@ -19,7 +20,8 @@ test('ro-md', async t => {
     const rootNameRep = new MemoryRootNameRepository();
     const pushConcepts = new PushContextConcepts(conceptRepository, rootNameRep);
     const locale: Locale = { lang: 'ro', country: 'md' };
-    const exploreWikiEntities = new ExploreWikiEntities(locale,
+    const container: ConceptContainer = { id: '1', ...locale };
+    const exploreWikiEntities = new ExploreWikiEntities(container,
         conceptRepository,
         rootNameRep,
         wikiEntityRepository,
@@ -30,7 +32,7 @@ test('ro-md', async t => {
     const conceptTexts: string[] = ['R. Moldova', 'Chișinău', 'Chisinau', 'Republica Moldova', 'Moldova', 'Chisinau'];
 
     const concepts = conceptTexts
-        .map(name => ConceptHelper.create({ name, ...locale }));
+        .map(name => ConceptHelper.create({ name, containerId: container.id, ...locale }));
 
     await pushConcepts.execute(concepts);
 

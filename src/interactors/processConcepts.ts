@@ -3,7 +3,6 @@ const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase } from '@textactor/domain';
 import { IConceptRepository } from './conceptRepository';
-import { Locale } from '../types';
 import { OnGenerateActorCallback, GenerateActors } from './actions/generateActors';
 import { IWikiEntityRepository } from './wikiEntityRepository';
 import { SetAbbrConceptsContextName } from './actions/setAbbrConceptsContextName';
@@ -15,70 +14,98 @@ import { IWikiTitleRepository } from './wikiTitleRepository';
 import { IConceptRootNameRepository } from './conceptRootNameRepository';
 import { DeleteInvalidConcepts } from './actions/deleteInvalidConcepts';
 import { ICountryTagsService } from '..';
+import { ConceptContainer, ConceptContainerStatus } from '../entities/conceptContainer';
+import { IConceptContainerRepository } from './conceptContainerRepository';
+import { ConceptContainerHelper } from '../entities/conceptContainerHelper';
 
 export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 
 }
 
 export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, ProcessConceptsOptions> {
-    constructor(private locale: Locale,
-        private conceptRepository: IConceptRepository,
+
+    constructor(private container: ConceptContainer,
+        private containerRep: IConceptContainerRepository,
+        private conceptRep: IConceptRepository,
         private rootNameRep: IConceptRootNameRepository,
-        private entityRepository: IWikiEntityRepository,
-        private wikiSearchNameRepository: IWikiSearchNameRepository,
-        private wikiTitleRepository: IWikiTitleRepository,
+        private entityRep: IWikiEntityRepository,
+        private wikiSearchNameRep: IWikiSearchNameRepository,
+        private wikiTitleRep: IWikiTitleRepository,
         private countryTags: ICountryTagsService) {
         super()
+
+        if (!container.lang || !container.country) {
+            throw new Error(`ConceptContainer is not valid: ${container.lang}-${container.country}`);
+        }
     }
 
     protected async innerExecute(callback: OnGenerateActorCallback, options: ProcessConceptsOptions): Promise<void> {
-        const locale = this.locale;
+        const container = this.container;
 
         debug(`Start processing concepts... ${JSON.stringify(options)}`);
 
-        const setAbbrConcextName = new SetAbbrConceptsContextName(locale, this.conceptRepository);
-        const setAbbrLongName = new SetAbbrConceptsLongName(locale, this.conceptRepository);
-        const deleteUnpopularConcepts = new DeleteUnpopularConcepts(locale, this.conceptRepository, this.rootNameRep);
+        if (!ConceptContainerHelper.canStartGenerate(container.status)) {
+            return Promise.reject(new Error(`ConceptContainer is not generateable: ${container.status}`));
+        }
+
+        const setAbbrConcextName = new SetAbbrConceptsContextName(container, this.conceptRep);
+        const setAbbrLongName = new SetAbbrConceptsLongName(container, this.conceptRep);
+        const deleteUnpopularConcepts = new DeleteUnpopularConcepts(container, this.conceptRep, this.rootNameRep);
         // const deletePartialConcepts = new DeletePartialConcepts(locale, this.conceptRepository, this.rootNameRep, this.entityRepository);
-        const deleteInvalidConcepts = new DeleteInvalidConcepts(locale, this.conceptRepository, this.rootNameRep, this.entityRepository);
-        const exploreWikiEntities = new ExploreWikiEntities(locale,
-            this.conceptRepository,
+        const deleteInvalidConcepts = new DeleteInvalidConcepts(container, this.conceptRep, this.rootNameRep, this.entityRep);
+        const exploreWikiEntities = new ExploreWikiEntities(container,
+            this.conceptRep,
             this.rootNameRep,
-            this.entityRepository,
-            this.wikiSearchNameRepository,
-            this.wikiTitleRepository,
+            this.entityRep,
+            this.wikiSearchNameRep,
+            this.wikiTitleRep,
             this.countryTags);
-        const generateActors = new GenerateActors(locale,
-            this.conceptRepository,
+        const generateActors = new GenerateActors(this.container,
+            this.conceptRep,
             this.rootNameRep,
-            this.entityRepository);
+            this.entityRep);
 
-        debug(`<===== Start deleteInvalidConcepts`);
-        await deleteInvalidConcepts.execute(null);
-        debug(`<===== End deleteInvalidConcepts`);
+        await this.containerRep.update({ item: { id: this.container.id, status: ConceptContainerStatus.GENERATING } });
 
-        debug(`=====> Start setAbbrLongName`);
-        const setAbbrLongNameMap = await setAbbrLongName.execute(null);
-        debug(`setAbbrLongNameMap=${JSON.stringify(setAbbrLongNameMap)}`);
-        debug(`<===== End setAbbrLongName`);
-        debug(`=====> Start setAbbrConcextName`);
-        const setAbbrContextNameMap = await setAbbrConcextName.execute(null);
-        debug(`setAbbrContextNameMap=${JSON.stringify(setAbbrContextNameMap)}`);
-        debug(`<===== End setAbbrConcextName`);
-        debug(`=====> Start deleteUnpopularConcepts`);
-        await deleteUnpopularConcepts.execute(options);
-        debug(`<===== End deleteUnpopularConcepts`);
+        try {
+            debug(`<===== Start deleteInvalidConcepts`);
+            await deleteInvalidConcepts.execute(null);
+            debug(`<===== End deleteInvalidConcepts`);
 
-        debug(`=====> Start exploreWikiEntities`);
-        await exploreWikiEntities.execute(null);
-        debug(`<===== End exploreWikiEntities`);
+            debug(`=====> Start setAbbrLongName`);
+            const setAbbrLongNameMap = await setAbbrLongName.execute(null);
+            debug(`setAbbrLongNameMap=${JSON.stringify(setAbbrLongNameMap)}`);
+            debug(`<===== End setAbbrLongName`);
+            debug(`=====> Start setAbbrConcextName`);
+            const setAbbrContextNameMap = await setAbbrConcextName.execute(null);
+            debug(`setAbbrContextNameMap=${JSON.stringify(setAbbrContextNameMap)}`);
+            debug(`<===== End setAbbrConcextName`);
+            debug(`=====> Start deleteUnpopularConcepts`);
+            await deleteUnpopularConcepts.execute(options);
+            debug(`<===== End deleteUnpopularConcepts`);
 
-        debug(`<===== Start deleteInvalidConcepts`);
-        await deleteInvalidConcepts.execute(null);
-        debug(`<===== End deleteInvalidConcepts`);
+            debug(`=====> Start exploreWikiEntities`);
+            await exploreWikiEntities.execute(null);
+            debug(`<===== End exploreWikiEntities`);
 
-        debug(`=====> Start generateActors`);
-        await generateActors.execute(callback);
-        debug(`<===== End generateActors`);
+            debug(`<===== Start deleteInvalidConcepts`);
+            await deleteInvalidConcepts.execute(null);
+            debug(`<===== End deleteInvalidConcepts`);
+
+            debug(`=====> Start generateActors`);
+            await generateActors.execute(callback);
+            debug(`<===== End generateActors`);
+        } catch (e) {
+            const error = e.message;
+            await this.containerRep.update({
+                item: {
+                    id: this.container.id, status: ConceptContainerStatus.GENERATE_ERROR,
+                    lastError: error
+                }
+            });
+            throw e;
+        }
+
+        await this.containerRep.update({ item: { id: this.container.id, status: ConceptContainerStatus.EMPTY } });
     }
 }

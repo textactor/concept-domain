@@ -4,7 +4,6 @@ const debug = require('debug')('textactor:concept-domain');
 import { UseCase, uniq, seriesPromise } from "@textactor/domain";
 import { IWikiEntityReadRepository } from "../wikiEntityRepository";
 import { IConceptReadRepository } from "../conceptRepository";
-import { Locale } from "../../types";
 import { ConceptActor } from "../../entities/actor";
 import { WikiEntityHelper, EntityPopularity } from "../../entities/wikiEntityHelper";
 import { uniqProp } from "../../utils";
@@ -12,11 +11,11 @@ import { ActorHelper } from "../../entities/actorHelper";
 import { ConceptHelper } from "../../entities/conceptHelper";
 import { WikiEntity } from "../../entities/wikiEntity";
 import { RootNameHelper, Concept } from "../..";
+import { ConceptContainer } from "../../entities/conceptContainer";
 
 
 export class BuildActor extends UseCase<string, ConceptActor, void> {
-
-    constructor(private locale: Locale,
+    constructor(private container: ConceptContainer,
         private wikiEntityRepository: IWikiEntityReadRepository,
         private conceptRepository: IConceptReadRepository) {
         super()
@@ -24,8 +23,10 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
 
     protected async innerExecute(rootId: string): Promise<ConceptActor> {
 
-        const lang = this.locale.lang;
-        const country = this.locale.country;
+        const lang = this.container.lang;
+        const country = this.container.country;
+        const containerId = this.container.id;
+
         const rootIdConcepts = await this.conceptRepository.getByRootNameId(rootId);
         if (rootIdConcepts.length === 0) {
             debug(`NO root concepts for ${rootId}`);
@@ -40,7 +41,7 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
             let names = ConceptHelper.getConceptsNames(rootIdConcepts, false);
             names = names.concat(wikiEntity.names);
             names = uniq(names).filter(name => WikiEntityHelper.isValidName(name));
-            const rootIds = uniq(names.map(name => RootNameHelper.idFromName(name, lang, country)));
+            const rootIds = uniq(names.map(name => RootNameHelper.idFromName(name, lang, country, containerId)));
             concepts = await this.conceptRepository.getByRootNameIds(rootIds);
             // names = names.concat(wikiEntity.secondaryNames);
         } else {
@@ -56,7 +57,7 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
     }
 
     private async findPerfectWikiEntity(conceptNames: string[]): Promise<WikiEntity> {
-        const nameHashes = WikiEntityHelper.namesHashes(conceptNames, this.locale.lang);
+        const nameHashes = WikiEntityHelper.namesHashes(conceptNames, this.container.lang);
 
         let entities: WikiEntity[] = []
 
@@ -107,8 +108,8 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
 
         const topEntity = entities[0];
 
-        if (topEntity.countryCodes && topEntity.countryCodes.indexOf(this.locale.country) > -1) {
-            debug(`Top entity has country=${this.locale.country}: ${topEntity.name}`);
+        if (topEntity.countryCodes && topEntity.countryCodes.indexOf(this.container.country) > -1) {
+            debug(`Top entity has country=${this.container.country}: ${topEntity.name}`);
             return uniqProp(entities, 'id');
         }
 
@@ -142,7 +143,7 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
         if (!entities.length) {
             return entities;
         }
-        return entities.filter(item => item.countryCodes && item.countryCodes.indexOf(this.locale.country) > -1);
+        return entities.filter(item => item.countryCodes && item.countryCodes.indexOf(this.container.country) > -1);
     }
 }
 

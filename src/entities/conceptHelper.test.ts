@@ -4,16 +4,16 @@ import { ConceptHelper } from './conceptHelper';
 import { NameHelper } from '@textactor/domain';
 
 test('#nameHash', t => {
-    let hash1 = ConceptHelper.nameHash('text 1', 'en', 'us');
-    let hash2 = ConceptHelper.nameHash('text 2', 'en', 'us');
+    let hash1 = ConceptHelper.nameHash('text 1', 'en', 'us', '1');
+    let hash2 = ConceptHelper.nameHash('text 2', 'en', 'us', '1');
     t.not(hash1, hash2)
 
-    hash1 = ConceptHelper.nameHash('text 1', 'en', 'us');
-    hash2 = ConceptHelper.nameHash('text 1', 'en', 'gb');
+    hash1 = ConceptHelper.nameHash('text 1', 'en', 'us', '1');
+    hash2 = ConceptHelper.nameHash('text 1', 'en', 'gb', '1');
     t.not(hash1, hash2)
 
-    hash1 = ConceptHelper.nameHash('text 1', 'en', 'us');
-    hash2 = ConceptHelper.nameHash('text 1', 'en', 'us');
+    hash1 = ConceptHelper.nameHash('text 1', 'en', 'us', '1');
+    hash2 = ConceptHelper.nameHash('text 1', 'en', 'us', '1');
     t.is(hash1, hash2)
 })
 
@@ -25,7 +25,7 @@ test('#normalizeName', t => {
 })
 
 test('#create', t => {
-    const c1 = ConceptHelper.create({ name: 'Moldova 1', lang: 'ro', country: 'md', abbr: 'M1' });
+    const c1 = ConceptHelper.create({ name: 'Moldova 1', lang: 'ro', country: 'md', abbr: 'M1', containerId: '1' });
     t.is(c1.name, 'Moldova 1')
     t.is(c1.lang, 'ro')
     t.is(c1.country, 'md')
@@ -38,9 +38,9 @@ test('#create', t => {
 
 test('#setConceptsContextName', t => {
     const concepts = [
-        { name: 'Moldova 1', lang: 'ro', country: 'md', abbr: 'M1' },
-        { name: 'Comisia Electorala Centrala', lang: 'ro', country: 'md' },
-        { name: 'CEC', lang: 'ro', country: 'md' },
+        { name: 'Moldova 1', lang: 'ro', country: 'md', abbr: 'M1', containerId: '1' },
+        { name: 'Comisia Electorala Centrala', lang: 'ro', country: 'md', containerId: '1' },
+        { name: 'CEC', lang: 'ro', country: 'md', containerId: '1' },
     ].map(item => ConceptHelper.create(item));
 
     ConceptHelper.setConceptsContextNames(concepts)

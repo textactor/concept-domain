@@ -8,6 +8,7 @@ export type CreatingConceptData = {
     lang: string
     country: string
     name: string
+    containerId: string
     abbr?: string
     knownName?: string
     context?: string
@@ -19,19 +20,20 @@ export class ConceptHelper {
 
         const lang = data.lang.trim().toLowerCase();
         const country = data.country.trim().toLowerCase();
+        const containerId = data.containerId.trim();
         const name = data.name.trim();
         const nameLength = name.length;
 
         const normalName = NameHelper.normalizeName(name, lang);
-        const id = ConceptHelper.id(normalName, lang, country);
+        const id = ConceptHelper.id(normalName, lang, country, containerId);
 
-        const nameHash = ConceptHelper.nameHash(normalName, lang, country);
+        const nameHash = ConceptHelper.nameHash(normalName, lang, country, containerId);
 
         const isAbbr = NameHelper.isAbbr(name);
         const countWords = NameHelper.countWords(name);
         const isIrregular = NameHelper.isIrregular(name);
         const endsWithNumber = NameHelper.endsWithNumberWord(name);
-        const rootNameIds = RootNameHelper.idsFromNames([data.knownName, name], lang, country);
+        const rootNameIds = RootNameHelper.idsFromNames([data.knownName, name], lang, country, containerId);
 
         const popularity = 1;
 
@@ -39,6 +41,7 @@ export class ConceptHelper {
             id,
             country,
             lang,
+            containerId,
             name,
             nameLength,
             nameHash,
@@ -60,21 +63,21 @@ export class ConceptHelper {
         return concept;
     }
 
-    public static nameHash(name: string, lang: string, country: string) {
+    public static nameHash(name: string, lang: string, country: string, containerId: string) {
         name = name.trim();
         name = NameHelper.normalizeName(name, lang);
         name = NameHelper.atonic(name);
 
-        return ConceptHelper.hash(name, lang, country);
+        return ConceptHelper.hash(name, lang, country, containerId);
     }
 
-    public static hash(name: string, lang: string, country: string) {
-        return md5([lang.trim().toLowerCase(), country.trim().toLowerCase(), name.trim()].join('_'))
+    public static hash(name: string, lang: string, country: string, containerId: string) {
+        return md5([lang.trim().toLowerCase(), country.trim().toLowerCase(), containerId.trim(), name.trim()].join('_'))
     }
 
-    public static id(name: string, lang: string, country: string) {
+    public static id(name: string, lang: string, country: string, containerId: string) {
         name = NameHelper.normalizeName(name, lang);
-        return ConceptHelper.hash(name, lang, country);
+        return ConceptHelper.hash(name, lang, country, containerId);
     }
 
     public static setConceptsContextNames(concepts: Concept[]) {

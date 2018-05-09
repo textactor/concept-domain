@@ -14,6 +14,8 @@ export class DeleteActorConcepts extends UseCase<ConceptActor, ConceptActor, voi
 
     protected async innerExecute(actor: ConceptActor): Promise<ConceptActor> {
 
+        const concept = actor.concepts[0];
+        const containerId = concept.containerId;
         const ids = actor.concepts.map(item => item.id);
         let rootIds: string[] = actor.concepts.reduce<string[]>((list, item) => list.concat(item.rootNameIds), []);
         rootIds = uniq(rootIds);
@@ -24,7 +26,7 @@ export class DeleteActorConcepts extends UseCase<ConceptActor, ConceptActor, voi
 
 
         if (actor.wikiEntity) {
-            const wikiRootIds = RootNameHelper.idsFromNames(actor.wikiEntity.names, actor.lang, actor.country);
+            const wikiRootIds = RootNameHelper.idsFromNames(actor.wikiEntity.names, actor.lang, actor.country, containerId);
             await this.rootNameRep.deleteIds(wikiRootIds);
             await this.conceptRep.deleteByRootNameIds(wikiRootIds);
         }

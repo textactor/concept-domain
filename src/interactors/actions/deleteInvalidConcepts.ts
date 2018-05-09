@@ -2,15 +2,15 @@
 const debug = require('debug')('textactor:concept-domain');
 
 import { UseCase, uniq } from "@textactor/domain";
-import { Locale } from "../../types";
 import { IConceptRepository } from "../conceptRepository";
 import { IWikiEntityRepository } from "../wikiEntityRepository";
 import { ConceptHelper } from '../../entities/conceptHelper';
 import { RootNameHelper, IConceptRootNameRepository } from "../..";
+import { ConceptContainer } from "../../entities/conceptContainer";
 
 export class DeleteInvalidConcepts extends UseCase<void, void, void> {
 
-    constructor(private locale: Locale,
+    constructor(private container: ConceptContainer,
         private conceptRep: IConceptRepository,
         private rootNameRep: IConceptRootNameRepository,
         private wikiEntityRep: IWikiEntityRepository) {
@@ -18,13 +18,14 @@ export class DeleteInvalidConcepts extends UseCase<void, void, void> {
     }
 
     protected async innerExecute(): Promise<void> {
-        const lang = this.locale.lang;
-        const country = this.locale.country;
+        const lang = this.container.lang;
+        const country = this.container.country;
+        const containerId = this.container.id;
         const invalidNames = await this.wikiEntityRep.getInvalidPartialNames(lang);
         debug(`Deleting invalid names: ${JSON.stringify(invalidNames)}`);
 
-        const invalidNamesIds = uniq(invalidNames.map(item => ConceptHelper.id(item, lang, country)));
-        const invalidNamesRootIds = uniq(invalidNames.map(item => RootNameHelper.idFromName(item, lang, country)));
+        const invalidNamesIds = uniq(invalidNames.map(item => ConceptHelper.id(item, lang, country, containerId)));
+        const invalidNamesRootIds = uniq(invalidNames.map(item => RootNameHelper.idFromName(item, lang, country, containerId)));
 
         await this.conceptRep.deleteIds(invalidNamesIds);
         await this.conceptRep.deleteByRootNameIds(invalidNamesRootIds);

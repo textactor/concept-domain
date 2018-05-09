@@ -4,6 +4,8 @@ export type RootName = {
     lang?: string
     country?: string
 
+    containerId?: string
+
     name?: string
     rootName?: string
 

@@ -3,6 +3,7 @@ import { BuildActor } from './buildActor';
 import test from 'ava';
 import { Locale, MemoryWikiEntityRepository, MemoryConceptRepository, PushContextConcepts, MemoryRootNameRepository, ConceptHelper, MemoryWikiSearchNameRepository, MemoryWikiTitleRepository, WikiEntityHelper, ICountryTagsService } from '../..';
 import { ExploreWikiEntities } from './exploreWikiEntities';
+import { ConceptContainer } from '../../entities/conceptContainer';
 
 test('ro-md: partial name: Biblioteca Națională', async t => {
     const locale: Locale = { lang: 'ro', country: 'md' };
@@ -13,11 +14,13 @@ test('ro-md: partial name: Biblioteca Națională', async t => {
 
     const pushConcepts = new PushContextConcepts(conceptRep, rootConceptRep);
 
-    const bibliotecaNationala = ConceptHelper.create({ lang: locale.lang, country: locale.country, name: 'Biblioteca Națională' });
+    const container: ConceptContainer = { id: '1', ...locale };
+
+    const bibliotecaNationala = ConceptHelper.create({ lang: locale.lang, country: locale.country, name: 'Biblioteca Națională', containerId: container.id });
 
     await pushConcepts.execute([bibliotecaNationala]);
 
-    const exploreEntities = new ExploreWikiEntities(locale, conceptRep, rootConceptRep, entityRep,
+    const exploreEntities = new ExploreWikiEntities(container, conceptRep, rootConceptRep, entityRep,
         new MemoryWikiSearchNameRepository(), new MemoryWikiTitleRepository(), new CountryTags());
 
     await exploreEntities.execute(null);
@@ -27,7 +30,7 @@ test('ro-md: partial name: Biblioteca Națională', async t => {
 
     t.is(exploredEntities.length, 1, 'Explored `Biblioteca Națională a Republicii Moldova`');
 
-    const buildActor = new BuildActor(locale, entityRep, conceptRep);
+    const buildActor = new BuildActor(container, entityRep, conceptRep);
 
     const actor = await buildActor.execute(bibliotecaNationala.rootNameIds[0]);
 

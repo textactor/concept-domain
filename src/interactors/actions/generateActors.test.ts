@@ -8,6 +8,7 @@ import { PushContextConcepts } from './pushContextConcepts';
 import { ConceptHelper } from '../../entities/conceptHelper';
 import { ConceptActor } from '../../entities/actor';
 import { MemoryRootNameRepository } from '../memoryRootNameRepository';
+import { ConceptContainer } from '../../entities/conceptContainer';
 
 test('ro-md', async t => {
     const conceptRepository = new MemoryConceptRepository();
@@ -15,12 +16,13 @@ test('ro-md', async t => {
     const rootNameRep = new MemoryRootNameRepository();
     const pushConcepts = new PushContextConcepts(conceptRepository, rootNameRep);
     const locale: Locale = { lang: 'ro', country: 'md' };
-    const actorsGenerator = new GenerateActors(locale, conceptRepository, rootNameRep, wikiEntityRepository);
+    const container: ConceptContainer = { id: '1', ...locale };
+    const actorsGenerator = new GenerateActors(container, conceptRepository, rootNameRep, wikiEntityRepository);
 
     const conceptTexts: string[] = ['R. Moldova', 'Republica Moldova', 'Moldova', 'Republicii Moldova', 'Chișinău', 'Chisinau', 'Chisinaului', 'Adrian Ursu', 'Partidul Liberal', 'PDM', 'Partidul Democrat', 'PSRM'];
 
     const concepts = conceptTexts
-        .map(name => ConceptHelper.create({ name, ...locale }));
+        .map(name => ConceptHelper.create({ name, containerId: container.id, ...locale }));
 
     await pushConcepts.execute(concepts);
 
