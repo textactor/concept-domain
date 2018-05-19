@@ -1,24 +1,27 @@
 
 const debug = require('debug')('textactor:concept-domain');
 
-import { UseCase, uniq, seriesPromise } from "@textactor/domain";
+import { UseCase, uniq } from "@textactor/domain";
 import { IWikiEntityReadRepository } from "../wikiEntityRepository";
 import { IConceptReadRepository } from "../conceptRepository";
 import { ConceptActor } from "../../entities/actor";
-import { WikiEntityHelper, EntityPopularity } from "../../entities/wikiEntityHelper";
-import { uniqProp } from "../../utils";
+import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
 import { ActorHelper } from "../../entities/actorHelper";
 import { ConceptHelper } from "../../entities/conceptHelper";
-import { WikiEntity } from "../../entities/wikiEntity";
 import { RootNameHelper, Concept } from "../..";
 import { ConceptContainer } from "../../entities/conceptContainer";
+import { SelectWikiEntity } from "./selectWikiEntity";
 
 
 export class BuildActor extends UseCase<string, ConceptActor, void> {
+    private selectWikiEntity: SelectWikiEntity;
+
     constructor(private container: ConceptContainer,
-        private wikiEntityRepository: IWikiEntityReadRepository,
+        wikiEntityRepository: IWikiEntityReadRepository,
         private conceptRepository: IConceptReadRepository) {
         super()
+
+        this.selectWikiEntity = new SelectWikiEntity(container, wikiEntityRepository);
     }
 
     protected async innerExecute(rootId: string): Promise<ConceptActor> {
@@ -33,7 +36,7 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
             return null;
         }
         const conceptNames = ConceptHelper.getConceptsNames(rootIdConcepts, true);
-        const wikiEntity = await this.findPerfectWikiEntity(conceptNames);
+        const wikiEntity = await this.selectWikiEntity.execute(conceptNames);
 
         let concepts: Concept[]
 
@@ -41,11 +44,9 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
             let names = ConceptHelper.getConceptsNames(rootIdConcepts, false);
             names = names.concat(wikiEntity.names);
             names = uniq(names).filter(name => WikiEntityHelper.isValidName(name));
-            const rootIds = uniq(names.map(name => RootNameHelper.idFromName(name, lang, country, containerId)));
+            const rootIds = RootNameHelper.idsFromNames(names, lang, country, containerId);
             concepts = await this.conceptRepository.getByRootNameIds(rootIds);
-            // names = names.concat(wikiEntity.secondaryNames);
         } else {
-            // debug(JSON.stringify(node));
             concepts = rootIdConcepts;
         }
 
@@ -55,108 +56,4 @@ export class BuildActor extends UseCase<string, ConceptActor, void> {
 
         return actor;
     }
-
-    private async findPerfectWikiEntity(conceptNames: string[]): Promise<WikiEntity> {
-        const nameHashes = WikiEntityHelper.namesHashes(conceptNames, this.container.lang);
-
-        let entities: WikiEntity[] = []
-
-        await seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByNameHash(nameHash)
-            .then(list => entities = entities.concat(list)));
-
-        if (entities.length) {
-            debug(`Found wikientity by names: ${JSON.stringify(conceptNames)}`);
-        } else {
-            debug(`NOT Found wikientity by names: ${JSON.stringify(conceptNames)}`);
-        }
-
-        let foundByPartial = false;
-
-        if (entities.length === 0 || this.countryWikiEntities(entities).length === 0) {
-            let entitiesByPartialNames: WikiEntity[] = []
-            await seriesPromise(nameHashes, nameHash => this.wikiEntityRepository.getByPartialNameHash(nameHash)
-                .then(list => entitiesByPartialNames = entitiesByPartialNames.concat(list)));
-
-            entitiesByPartialNames = this.countryWikiEntities(entitiesByPartialNames);
-            if (entitiesByPartialNames.length) {
-                foundByPartial = true;
-                debug(`found locale entities by partial name: ${entitiesByPartialNames.map(item => item.name)}`);
-                entities = entities.concat(entitiesByPartialNames);
-            }
-
-            if (entities.length === 0) {
-                debug(`NOT Found wikientity by partial names: ${JSON.stringify(conceptNames)}`);
-                return null;
-            }
-        }
-
-        entities = uniqProp(entities, 'id');
-
-        entities = this.sortWikiEntities(entities, foundByPartial);
-
-        const entity = entities[0];
-
-        return entity;
-    }
-
-    private sortWikiEntities(entities: WikiEntity[], _foundByPartial: boolean): WikiEntity[] {
-        if (!entities.length) {
-            return entities;
-        }
-
-        entities = sortEntities(entities);
-
-        const topEntity = entities[0];
-
-        if (topEntity.countryCodes && topEntity.countryCodes.indexOf(this.container.country) > -1) {
-            debug(`Top entity has country=${this.container.country}: ${topEntity.name}`);
-            return uniqProp(entities, 'id');
-        }
-
-
-        const countryEntities = this.countryWikiEntities(entities);
-        if (countryEntities.length) {
-            let useCountryEntity = false;
-            // if (foundByPartial) {
-            const topEntityPopularity = WikiEntityHelper.getPopularity(topEntity.rank);
-            const countryEntityPopularity = WikiEntityHelper.getPopularity(countryEntities[0].rank);
-
-            if (topEntityPopularity < EntityPopularity.POPULAR || (topEntityPopularity - countryEntityPopularity) < 2) {
-                useCountryEntity = true;
-            }
-            else {
-                debug(`using POPULAR entity: ${topEntity.name}(${topEntity.rank}-${topEntityPopularity})>${countryEntities[0].rank}-(${countryEntityPopularity})`);
-            }
-
-            if (useCountryEntity) {
-                entities = countryEntities.concat(entities);
-                debug(`using country entity: ${entities[0].name}`);
-            }
-        }
-
-        entities = uniqProp(entities, 'id');
-
-        return entities;
-    }
-
-    private countryWikiEntities(entities: WikiEntity[]): WikiEntity[] {
-        if (!entities.length) {
-            return entities;
-        }
-        return entities.filter(item => item.countryCodes && item.countryCodes.indexOf(this.container.country) > -1);
-    }
-}
-
-function sortEntities(entities: WikiEntity[]) {
-    if (!entities.length) {
-        return entities;
-    }
-
-    entities = entities.sort((a, b) => b.rank - a.rank);
-
-    return entities;
-    // const typeEntities = entities.filter(item => !!item.type);
-    // const notTypeEntities = entities.filter(item => !item.type);
-
-    // return typeEntities.concat(notTypeEntities);
 }

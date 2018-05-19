@@ -33,7 +33,8 @@ export class ConceptContainerHelper {
     }
 
     static canStartGenerate(status: ConceptContainerStatus) {
-        return [ConceptContainerStatus.COLLECT_DONE]
+        return [ConceptContainerStatus.COLLECT_DONE,
+        ConceptContainerStatus.GENERATE_ERROR]
             .indexOf(status) > -1;
     }
 }
