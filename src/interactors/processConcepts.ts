@@ -17,6 +17,9 @@ import { ICountryTagsService } from '..';
 import { ConceptContainer, ConceptContainerStatus } from '../entities/conceptContainer';
 import { IConceptContainerRepository } from './conceptContainerRepository';
 import { ConceptContainerHelper } from '../entities/conceptContainerHelper';
+import { PopularConceptNamesEnumerator } from './popularConceptNamesEnumerator';
+import { DeleteActorConcepts } from './actions/deleteActorConcepts';
+import { CleanConceptContainer } from './actions/cleanConceptContainer';
 
 export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 
@@ -51,19 +54,18 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         const setAbbrConcextName = new SetAbbrConceptsContextName(container, this.conceptRep);
         const setAbbrLongName = new SetAbbrConceptsLongName(container, this.conceptRep);
         const deleteUnpopularConcepts = new DeleteUnpopularConcepts(container, this.conceptRep, this.rootNameRep);
-        // const deletePartialConcepts = new DeletePartialConcepts(locale, this.conceptRepository, this.rootNameRep, this.entityRepository);
         const deleteInvalidConcepts = new DeleteInvalidConcepts(container, this.conceptRep, this.rootNameRep, this.entityRep);
         const exploreWikiEntities = new ExploreWikiEntities(container,
-            this.conceptRep,
-            this.rootNameRep,
+            new PopularConceptNamesEnumerator({ rootNames: true }, container, this.conceptRep, this.rootNameRep),
             this.entityRep,
             this.wikiSearchNameRep,
             this.wikiTitleRep,
             this.countryTags);
         const generateActors = new GenerateActors(this.container,
-            this.conceptRep,
-            this.rootNameRep,
+            new PopularConceptNamesEnumerator({ rootNames: false }, container, this.conceptRep, this.rootNameRep),
+            new DeleteActorConcepts(container, this.conceptRep, this.rootNameRep),
             this.entityRep);
+        const cleanContainer = new CleanConceptContainer(this.conceptRep, this.rootNameRep);
 
         await this.containerRep.update({ item: { id: this.container.id, status: ConceptContainerStatus.GENERATING } });
 
@@ -95,6 +97,8 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
             debug(`=====> Start generateActors`);
             await generateActors.execute(callback);
             debug(`<===== End generateActors`);
+            await cleanContainer.execute(container);
+
         } catch (e) {
             const error = e.message;
             await this.containerRep.update({

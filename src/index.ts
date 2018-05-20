@@ -70,6 +70,22 @@ export {
 } from './interactors/actions/deleteUnpopularConcepts';
 
 export {
+    BuildActorByNames
+} from './interactors/actions/buildActorByNames';
+
+export {
+    ExploreWikiEntitiesByNames
+} from './interactors/actions/exploreWikiEntitiesByNames';
+
+export {
+    FindWikiEntitiesByTitles
+} from './interactors/actions/findWikiEntitiesByTitles';
+
+export {
+    CleanConceptContainer
+} from './interactors/actions/cleanConceptContainer';
+
+export {
     ProcessConcepts,
     ProcessConceptsOptions,
 } from './interactors/processConcepts';
@@ -81,3 +97,12 @@ export {
 export {
     ICountryTagsService
 } from './interactors/actions/findWikiTitles';
+
+export {
+    INamesEnumerator
+} from './interactors/namesEnumerator';
+
+export {
+    PopularConceptNamesEnumerator,
+    PopularConceptNamesEnumeratorOptions,
+} from './interactors/popularConceptNamesEnumerator';

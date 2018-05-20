@@ -1,5 +1,5 @@
 import { WikiEntity } from "./wikiEntity";
-import { Concept } from "./concept";
+// import { Concept } from "./concept";
 
 
 
@@ -10,8 +10,8 @@ export type ConceptActor = {
     names?: string[]
     
     wikiEntity?: WikiEntity
-    concepts?: Concept[]
+    // concepts?: Concept[]
 
-    popularity?: number
+    // popularity?: number
     context?: string
 }

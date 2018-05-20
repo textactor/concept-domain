@@ -11,6 +11,7 @@ import { MemoryWikiTitleRepository } from '../memoryWikiTitleRepository';
 import { MemoryRootNameRepository } from '../memoryRootNameRepository';
 import { ICountryTagsService } from './findWikiTitles';
 import { ConceptContainer } from '../../entities/conceptContainer';
+import { PopularConceptNamesEnumerator } from '../popularConceptNamesEnumerator';
 
 test('ro-md', async t => {
     const conceptRepository = new MemoryConceptRepository();
@@ -21,9 +22,9 @@ test('ro-md', async t => {
     const pushConcepts = new PushContextConcepts(conceptRepository, rootNameRep);
     const locale: Locale = { lang: 'ro', country: 'md' };
     const container: ConceptContainer = { id: '1', ...locale };
+    const namesEnumerator = new PopularConceptNamesEnumerator({ rootNames: true }, container, conceptRepository, rootNameRep);
     const exploreWikiEntities = new ExploreWikiEntities(container,
-        conceptRepository,
-        rootNameRep,
+        namesEnumerator,
         wikiEntityRepository,
         wikiSearchNameRepository,
         wikiTitleRepository,

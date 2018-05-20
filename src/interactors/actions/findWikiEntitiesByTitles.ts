@@ -8,7 +8,7 @@ import { getEntities, WikiEntitiesParams, WikiEntity as ExternWikiEntity } from 
 import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
 import { isTimeoutError, delay } from "../../utils";
 
-export class ExploreWikiEntitiesByTitles extends UseCase<string[], WikiEntity[], null> {
+export class FindWikiEntitiesByTitles extends UseCase<string[], WikiEntity[], null> {
 
     constructor(private locale: Locale) {
         super()

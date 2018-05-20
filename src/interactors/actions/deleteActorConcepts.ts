@@ -1,40 +1,34 @@
 
 import { UseCase, uniq } from "@textactor/domain";
 import { IConceptWriteRepository } from "../conceptRepository";
-import { ConceptActor } from "../../entities/actor";
-// import { ConceptHelper } from "../../entities/conceptHelper";
 import { IConceptRootNameWriteRepository } from "../conceptRootNameRepository";
-import { RootNameHelper } from "../..";
+import { ConceptContainer } from "../../entities/conceptContainer";
+import { ConceptHelper } from "../../entities/conceptHelper";
+import { RootNameHelper } from "../../entities/rootNameHelper";
 
-export class DeleteActorConcepts extends UseCase<ConceptActor, ConceptActor, void> {
+export class DeleteActorConcepts extends UseCase<string[], void, void> {
 
-    constructor(private conceptRep: IConceptWriteRepository, private rootNameRep: IConceptRootNameWriteRepository) {
+    constructor(
+        private container: ConceptContainer,
+        private conceptRep: IConceptWriteRepository,
+        private rootNameRep: IConceptRootNameWriteRepository) {
         super()
     }
 
-    protected async innerExecute(actor: ConceptActor): Promise<ConceptActor> {
+    protected async innerExecute(names: string[]): Promise<void> {
 
-        const concept = actor.concepts[0];
-        const containerId = concept.containerId;
-        const ids = actor.concepts.map(item => item.id);
-        let rootIds: string[] = actor.concepts.reduce<string[]>((list, item) => list.concat(item.rootNameIds), []);
+        const lang = this.container.lang;
+        const country = this.container.country;
+        const containerId = this.container.id;
+
+        let conceptIds = names.map(item => ConceptHelper.id(item, lang, country, containerId));
+        conceptIds = uniq(conceptIds);
+
+        let rootIds = RootNameHelper.idsFromNames(names, lang, country, containerId);
         rootIds = uniq(rootIds);
 
-        await this.conceptRep.deleteIds(ids);
+        await this.conceptRep.deleteIds(conceptIds);
         await this.conceptRep.deleteByRootNameIds(rootIds);
         await this.rootNameRep.deleteIds(rootIds);
-
-
-        if (actor.wikiEntity) {
-            const wikiRootIds = RootNameHelper.idsFromNames(actor.wikiEntity.names, actor.lang, actor.country, containerId);
-            await this.rootNameRep.deleteIds(wikiRootIds);
-            await this.conceptRep.deleteByRootNameIds(wikiRootIds);
-        }
-
-        // if (actor.wikiEntity && actor.wikiEntity.partialNames && actor.wikiEntity.partialNames.length) {
-        //     await this.conceptRep.deleteIds(actor.wikiEntity.partialNames.map(name => ConceptHelper.id(name, actor.lang, actor.country)));
-        // }
-
-        return actor;
     }
 }

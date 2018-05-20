@@ -4,6 +4,7 @@ import test from 'ava';
 import { Locale, MemoryWikiEntityRepository, MemoryConceptRepository, PushContextConcepts, MemoryRootNameRepository, ConceptHelper, MemoryWikiSearchNameRepository, MemoryWikiTitleRepository, WikiEntityHelper, ICountryTagsService } from '../..';
 import { ExploreWikiEntities } from './exploreWikiEntities';
 import { ConceptContainer } from '../../entities/conceptContainer';
+import { PopularConceptNamesEnumerator } from '../popularConceptNamesEnumerator';
 
 test('ro-md: partial name: Biblioteca Națională', async t => {
     const locale: Locale = { lang: 'ro', country: 'md' };
@@ -11,16 +12,15 @@ test('ro-md: partial name: Biblioteca Națională', async t => {
     const entityRep = new MemoryWikiEntityRepository();
     const conceptRep = new MemoryConceptRepository();
     const rootConceptRep = new MemoryRootNameRepository();
-
     const pushConcepts = new PushContextConcepts(conceptRep, rootConceptRep);
-
     const container: ConceptContainer = { id: '1', ...locale };
+    const popularNamesEnumerator = new PopularConceptNamesEnumerator({ rootNames: true }, container, conceptRep, rootConceptRep);
 
     const bibliotecaNationala = ConceptHelper.create({ lang: locale.lang, country: locale.country, name: 'Biblioteca Națională', containerId: container.id });
 
     await pushConcepts.execute([bibliotecaNationala]);
 
-    const exploreEntities = new ExploreWikiEntities(container, conceptRep, rootConceptRep, entityRep,
+    const exploreEntities = new ExploreWikiEntities(container, popularNamesEnumerator, entityRep,
         new MemoryWikiSearchNameRepository(), new MemoryWikiTitleRepository(), new CountryTags());
 
     await exploreEntities.execute(null);

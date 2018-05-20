@@ -1,51 +1,46 @@
 
-import { UseCase } from '@textactor/domain';
+import { UseCase, IUseCase } from '@textactor/domain';
 import { IWikiEntityRepository } from '../wikiEntityRepository';
-import { IConceptRepository } from '../conceptRepository';
 import { ConceptActor } from '../../entities/actor';
-import { BuildActor } from './buildActor';
-import { DeleteActorConcepts } from './deleteActorConcepts';
-import { IConceptRootNameRepository } from '../conceptRootNameRepository';
 import { ConceptContainer } from '../../entities/conceptContainer';
+import { INamesEnumerator } from '../namesEnumerator';
+import { BuildActorByNames } from './buildActorByNames';
 
 export interface OnGenerateActorCallback {
     (actor: ConceptActor): Promise<any>
 }
 
 export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void> {
-    private minCountWords = 2
-    private buildActor: BuildActor
-    private deleteActorConcepts: DeleteActorConcepts
+    private buildActor: BuildActorByNames
 
-    constructor(private container: ConceptContainer,
-        private conceptRep: IConceptRepository,
-        private rootNameRep: IConceptRootNameRepository,
+    constructor(container: ConceptContainer,
+        private namesEnumerator: INamesEnumerator,
+        private postNamesProcess: IUseCase<string[], void, void>,
         wikiEntityRep: IWikiEntityRepository) {
         super()
 
-        this.buildActor = new BuildActor(container, wikiEntityRep, conceptRep);
-        this.deleteActorConcepts = new DeleteActorConcepts(conceptRep, rootNameRep);
+        this.buildActor = new BuildActorByNames(container, wikiEntityRep);
     }
 
     protected async innerExecute(callback: OnGenerateActorCallback): Promise<void> {
         let actor: ConceptActor;
 
-        while (true) {
+        while (!this.namesEnumerator.atEnd()) {
             try {
-                const rootId = await this.getNextPopularRootId();
-
-                if (!rootId) {
-                    await this.conceptRep.deleteAll(this.container.id);
-                    await this.rootNameRep.deleteAll(this.container.id);
-                    return;
+                const names = await this.namesEnumerator.next();
+                if (!names || !names.length) {
+                    break;
                 }
-                actor = await this.buildActor.execute(rootId);
+
+                actor = await this.buildActor.execute(names);
+                if (this.postNamesProcess) {
+                    await this.postNamesProcess.execute(names);
+                }
                 if (actor) {
-                    await this.deleteActorConcepts.execute(actor);
-                } else {
-                    await this.rootNameRep.deleteIds([rootId]);
+                    if (this.postNamesProcess) {
+                        await this.postNamesProcess.execute(actor.names);
+                    }
                 }
-
             } catch (e) {
                 return Promise.reject(e);
             }
@@ -54,19 +49,5 @@ export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void>
                 await callback(actor);
             }
         }
-    }
-
-    private async getNextPopularRootId(): Promise<string> {
-        const rootIds = await this.rootNameRep.getMostPopularIds(this.container.id, 1, 0, this.minCountWords);
-
-        if (rootIds.length < 1) {
-            if (this.minCountWords === 1) {
-                return null;
-            }
-            this.minCountWords = 1;
-            return this.getNextPopularRootId();
-        }
-
-        return rootIds[0];
     }
 }
