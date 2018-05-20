@@ -91,6 +91,10 @@ export {
 } from './interactors/processConcepts';
 
 export {
+    ProcessName
+} from './interactors/processName';
+
+export {
     INameCorrectionService
 } from './interactors/nameCorrectionService';
 

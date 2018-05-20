@@ -1,0 +1,123 @@
+
+import { ProcessName } from './processName';
+import test from 'ava';
+import { ConceptContainer } from '../entities/conceptContainer';
+import { MemoryWikiEntityRepository, MemoryWikiSearchNameRepository, MemoryWikiTitleRepository, ICountryTagsService } from '..';
+
+
+
+
+test(`ro-md: Moldova`, async t => {
+    const container: ConceptContainer = {
+        id: Date.now().toString(),
+        lang: 'ro',
+        country: 'md',
+    }
+    const entityRep = new MemoryWikiEntityRepository();
+    const searchName = new MemoryWikiSearchNameRepository();
+    const titleService = new MemoryWikiTitleRepository();
+    const tagsService = new CountryTags();
+
+    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService);
+
+    const actor1 = await processName.execute('Moldova');
+    t.is(!!actor1, true);
+    t.is(actor1.wikiEntity.wikiDataId, 'Q21095978');
+    t.is(actor1.name, 'Moldova');
+
+    const actor2 = await processName.execute('R. Moldova');
+    t.is(!!actor2, true);
+    t.is(actor2.name, 'Republica Moldova');
+});
+
+test(`ro-ro: Botoșani`, async t => {
+    const container: ConceptContainer = {
+        id: Date.now().toString(),
+        lang: 'ro',
+        country: 'ro',
+    }
+    const entityRep = new MemoryWikiEntityRepository();
+    const searchName = new MemoryWikiSearchNameRepository();
+    const titleService = new MemoryWikiTitleRepository();
+    const tagsService = new CountryTags();
+
+    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService);
+
+    const actor1 = await processName.execute('Botoșani');
+    t.is(!!actor1, true);
+    t.is(actor1.name, 'Botoșani');
+});
+
+test(`ro-ro: Județul Botoșani`, async t => {
+    const container: ConceptContainer = {
+        id: Date.now().toString(),
+        lang: 'ro',
+        country: 'ro',
+    }
+    const entityRep = new MemoryWikiEntityRepository();
+    const searchName = new MemoryWikiSearchNameRepository();
+    const titleService = new MemoryWikiTitleRepository();
+    const tagsService = new CountryTags();
+
+    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService);
+
+    const actor1 = await processName.execute('Județul Botoșani');
+    t.is(!!actor1, true);
+    t.is(actor1.name, 'Județul Botoșani');
+});
+
+test(`ro-ro: unexisting name`, async t => {
+    const container: ConceptContainer = {
+        id: Date.now().toString(),
+        lang: 'ro',
+        country: 'ro',
+    }
+    const entityRep = new MemoryWikiEntityRepository();
+    const searchName = new MemoryWikiSearchNameRepository();
+    const titleService = new MemoryWikiTitleRepository();
+    const tagsService = new CountryTags();
+
+    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService);
+
+    const actor1 = await processName.execute('vdterywnteunrtur rtjhrt');
+    t.is(actor1.wikiEntity, null);
+});
+
+test(`ro-md: Ministerul Afacerilor Externe`, async t => {
+    const container: ConceptContainer = {
+        id: Date.now().toString(),
+        lang: 'ro',
+        country: 'md',
+    }
+    const entityRep = new MemoryWikiEntityRepository();
+    const searchName = new MemoryWikiSearchNameRepository();
+    const titleService = new MemoryWikiTitleRepository();
+    const tagsService = new CountryTags();
+
+    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService);
+
+    const actor1 = await processName.execute('Ministerul Afacerilor Externe');
+    t.is(actor1.wikiEntity.name, 'Ministerul Afacerilor Externe și Integrării Europene al Republicii Moldova');
+});
+
+
+class CountryTags implements ICountryTagsService {
+    getTags(country: string, lang: string): string[] {
+
+        const LOCALE_COUNTRY_TAGS: { [country: string]: { [lang: string]: string[] } } = {
+            md: {
+                ro: ['republica moldova', 'moldova'],
+            },
+            ro: {
+                ro: ['românia', 'româniei'],
+            },
+            ru: {
+                ru: ['Россия', 'РФ', 'России', 'Российской'],
+            },
+        }
+
+        if (LOCALE_COUNTRY_TAGS[country]) {
+            return LOCALE_COUNTRY_TAGS[country][lang];
+        }
+    }
+}
