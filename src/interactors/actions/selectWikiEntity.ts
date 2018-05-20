@@ -76,7 +76,7 @@ export class SelectWikiEntity extends UseCase<string[], WikiEntity, void> {
             const topEntityPopularity = WikiEntityHelper.getPopularity(topEntity.rank);
             const countryEntityPopularity = WikiEntityHelper.getPopularity(countryEntities[0].rank);
 
-            if (topEntityPopularity < EntityPopularity.POPULAR || (topEntityPopularity - countryEntityPopularity) < 2) {
+            if (topEntityPopularity < EntityPopularity.POPULAR || countryEntityPopularity > EntityPopularity.UNKNOWN) {
                 useCountryEntity = true;
             }
             else {
