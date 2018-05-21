@@ -4,6 +4,7 @@ import { WikiEntityType, WikiEntity } from './wikiEntity';
 import { NameHelper, uniq, md5 } from '@textactor/domain';
 import { getPartialName } from '../utils';
 import { RootNameHelper } from './rootNameHelper';
+import { ConceptHelper } from '..';
 
 export class WikiEntityHelper {
 
@@ -83,7 +84,7 @@ export class WikiEntityHelper {
         }
 
         entity.names = [entity.name, entity.wikiPageTitle]
-            .filter(name => WikiEntityHelper.isValidName(name));
+            .filter(name => WikiEntityHelper.isValidName(name, lang));
 
         if (wikiEntity.redirects && wikiEntity.redirects.length) {
             entity.names = entity.names.concat(wikiEntity.redirects);
@@ -93,14 +94,14 @@ export class WikiEntityHelper {
         }
 
         entity.names = entity.names.map(name => NameHelper.standardText(name, lang));
-        entity.names = entity.names.filter(name => WikiEntityHelper.isValidName(name));
+        entity.names = entity.names.filter(name => WikiEntityHelper.isValidName(name, lang));
         entity.names = uniq(entity.names);
 
         entity.secondaryNames = [];
 
         entity.names.forEach(name => {
             let nname = WikiEntityHelper.rootName(name, lang);
-            if (nname !== name && WikiEntityHelper.isValidName(nname)) {
+            if (nname !== name && WikiEntityHelper.isValidName(nname, lang)) {
                 entity.secondaryNames.push(nname);
             }
         });
@@ -108,24 +109,31 @@ export class WikiEntityHelper {
         entity.namesHashes = WikiEntityHelper.namesHashes(entity.names.concat(entity.secondaryNames), lang);
 
         let partialNames = entity.names.map(name => getPartialName(name, lang, country))
-            .filter(name => !!name && NameHelper.countWords(name) > 1);
+            .filter(name => !!name && NameHelper.countWords(name) > 1 && entity.names.indexOf(name) < 0);
 
         partialNames = uniq(partialNames);
+        if (partialNames.length) {
+            entity.partialNames = partialNames;
 
-        entity.partialNames = partialNames;
+            entity.partialNamesHashes = WikiEntityHelper.namesHashes(entity.partialNames, lang);
 
-        entity.partialNamesHashes = WikiEntityHelper.namesHashes(entity.partialNames, lang);
+            const partialNamesRoot = partialNames.map(name => RootNameHelper.rootName(name, lang));
+            const partialNamesRootHashes = WikiEntityHelper.namesHashes(partialNamesRoot, lang);
 
-        const partialNamesRoot = partialNames.map(name => RootNameHelper.rootName(name, lang));
-        const partialNamesRootHashes = WikiEntityHelper.namesHashes(partialNamesRoot, lang);
+            entity.partialNamesHashes = uniq(entity.partialNamesHashes.concat(partialNamesRootHashes));
+        }
 
-        entity.partialNamesHashes = uniq(entity.partialNamesHashes.concat(partialNamesRootHashes));
+        for (let name of Object.keys(entity)) {
+            if (~[null, undefined, ''].indexOf((<any>entity)[name])) {
+                delete (<any>entity)[name];
+            }
+        }
 
         return entity;
     }
 
-    static isValidName(name: string) {
-        return name && name.trim().length > 1;
+    static isValidName(name: string, lang: string) {
+        return ConceptHelper.isValidName(name, lang);
     }
 
     static nameHash(name: string, lang: string) {
@@ -139,7 +147,7 @@ export class WikiEntityHelper {
     }
 
     static namesHashes(names: string[], lang: string) {
-        names = names.filter(name => WikiEntityHelper.isValidName(name));
+        names = names.filter(name => WikiEntityHelper.isValidName(name, lang));
         const hashes = uniq(names.map(name => WikiEntityHelper.nameHash(name, lang)));
 
         return hashes;

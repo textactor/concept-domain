@@ -25,7 +25,7 @@ test('#normalizeName', t => {
 })
 
 test('#create', t => {
-    const c1 = ConceptHelper.create({ name: 'Moldova 1', lang: 'ro', country: 'md', abbr: 'M1', containerId: '1' });
+    const c1 = ConceptHelper.build({ name: 'Moldova 1', lang: 'ro', country: 'md', abbr: 'M1', containerId: '1' });
     t.is(c1.name, 'Moldova 1')
     t.is(c1.lang, 'ro')
     t.is(c1.country, 'md')
@@ -41,7 +41,7 @@ test('#setConceptsContextName', t => {
         { name: 'Moldova 1', lang: 'ro', country: 'md', abbr: 'M1', containerId: '1' },
         { name: 'Comisia Electorala Centrala', lang: 'ro', country: 'md', containerId: '1' },
         { name: 'CEC', lang: 'ro', country: 'md', containerId: '1' },
-    ].map(item => ConceptHelper.create(item));
+    ].map(item => ConceptHelper.build(item));
 
     ConceptHelper.setConceptsContextNames(concepts)
 

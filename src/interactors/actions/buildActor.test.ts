@@ -16,7 +16,7 @@ test('ro-md: partial name: Biblioteca Națională', async t => {
     const container: ConceptContainer = { id: '1', ...locale };
     const popularNamesEnumerator = new PopularConceptNamesEnumerator({ rootNames: true }, container, conceptRep, rootConceptRep);
 
-    const bibliotecaNationala = ConceptHelper.create({ lang: locale.lang, country: locale.country, name: 'Biblioteca Națională', containerId: container.id });
+    const bibliotecaNationala = ConceptHelper.build({ lang: locale.lang, country: locale.country, name: 'Biblioteca Națională', containerId: container.id });
 
     await pushConcepts.execute([bibliotecaNationala]);
 

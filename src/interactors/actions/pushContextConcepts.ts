@@ -18,12 +18,12 @@ export class PushContextConcepts extends UseCase<Concept[], Concept[], void> {
     }
 
     private async pushConcept(concept: Concept): Promise<Concept> {
-        const rootName = RootNameHelper.create({ name: concept.name, lang: concept.lang, country: concept.country, containerId: concept.containerId });
+        const rootName = RootNameHelper.build({ name: concept.name, lang: concept.lang, country: concept.country, containerId: concept.containerId });
 
         await this.rootNameRep.createOrUpdate(rootName);
 
         if (concept.knownName) {
-            const knownRootName = RootNameHelper.create({ name: concept.knownName, lang: concept.lang, country: concept.country, containerId: concept.containerId });
+            const knownRootName = RootNameHelper.build({ name: concept.knownName, lang: concept.lang, country: concept.country, containerId: concept.containerId });
             if (knownRootName.id !== rootName.id) {
                 await this.rootNameRep.createOrUpdate(knownRootName);
             }

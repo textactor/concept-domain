@@ -4,7 +4,7 @@ import { Concept } from './concept';
 import * as isAbbrOf from 'is-abbr-of';
 import { RootNameHelper } from './rootNameHelper';
 
-export type CreatingConceptData = {
+export type KnownConceptData = {
     lang: string
     country: string
     name: string
@@ -16,7 +16,7 @@ export type CreatingConceptData = {
 
 export class ConceptHelper {
 
-    static create(data: CreatingConceptData): Concept {
+    static build(data: KnownConceptData): Concept {
 
         const lang = data.lang.trim().toLowerCase();
         const country = data.country.trim().toLowerCase();
@@ -33,7 +33,7 @@ export class ConceptHelper {
         const countWords = NameHelper.countWords(name);
         const isIrregular = NameHelper.isIrregular(name);
         const endsWithNumber = NameHelper.endsWithNumberWord(name);
-        const rootNameIds = RootNameHelper.idsFromNames([data.knownName, name], lang, country, containerId);
+        const rootNameIds = RootNameHelper.ids([data.knownName, name], lang, country, containerId);
 
         const popularity = 1;
 

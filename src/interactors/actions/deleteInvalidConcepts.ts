@@ -25,7 +25,7 @@ export class DeleteInvalidConcepts extends UseCase<void, void, void> {
         debug(`Deleting invalid names: ${JSON.stringify(invalidNames)}`);
 
         const invalidNamesIds = uniq(invalidNames.map(item => ConceptHelper.id(item, lang, country, containerId)));
-        const invalidNamesRootIds = uniq(invalidNames.map(item => RootNameHelper.idFromName(item, lang, country, containerId)));
+        const invalidNamesRootIds = uniq(invalidNames.map(item => RootNameHelper.id(item, lang, country, containerId)));
 
         await this.conceptRep.deleteIds(invalidNamesIds);
         await this.conceptRep.deleteByRootNameIds(invalidNamesRootIds);

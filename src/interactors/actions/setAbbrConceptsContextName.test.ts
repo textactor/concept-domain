@@ -16,13 +16,13 @@ test('set concept contextName', async t => {
     const container: ConceptContainer = { id: '1', ...locale };
 
     const concepts = [
-        ConceptHelper.create({ name: 'CEC', containerId: '1', ...locale }),
-        ConceptHelper.create({ name: 'Comisia Electorală Centrală', containerId: '1', ...locale }),
+        ConceptHelper.build({ name: 'CEC', containerId: '1', ...locale }),
+        ConceptHelper.build({ name: 'Comisia Electorală Centrală', containerId: '1', ...locale }),
     ];
 
     await pushConcepts.execute(concepts);
 
-    const cecConcept = ConceptHelper.create({ name: 'CEC', containerId: '1', ...locale });
+    const cecConcept = ConceptHelper.build({ name: 'CEC', containerId: '1', ...locale });
 
     let concept = await conceptRepository.getById(cecConcept.id);
     t.deepEqual(concept.contextNames, [concepts[1].name]);

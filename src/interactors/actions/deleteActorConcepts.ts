@@ -22,7 +22,7 @@ export class DeleteActorConcepts extends UseCase<string[], void, void> {
         const containerId = this.container.id;
 
         const conceptIds = ConceptHelper.ids(names, lang, country, containerId);
-        const rootIds = RootNameHelper.idsFromNames(names, lang, country, containerId);
+        const rootIds = RootNameHelper.ids(names, lang, country, containerId);
 
         await this.conceptRep.deleteIds(conceptIds);
         await this.conceptRep.deleteByRootNameIds(rootIds);

@@ -34,7 +34,7 @@ export class MemoryWikiEntityRepository implements IWikiEntityRepository {
     getByPartialNameHash(hash: string): Promise<WikiEntity[]> {
         const list: WikiEntity[] = []
         for (let item of this.db.values()) {
-            if (~item.partialNamesHashes.indexOf(hash)) {
+            if (item.partialNamesHashes && ~item.partialNamesHashes.indexOf(hash)) {
                 list.push(item)
             }
         }

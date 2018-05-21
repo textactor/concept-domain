@@ -16,8 +16,8 @@ test('set concept abbrLongName', async t => {
     const container: ConceptContainer = { id: '1', ...locale };
 
     const concepts = [
-        ConceptHelper.create({ name: 'CEC', containerId: '1', ...locale }),
-        ConceptHelper.create({ name: 'Comisia Electorală Centrală', abbr: 'CEC', containerId: '1', ...locale }),
+        ConceptHelper.build({ name: 'CEC', containerId: '1', ...locale }),
+        ConceptHelper.build({ name: 'Comisia Electorală Centrală', abbr: 'CEC', containerId: '1', ...locale }),
     ];
 
     await pushConcepts.execute(concepts);

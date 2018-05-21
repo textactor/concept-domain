@@ -25,7 +25,7 @@ test('ro-md', async t => {
     const conceptTexts: string[] = ['R. Moldova', 'Republica Moldova', 'Moldova', 'Republicii Moldova', 'Chișinău', 'Chisinau', 'Chisinaului', 'Adrian Ursu', 'Partidul Liberal', 'PDM', 'Partidul Democrat', 'PSRM'];
 
     const concepts = conceptTexts
-        .map(name => ConceptHelper.create({ name, containerId: container.id, ...locale }));
+        .map(name => ConceptHelper.build({ name, containerId: container.id, ...locale }));
 
     await pushConcepts.execute(concepts);
 
