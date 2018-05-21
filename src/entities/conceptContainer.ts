@@ -9,6 +9,17 @@ export enum ConceptContainerStatus {
     EMPTY = 'EMPTY',
 }
 
+export const ConceptContainerStatusKeys = [
+    ConceptContainerStatus.NEW,
+    ConceptContainerStatus.COLLECT_DONE,
+    ConceptContainerStatus.COLLECT_ERROR,
+    ConceptContainerStatus.COLLECTING,
+    ConceptContainerStatus.EMPTY,
+    ConceptContainerStatus.GENERATE_ERROR,
+    ConceptContainerStatus.GENERATING,
+    ConceptContainerStatus.NEW,
+];
+
 export type ConceptContainer = {
     id: string
     lang?: string

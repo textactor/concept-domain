@@ -24,17 +24,52 @@ export class ConceptContainerHelper {
         return container;
     }
 
+    static newId() {
+        return generateNewId();
+    }
+
+    static validate(entity: ConceptContainer) {
+        if (!entity) {
+            throw new Error(`Invalid ConceptContainer: null or undefined`);
+        }
+
+        if (!entity.id || entity.id.trim().length < 2) {
+            throw new Error(`Invalid ConceptContainer: invalid id`);
+        }
+
+        if (!entity.lang) {
+            throw new Error(`Invalid ConceptContainer: invalid lang`);
+        }
+
+        if (!entity.country) {
+            throw new Error(`Invalid ConceptContainer: invalid country`);
+        }
+
+        if (!entity.name) {
+            throw new Error(`Invalid ConceptContainer: invalid name`);
+        }
+        if (!entity.uniqueName) {
+            throw new Error(`Invalid ConceptContainer: invalid uniqueName`);
+        }
+        if (!entity.ownerId) {
+            throw new Error(`Invalid ConceptContainer: invalid ownerId`);
+        }
+        if (!entity.status) {
+            throw new Error(`Invalid ConceptContainer: invalid status`);
+        }
+    }
+
     static canStartCollect(status: ConceptContainerStatus) {
-        return [ConceptContainerStatus.NEW,
-        ConceptContainerStatus.COLLECT_ERROR,
-        ConceptContainerStatus.COLLECT_DONE,
-        ConceptContainerStatus.COLLECTING]
-            .indexOf(status) > -1;
+        return [
+            ConceptContainerStatus.NEW
+        ].indexOf(status) > -1;
     }
 
     static canStartGenerate(status: ConceptContainerStatus) {
-        return [ConceptContainerStatus.COLLECT_DONE,
-        ConceptContainerStatus.GENERATE_ERROR]
-            .indexOf(status) > -1;
+        return [
+            ConceptContainerStatus.COLLECT_DONE,
+            ConceptContainerStatus.COLLECT_ERROR,
+            ConceptContainerStatus.GENERATE_ERROR,
+        ].indexOf(status) > -1;
     }
 }
