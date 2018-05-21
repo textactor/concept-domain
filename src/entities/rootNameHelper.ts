@@ -3,7 +3,7 @@ import { NameHelper, md5, uniq } from '@textactor/domain';
 import { formatRootName } from '../utils';
 import { RootName } from './rootName';
 
-export type KnowingRootNameData = {
+export type KnownRootNameData = {
     lang: string
     country: string
     name: string
@@ -12,7 +12,7 @@ export type KnowingRootNameData = {
 
 export class RootNameHelper {
 
-    static build(data: KnowingRootNameData): RootName {
+    static build(data: KnownRootNameData): RootName {
 
         const lang = data.lang.trim().toLowerCase();
         const country = data.country.trim().toLowerCase();

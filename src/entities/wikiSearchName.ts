@@ -9,7 +9,7 @@ export type WikiSearchName = {
     updatedAt?: number
 }
 
-export type CreatingWikiSearchNameData = {
+export type KnownWikiSearchNameData = {
     lang: string
     country: string
     name: string
@@ -17,7 +17,7 @@ export type CreatingWikiSearchNameData = {
 }
 
 export class WikiSearchNameHelper {
-    static create(data: CreatingWikiSearchNameData) {
+    static build(data: KnownWikiSearchNameData) {
 
         const name = data.name.trim();
         const lang = data.lang.trim().toLowerCase();

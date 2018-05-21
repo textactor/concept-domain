@@ -1,7 +1,7 @@
 import { ConceptContainer, ConceptContainerStatus } from "./conceptContainer";
 import { generate as generateNewId } from 'shortid';
 
-export type ConceptContainerKnownData = {
+export type KnownConceptContainerData = {
     lang: string
     country: string
     name: string
@@ -10,7 +10,7 @@ export type ConceptContainerKnownData = {
 }
 
 export class ConceptContainerHelper {
-    static build(data: ConceptContainerKnownData): ConceptContainer {
+    static build(data: KnownConceptContainerData): ConceptContainer {
         const container: ConceptContainer = {
             id: generateNewId(),
             status: ConceptContainerStatus.NEW,

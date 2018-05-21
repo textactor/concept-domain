@@ -6,7 +6,7 @@ export { ActorHelper } from './entities/actorHelper';
 export { Concept } from './entities/concept';
 export { ConceptHelper, KnownConceptData } from './entities/conceptHelper';
 export { RootName } from './entities/rootName';
-export { RootNameHelper, KnowingRootNameData } from './entities/rootNameHelper';
+export { RootNameHelper, KnownRootNameData } from './entities/rootNameHelper';
 export { WikiEntity, WikiEntityType } from './entities/wikiEntity';
 export { WikiEntityHelper } from './entities/wikiEntityHelper';
 export { WikiTitle, WikiTitleHelper } from './entities/wikiTitle';
@@ -18,7 +18,7 @@ export {
 
 export {
     ConceptContainerHelper,
-    ConceptContainerKnownData,
+    KnownConceptContainerData,
 } from './entities/conceptContainerHelper';
 
 export {

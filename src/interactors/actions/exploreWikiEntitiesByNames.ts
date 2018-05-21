@@ -51,7 +51,7 @@ export class ExploreWikiEntitiesByNames extends UseCase<string[], void, void> {
 
             unknownNames.push(name);
 
-            await this.wikiSearchNameRep.createOrUpdate(WikiSearchNameHelper.create({
+            await this.wikiSearchNameRep.createOrUpdate(WikiSearchNameHelper.build({
                 name,
                 lang,
                 country,

@@ -1,10 +1,19 @@
 
 import { BuildActor } from './buildActor';
 import test from 'ava';
-import { Locale, MemoryWikiEntityRepository, MemoryConceptRepository, PushContextConcepts, MemoryRootNameRepository, ConceptHelper, MemoryWikiSearchNameRepository, MemoryWikiTitleRepository, WikiEntityHelper, ICountryTagsService } from '../..';
 import { ExploreWikiEntities } from './exploreWikiEntities';
 import { ConceptContainer } from '../../entities/conceptContainer';
 import { PopularConceptNamesEnumerator } from '../popularConceptNamesEnumerator';
+import { Locale } from '../../types';
+import { MemoryWikiEntityRepository } from '../memoryWikiEntityRepository';
+import { MemoryConceptRepository } from '../memoryConceptRepository';
+import { MemoryRootNameRepository } from '../memoryRootNameRepository';
+import { PushContextConcepts } from './pushContextConcepts';
+import { ConceptHelper } from '../../entities/conceptHelper';
+import { MemoryWikiTitleRepository } from '../memoryWikiTitleRepository';
+import { MemoryWikiSearchNameRepository } from '../memoryWikiSearchNameRepository';
+import { WikiEntityHelper } from '../../entities/wikiEntityHelper';
+import { ICountryTagsService } from './findWikiTitles';
 
 test('ro-md: partial name: Biblioteca Națională', async t => {
     const locale: Locale = { lang: 'ro', country: 'md' };
