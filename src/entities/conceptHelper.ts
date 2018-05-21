@@ -80,6 +80,10 @@ export class ConceptHelper {
         return ConceptHelper.hash(name, lang, country, containerId);
     }
 
+    public static ids(names: string[], lang: string, country: string, containerId: string) {
+        return uniq(names.map(name => ConceptHelper.id(name, lang, country, containerId)));
+    }
+
     public static setConceptsContextNames(concepts: Concept[]) {
         const abbreviations = concepts.filter(item => !!item.isAbbr);
         for (let concept of concepts) {

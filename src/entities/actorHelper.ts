@@ -1,4 +1,4 @@
-import { Concept } from "./concept";
+
 import { WikiEntity } from "./wikiEntity";
 import { ConceptActor } from "./actor";
 import { uniq } from "@textactor/domain";
@@ -10,6 +10,18 @@ export class ActorHelper {
 
         const lang = locale.lang.trim().toLowerCase();
         const country = locale.country.trim().toLowerCase();
+        names = ActorHelper.buildNames(lang, names, entity && entity.names);
+
+        if (entity && entity.countryCodes && entity.countryCodes.indexOf(country) > -1) {
+            names = names.concat(entity.partialNames || []);
+        }
+
+        names = uniq(names).filter(name => ConceptHelper.isValidName(name, lang));
+
+        if (!names.length) {
+            throw new Error(`Invalid ConceptActor: no names!`);
+        }
+
         const name = entity && entity.name || names[0];
 
         const actor: ConceptActor = {
@@ -17,63 +29,37 @@ export class ActorHelper {
             country,
             name,
             wikiEntity: entity,
-            names: ActorHelper.buildNames(names, entity),
+            names,
         };
-
-        if (entity) {
-            actor.names.push(entity.name);
-            if (entity.wikiPageTitle) {
-                actor.names.push(entity.wikiPageTitle);
-            }
-            actor.names = actor.names.concat(entity.names || []);
-        }
-
-        actor.names = uniq(actor.names).filter(name => ConceptHelper.isValidName(name, lang));
 
         return actor;
     }
 
-    static buildNames(names: string[], entity?: WikiEntity) {
-        if (entity) {
-            names = (entity.names || []).concat(names);
-        }
+    static buildNames(lang: string, names: string[], entityNames?: string[]) {
+        names = (entityNames || []).concat(names || []);
+        names = names.filter(name => ConceptHelper.isValidName(name, lang));
         return uniq(names);
     }
 
-    static create(concepts: Concept[], entity?: WikiEntity): ConceptActor {
-
-        const concept = concepts[0];
-
-        const lang = concept.lang.trim().toLowerCase();
-        const country = concept.country.trim().toLowerCase();
-        const name = entity && entity.name || concept.name;
-
-        const actor: ConceptActor = {
-            lang,
-            country,
-            name,
-            wikiEntity: entity,
-            names: [],
-            // concepts,
-            // popularity: concepts.reduce<number>((total, current) => total + current.popularity, 0),
-            context: concept.context,
-        };
-
-        if (entity) {
-            actor.names.push(entity.name);
-            if (entity.wikiPageTitle) {
-                actor.names.push(entity.wikiPageTitle);
-            }
-            actor.names = actor.names.concat(entity.names || []);
+    static validate(entity: ConceptActor) {
+        if (!entity) {
+            throw new Error(`Invalid ConceptActor: null or undefined`);
         }
-
-        actor.names = actor.names.concat(ConceptHelper.getConceptsNames(concepts, false));
-        if (entity && entity.countryCodes && entity.countryCodes.indexOf(country) > -1) {
-            actor.names = actor.names.concat(entity.partialNames);
+        if (!entity.lang) {
+            throw new Error(`Invalid ConceptActor: invalid lang`);
         }
-
-        actor.names = uniq(actor.names).filter(name => ConceptHelper.isValidName(name, lang));
-
-        return actor;
+        if (!entity.country) {
+            throw new Error(`Invalid ConceptActor: invalid country`);
+        }
+        if (!ConceptHelper.isValidName(entity.name, entity.lang)) {
+            throw new Error(`Invalid ConceptActor: invalid name: ${entity.name}`);
+        }
+        if (!entity.names || !entity.names.length) {
+            throw new Error(`Invalid ConceptActor: no names`);
+        }
+        const invalidName = entity.names.find(item => !ConceptHelper.isValidName(item, entity.lang));
+        if (invalidName) {
+            throw new Error(`Invalid ConceptActor: names contains invalid names: ${invalidName}`);
+        }
     }
 }

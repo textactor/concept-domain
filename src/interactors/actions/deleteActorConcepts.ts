@@ -1,5 +1,5 @@
 
-import { UseCase, uniq } from "@textactor/domain";
+import { UseCase } from "@textactor/domain";
 import { IConceptWriteRepository } from "../conceptRepository";
 import { IConceptRootNameWriteRepository } from "../conceptRootNameRepository";
 import { ConceptContainer } from "../../entities/conceptContainer";
@@ -21,11 +21,8 @@ export class DeleteActorConcepts extends UseCase<string[], void, void> {
         const country = this.container.country;
         const containerId = this.container.id;
 
-        let conceptIds = names.map(item => ConceptHelper.id(item, lang, country, containerId));
-        conceptIds = uniq(conceptIds);
-
-        let rootIds = RootNameHelper.idsFromNames(names, lang, country, containerId);
-        rootIds = uniq(rootIds);
+        const conceptIds = ConceptHelper.ids(names, lang, country, containerId);
+        const rootIds = RootNameHelper.idsFromNames(names, lang, country, containerId);
 
         await this.conceptRep.deleteIds(conceptIds);
         await this.conceptRep.deleteByRootNameIds(rootIds);
