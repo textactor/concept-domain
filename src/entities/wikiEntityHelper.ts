@@ -4,7 +4,8 @@ import { WikiEntityType, WikiEntity } from './wikiEntity';
 import { NameHelper, uniq, md5 } from '@textactor/domain';
 import { getPartialName } from '../utils';
 import { RootNameHelper } from './rootNameHelper';
-import { ConceptHelper } from '..';
+import { ConceptHelper } from './conceptHelper';
+import textCountry from 'text-country';
 
 export class WikiEntityHelper {
 
@@ -242,27 +243,9 @@ export enum EntityPopularity {
 }
 
 function getCountryByTitle(titles: string[], lang: string): string {
-    if (!COUNTRY_NAMES[lang]) {
-        return;
-    }
     const title = titles.filter(item => !!item).join('; ');
-    for (let country of Object.keys(COUNTRY_NAMES[lang])) {
-        const names = COUNTRY_NAMES[lang][country];
-        for (let name of names) {
-            if (title.indexOf(name) > 0) {
-                return country;
-            }
-        }
-    }
-}
-
-const COUNTRY_NAMES: { [lang: string]: { [country: string]: string[] } } = {
-    ro: {
-        ro: ['România', 'României', 'București'],
-        md: ['Republica Moldova', 'Moldova', 'Moldovei', 'Chișinău'],
-    },
-    ru: {
-        ru: ['Россия', 'Российская Федерация', 'России', 'Российской Федерации'],
-        md: ['Молдова', 'Молдавия', 'Молдавии', 'Кишинёв', 'Кишинёве', 'Кишинёва'],
+    const result = textCountry(title, lang);
+    if (result && result.length) {
+        return result[0].country.trim().toLowerCase();
     }
 }
