@@ -97,7 +97,7 @@ test(`ro-md: Ministerul Afacerilor Externe`, async t => {
     const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService);
 
     const actor1 = await processName.execute('Ministerul Afacerilor Externe');
-    t.is(actor1.wikiEntity.name, 'Ministerul Afacerilor Externe și Integrării Europene al Republicii Moldova');
+    t.is(actor1.wikiEntity.name, 'Ministerul Afacerilor Externe și Integrării Europene (Republica Moldova)');
 });
 
 

@@ -146,32 +146,7 @@ export class WikiEntityHelper {
     }
 
     static getName(entity: SimpleEntity): string {
-
-        if (entity.name && NameHelper.countWords(entity.name) > 1
-            && !WikiEntityHelper.getSimpleName(entity.name)) {
-            return entity.name;
-        }
-
-        let names = [entity.wikiPageTitle, entity.name]
-            .filter(item => WikiEntityHelper.isValidName(item, entity.lang));
-
-        names = names.map(name => {
-            if (NameHelper.countWords(name) < 2) {
-                return name;
-            }
-            const simpleName = WikiEntityHelper.getSimpleName(name);
-            if (!WikiEntityHelper.isValidName(simpleName, entity.lang)) {
-                return name;
-            }
-            if (NameHelper.countWords(simpleName) < 2) {
-                return name;
-            }
-            return simpleName;
-        });
-
-        // names = names.sort((a, b) => NameHelper.countWords(a) - NameHelper.countWords(b));
-
-        return names[0];
+        return entity.wikiPageTitle;
     }
 
     static isValidName(name: string, lang: string) {

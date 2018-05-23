@@ -68,13 +68,11 @@ test('#convert (Adrian Ursu)', async t => {
 
     const entity = WikiEntityHelper.convert(wikiEntity, lang, lang);
 
-    t.is(entity.name, wikiEntity.label)
-    t.is(entity.name, 'Adrian Ursu');
-    t.not(entity.name, entity.wikiPageTitle);
+    t.is(entity.name, entity.wikiPageTitle);
     t.is(entity.type, WikiEntityType.PERSON)
     t.is(entity.countryCodes.indexOf('md') > -1, true)
     t.is(entity.wikiDataId, 'Q18548924')
-    t.is(entity.partialNames, undefined);
+    t.is(entity.partialNames[0], 'Adrian Ursu');
 })
 
 test('#convert (partial names)', async t => {
