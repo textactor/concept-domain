@@ -20,6 +20,7 @@ export class PopularConceptNamesEnumerator implements INamesEnumerator {
     private currentRootIds: string[];
     private end = false;
     private minCountWords = START_MIN_COUNT_WORDS;
+    private maxCountWords: number
 
     constructor(private options: PopularConceptNamesEnumeratorOptions,
         private container: ConceptContainer,
@@ -39,16 +40,18 @@ export class PopularConceptNamesEnumerator implements INamesEnumerator {
 
     async next(): Promise<string[]> {
         if (this.end) {
-            return Promise.resolve([]);
+            return [];
         }
         if (this.currentRootIds && this.currentIndex < this.currentRootIds.length) {
             return await this.getConceptNames(this.currentRootIds[this.currentIndex++]);
         }
-        const rootIds = await this.rootNameRep.getMostPopularIds(this.container.id, this.limit, this.skip, this.minCountWords);
+        const rootIds = await this.rootNameRep.getMostPopularIds(this.container.id, this.limit, this.skip,
+            { minCountWords: this.minCountWords, maxCountWords: this.maxCountWords });
 
         if (rootIds.length === 0) {
             if (this.minCountWords === START_MIN_COUNT_WORDS) {
-                this.minCountWords = 1;
+                this.minCountWords = undefined;
+                this.maxCountWords = 1;
                 this.reset();
                 return this.next();
             }
@@ -67,12 +70,12 @@ export class PopularConceptNamesEnumerator implements INamesEnumerator {
         if (!rootId) {
             throw new Error(`Invalid rootId`);
         }
-        const rootName = await this.rootNameRep.getById(rootId);
+        // const rootName = await this.rootNameRep.getById(rootId);
         const concepts = await this.conceptRep.getByRootNameId(rootId);
         const names = ConceptHelper.getConceptsNames(concepts, this.options.rootNames);
-        if (rootName && names.indexOf(rootName.name) < 0) {
-            names.push(rootName.name);
-        }
+        // if (rootName && names.indexOf(rootName.name) < 0) {
+        //     names.push(rootName.name);
+        // }
 
         return names;
     }
