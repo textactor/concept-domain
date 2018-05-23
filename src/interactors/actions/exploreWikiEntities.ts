@@ -30,10 +30,11 @@ export class ExploreWikiEntities extends UseCase<void, void, void> {
 
         async function start(): Promise<void> {
             const names = await self.namesEnumerator.next();
+            if (names && names.length) {
+                debug(`exploring wiki entity by names: ${names}`);
 
-            debug(`exploring wiki entity by names: ${names}`);
-
-            await self.exploreByNames.execute(names);
+                await self.exploreByNames.execute(names);
+            }
 
             if (!self.namesEnumerator.atEnd()) {
                 await start();

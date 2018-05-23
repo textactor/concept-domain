@@ -86,7 +86,7 @@ test('#convert (partial names)', async t => {
     t.not(wikiEntity, null);
 
     const entity = WikiEntityHelper.convert(wikiEntity, lang, 'md');
-    t.is(entity.name, wikiEntity.label)
+    t.true(entity.name.indexOf('Moldova') > 0);
     t.is(entity.type, WikiEntityType.ORG)
     t.is(entity.countryCodes.indexOf('md') > -1, true)
     t.is(entity.wikiDataId, 'Q4294406')
@@ -105,4 +105,10 @@ test('#getLastname', t => {
     t.is(WikiEntityHelper.getLastname(null), undefined);
     t.is(WikiEntityHelper.getLastname('Bauer'), undefined);
     t.is(WikiEntityHelper.getLastname('Kim Bauer'), 'Bauer');
+})
+
+test('#getPartialName', t => {
+    t.is(WikiEntityHelper.getPartialName('Ministerul Educatiei (Romaniei)', 'ro'), 'Ministerul Educatiei', '(Romaniei)');
+    t.is(WikiEntityHelper.getPartialName('Ministerul Educatiei al Romaniei', 'ro'), 'Ministerul Educatiei', 'al Romaniei');
+    t.is(WikiEntityHelper.getPartialName('Ministerul Educatiei al Moldovei', 'ro'), 'Ministerul Educatiei', 'al Moldovei');
 })

@@ -1,8 +1,8 @@
 
-import { WikiEntity as ExternWikiEntity, convertToSimpleEntity, SimpleEntityType } from 'wiki-entity';
+import { WikiEntity as ExternWikiEntity, convertToSimpleEntity, SimpleEntityType, SimpleEntity } from 'wiki-entity';
 import { WikiEntityType, WikiEntity } from './wikiEntity';
 import { NameHelper, uniq, md5 } from '@textactor/domain';
-import { getPartialName } from '../utils';
+import { partialName } from 'partial-name';
 import { RootNameHelper } from './rootNameHelper';
 import { ConceptHelper } from './conceptHelper';
 import textCountry from 'text-country';
@@ -13,16 +13,7 @@ export class WikiEntityHelper {
         lang = lang.trim().toLowerCase();
         country = country.trim().toLowerCase();
         const simpleEntity = convertToSimpleEntity(wikiEntity, lang);
-        let name: string;
-        if (simpleEntity.name) {
-            if (NameHelper.countWords(simpleEntity.name) > 1) {
-                name = simpleEntity.name;
-            } else {
-                name = simpleEntity.wikiPageTitle;
-            }
-        } else {
-            name = simpleEntity.wikiPageTitle;
-        }
+        const name = WikiEntityHelper.getName(simpleEntity);
 
         if (!name) {
             throw new Error(`Entity has no name! ${simpleEntity.wikiDataId}`);
@@ -102,14 +93,14 @@ export class WikiEntityHelper {
 
         entity.names.forEach(name => {
             let nname = WikiEntityHelper.rootName(name, lang);
-            if (nname !== name && WikiEntityHelper.isValidName(nname, lang)) {
+            if (entity.names.indexOf(nname) < 0 && WikiEntityHelper.isValidName(nname, lang)) {
                 entity.secondaryNames.push(nname);
             }
         });
 
         entity.namesHashes = WikiEntityHelper.namesHashes(entity.names.concat(entity.secondaryNames), lang);
 
-        let partialNames = entity.names.map(name => getPartialName(name, lang, country, entity.countryCodes))
+        let partialNames = entity.names.map(name => WikiEntityHelper.getPartialName(name, lang))
             .filter(name => !!name && NameHelper.countWords(name) > 1 && entity.names.indexOf(name) < 0);
 
         partialNames = uniq(partialNames);
@@ -131,6 +122,56 @@ export class WikiEntityHelper {
         }
 
         return entity;
+    }
+
+    static getPartialName(name: string, lang: string): string {
+        if (!name || NameHelper.countWords(name) < 2) {
+            return null;
+        }
+
+        const exResult = /\(([^)]+)\)$/.exec(name);
+        if (exResult) {
+            const partial = name.substr(0, exResult.index).trim();
+            if (NameHelper.countWords(partial) > 1) {
+                return partial;
+            }
+        }
+
+        const partial = partialName(name, { lang });
+        if (partial && NameHelper.countWords(partial) > 1) {
+            return partial;
+        }
+
+        return null;
+    }
+
+    static getName(entity: SimpleEntity): string {
+
+        if (entity.name && NameHelper.countWords(entity.name) > 1
+            && !WikiEntityHelper.getSimpleName(entity.name)) {
+            return entity.name;
+        }
+
+        let names = [entity.wikiPageTitle, entity.name]
+            .filter(item => WikiEntityHelper.isValidName(item, entity.lang));
+
+        names = names.map(name => {
+            if (NameHelper.countWords(name) < 2) {
+                return name;
+            }
+            const simpleName = WikiEntityHelper.getSimpleName(name);
+            if (!WikiEntityHelper.isValidName(simpleName, entity.lang)) {
+                return name;
+            }
+            if (NameHelper.countWords(simpleName) < 2) {
+                return name;
+            }
+            return simpleName;
+        });
+
+        // names = names.sort((a, b) => NameHelper.countWords(a) - NameHelper.countWords(b));
+
+        return names[0];
     }
 
     static isValidName(name: string, lang: string) {
@@ -186,6 +227,13 @@ export class WikiEntityHelper {
         return {
             simple: name.substr(0, firstIndex).trim(),
             special: name.substring(firstIndex + 1, lastIndex)
+        }
+    }
+
+    static getSimpleName(name: string): string {
+        const splitName = WikiEntityHelper.splitName(name);
+        if (splitName) {
+            return splitName.simple;
         }
     }
 

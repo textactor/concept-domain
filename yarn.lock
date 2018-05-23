@@ -2791,9 +2791,9 @@ term-size@^1.2.0:
   dependencies:
     execa "^0.7.0"
 
-text-country@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/text-country/-/text-country-0.1.0.tgz#5412a909ff708649ad911d5063539265d41486ae"
+text-country@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/text-country/-/text-country-0.1.1.tgz#79980473d81250d28eff8135d595fa7f34031a2c"
 
 text-table@^0.2.0:
   version "0.2.0"
