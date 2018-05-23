@@ -85,8 +85,7 @@ test('#convert (partial names)', async t => {
 
     t.not(wikiEntity, null);
 
-    const entity = WikiEntityHelper.convert(wikiEntity, lang, lang);
-
+    const entity = WikiEntityHelper.convert(wikiEntity, lang, 'md');
     t.is(entity.name, wikiEntity.label)
     t.is(entity.type, WikiEntityType.ORG)
     t.is(entity.countryCodes.indexOf('md') > -1, true)

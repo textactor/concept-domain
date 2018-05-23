@@ -29,7 +29,7 @@ export class GenerateActors extends UseCase<OnGenerateActorCallback, void, void>
             try {
                 const names = await this.namesEnumerator.next();
                 if (!names || !names.length) {
-                    break;
+                    continue;
                 }
 
                 actor = await this.buildActor.execute(names);

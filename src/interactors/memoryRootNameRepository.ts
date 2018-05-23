@@ -1,19 +1,23 @@
 
 import { Concept } from '../entities/concept';
 import { RepUpdateData } from '@textactor/domain';
-import { IConceptRootNameRepository } from './conceptRootNameRepository';
+import { IConceptRootNameRepository, RootNamePopularIdsOptions } from './conceptRootNameRepository';
 import { RootName } from '../entities/rootName';
 
 export class MemoryRootNameRepository implements IConceptRootNameRepository {
     private db: Map<string, RootName> = new Map()
 
-    getMostPopularIds(containerId: string, limit: number, skip: number, minCountWords?: number): Promise<string[]> {
+    getMostPopularIds(containerId: string, limit: number, skip: number, options?: RootNamePopularIdsOptions): Promise<string[]> {
+        options = { ...options };
         const list: string[] = [];
         for (let item of this.db.values()) {
             if (item.containerId !== containerId) {
                 continue;
             }
-            if (Number.isFinite(minCountWords) && item.countWords < minCountWords) {
+            if (Number.isFinite(options.minCountWords) && item.countWords < options.minCountWords) {
+                continue;
+            }
+            if (Number.isFinite(options.maxCountWords) && item.countWords > options.maxCountWords) {
                 continue;
             }
             list.push(item.id);

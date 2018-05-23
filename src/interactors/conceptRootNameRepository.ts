@@ -10,8 +10,13 @@ export interface IConceptRootNameWriteRepository extends IWriteRepository<string
     createOrUpdate(name: RootName): Promise<RootName>
 }
 
+export type RootNamePopularIdsOptions = {
+    minCountWords?: number
+    maxCountWords?: number
+}
+
 export interface IConceptRootNameReadRepository extends IReadRepository<string, RootName> {
-    getMostPopularIds(containerId: string, limit: number, skip: number, minCountWords?: number): Promise<string[]>
+    getMostPopularIds(containerId: string, limit: number, skip: number, options?: RootNamePopularIdsOptions): Promise<string[]>
 }
 
 export interface IConceptRootNameRepository extends IConceptRootNameReadRepository, IConceptRootNameWriteRepository {

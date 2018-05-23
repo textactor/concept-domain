@@ -109,7 +109,7 @@ export class WikiEntityHelper {
 
         entity.namesHashes = WikiEntityHelper.namesHashes(entity.names.concat(entity.secondaryNames), lang);
 
-        let partialNames = entity.names.map(name => getPartialName(name, lang, country))
+        let partialNames = entity.names.map(name => getPartialName(name, lang, country, entity.countryCodes))
             .filter(name => !!name && NameHelper.countWords(name) > 1 && entity.names.indexOf(name) < 0);
 
         partialNames = uniq(partialNames);
