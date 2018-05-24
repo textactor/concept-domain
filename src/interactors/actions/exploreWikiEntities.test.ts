@@ -12,6 +12,7 @@ import { MemoryRootNameRepository } from '../memoryRootNameRepository';
 import { ICountryTagsService } from './findWikiTitles';
 import { ConceptContainer } from '../../entities/conceptContainer';
 import { PopularConceptNamesEnumerator } from '../popularConceptNamesEnumerator';
+import { IKnownNameService } from '../knownNamesService';
 
 test('ro-md', async t => {
     const conceptRepository = new MemoryConceptRepository();
@@ -28,7 +29,8 @@ test('ro-md', async t => {
         wikiEntityRepository,
         wikiSearchNameRepository,
         wikiTitleRepository,
-        new CountryTags());
+        new CountryTags(),
+        new KnownNamesService());
 
     const conceptTexts: string[] = ['R. Moldova', 'Chișinău', 'Chisinau', 'Republica Moldova', 'Moldova', 'Chisinau'];
 
@@ -66,5 +68,11 @@ class CountryTags implements ICountryTagsService {
         if (LOCALE_COUNTRY_TAGS[country]) {
             return LOCALE_COUNTRY_TAGS[country][lang];
         }
+    }
+}
+
+class KnownNamesService implements IKnownNameService {
+    getKnownName(_name: string, _lang: string, _country: string): { name: string; countryCodes?: string[]; } {
+        return null;
     }
 }

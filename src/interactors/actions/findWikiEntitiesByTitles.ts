@@ -7,11 +7,15 @@ import { WikiEntity } from "../../entities/wikiEntity";
 import { getEntities, WikiEntitiesParams, WikiEntity as ExternWikiEntity } from 'wiki-entity';
 import { WikiEntityHelper } from "../../entities/wikiEntityHelper";
 import { isTimeoutError, delay } from "../../utils";
+import { IKnownNameService } from "../knownNamesService";
+import { IWikiEntityBuilder, WikiEntityBuilder } from "./wikiEntityBuilder";
 
 export class FindWikiEntitiesByTitles extends UseCase<string[], WikiEntity[], null> {
+    private wikiEntityBuilder: IWikiEntityBuilder
 
-    constructor(private locale: Locale) {
+    constructor(private locale: Locale, knownNames: IKnownNameService) {
         super()
+        this.wikiEntityBuilder = new WikiEntityBuilder(locale, knownNames);
     }
 
     protected async innerExecute(titles: string[]): Promise<WikiEntity[]> {
@@ -48,7 +52,7 @@ export class FindWikiEntitiesByTitles extends UseCase<string[], WikiEntity[], nu
             debug(`Found wiki entities for ${titles.join('|')}: ${wikiEntities.map(item => item.label)}`);
         }
 
-        let entities = wikiEntities.map(item => WikiEntityHelper.convert(item, this.locale.lang, this.locale.country));
+        let entities = wikiEntities.map(wikiEntity => this.wikiEntityBuilder.build({ wikiEntity }));
 
         entities = entities.filter(item => !WikiEntityHelper.isDisambiguation(item));
 

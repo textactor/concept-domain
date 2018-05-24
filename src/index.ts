@@ -103,6 +103,10 @@ export {
 } from './interactors/actions/findWikiTitles';
 
 export {
+    IKnownNameService
+} from './interactors/knownNamesService';
+
+export {
     INamesEnumerator
 } from './interactors/namesEnumerator';
 

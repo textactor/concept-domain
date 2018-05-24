@@ -14,6 +14,7 @@ import { MemoryWikiTitleRepository } from '../memoryWikiTitleRepository';
 import { MemoryWikiSearchNameRepository } from '../memoryWikiSearchNameRepository';
 import { WikiEntityHelper } from '../../entities/wikiEntityHelper';
 import { ICountryTagsService } from './findWikiTitles';
+import { IKnownNameService } from '../knownNamesService';
 
 test('ro-md: partial name: Biblioteca Națională', async t => {
     const locale: Locale = { lang: 'ro', country: 'md' };
@@ -30,7 +31,7 @@ test('ro-md: partial name: Biblioteca Națională', async t => {
     await pushConcepts.execute([bibliotecaNationala]);
 
     const exploreEntities = new ExploreWikiEntities(container, popularNamesEnumerator, entityRep,
-        new MemoryWikiSearchNameRepository(), new MemoryWikiTitleRepository(), new CountryTags());
+        new MemoryWikiSearchNameRepository(), new MemoryWikiTitleRepository(), new CountryTags(), new KnownNamesService());
 
     await exploreEntities.execute(null);
 
@@ -66,5 +67,11 @@ class CountryTags implements ICountryTagsService {
         if (LOCALE_COUNTRY_TAGS[country]) {
             return LOCALE_COUNTRY_TAGS[country][lang];
         }
+    }
+}
+
+class KnownNamesService implements IKnownNameService {
+    getKnownName(_name: string, _lang: string, _country: string): { name: string; countryCodes?: string[]; } {
+        return null;
     }
 }

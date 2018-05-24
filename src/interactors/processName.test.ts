@@ -2,7 +2,7 @@
 import { ProcessName } from './processName';
 import test from 'ava';
 import { ConceptContainer } from '../entities/conceptContainer';
-import { MemoryWikiEntityRepository, MemoryWikiSearchNameRepository, MemoryWikiTitleRepository, ICountryTagsService } from '..';
+import { MemoryWikiEntityRepository, MemoryWikiSearchNameRepository, MemoryWikiTitleRepository, ICountryTagsService, IKnownNameService } from '..';
 
 
 
@@ -18,7 +18,7 @@ test(`ro-md: Moldova`, async t => {
     const titleService = new MemoryWikiTitleRepository();
     const tagsService = new CountryTags();
 
-    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService);
+    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService, new KnownNamesService());
 
     const actor1 = await processName.execute('Moldova');
     t.is(!!actor1, true);
@@ -41,7 +41,7 @@ test(`ro-ro: Botoșani`, async t => {
     const titleService = new MemoryWikiTitleRepository();
     const tagsService = new CountryTags();
 
-    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService);
+    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService, new KnownNamesService());
 
     const actor1 = await processName.execute('Botoșani');
     t.is(!!actor1, true);
@@ -59,7 +59,7 @@ test(`ro-ro: Județul Botoșani`, async t => {
     const titleService = new MemoryWikiTitleRepository();
     const tagsService = new CountryTags();
 
-    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService);
+    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService, new KnownNamesService());
 
     const actor1 = await processName.execute('Județul Botoșani');
     t.is(!!actor1, true);
@@ -77,7 +77,7 @@ test(`ro-ro: unexisting name`, async t => {
     const titleService = new MemoryWikiTitleRepository();
     const tagsService = new CountryTags();
 
-    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService);
+    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService, new KnownNamesService());
 
     const actor1 = await processName.execute('vdterywnteunrtur rtjhrt');
     t.is(actor1.wikiEntity, null);
@@ -94,7 +94,7 @@ test(`ro-md: Ministerul Afacerilor Externe`, async t => {
     const titleService = new MemoryWikiTitleRepository();
     const tagsService = new CountryTags();
 
-    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService);
+    const processName = new ProcessName(container, entityRep, searchName, titleService, tagsService, new KnownNamesService());
 
     const actor1 = await processName.execute('Ministerul Afacerilor Externe');
     t.is(actor1.wikiEntity.name, 'Ministerul Afacerilor Externe și Integrării Europene (Republica Moldova)');
@@ -119,5 +119,11 @@ class CountryTags implements ICountryTagsService {
         if (LOCALE_COUNTRY_TAGS[country]) {
             return LOCALE_COUNTRY_TAGS[country][lang];
         }
+    }
+}
+
+class KnownNamesService implements IKnownNameService {
+    getKnownName(_name: string, _lang: string, _country: string): { name: string; countryCodes?: string[]; } {
+        return null;
     }
 }

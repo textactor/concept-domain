@@ -9,6 +9,7 @@ import { ICountryTagsService, ConceptActor } from '..';
 import { ConceptContainer } from '../entities/conceptContainer';
 import { ExploreWikiEntitiesByNames } from './actions/exploreWikiEntitiesByNames';
 import { BuildActorByNames } from './actions/buildActorByNames';
+import { IKnownNameService } from './knownNamesService';
 
 export class ProcessName extends UseCase<string, ConceptActor, void> {
 
@@ -16,7 +17,8 @@ export class ProcessName extends UseCase<string, ConceptActor, void> {
         private entityRep: IWikiEntityRepository,
         private wikiSearchNameRep: IWikiSearchNameRepository,
         private wikiTitleRep: IWikiTitleRepository,
-        private countryTags: ICountryTagsService) {
+        private countryTags: ICountryTagsService,
+        private knownNames: IKnownNameService) {
         super()
 
         if (!container.lang || !container.country) {
@@ -33,7 +35,8 @@ export class ProcessName extends UseCase<string, ConceptActor, void> {
             this.entityRep,
             this.wikiSearchNameRep,
             this.wikiTitleRep,
-            this.countryTags);
+            this.countryTags,
+            this.knownNames);
         const buildActor = new BuildActorByNames(this.container, this.entityRep);
 
         debug(`=====> Start exploreWikiEntities`);

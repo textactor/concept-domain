@@ -12,6 +12,7 @@ import { WikiSearchNameHelper } from '../../entities/wikiSearchName';
 import { IWikiTitleRepository } from '../wikiTitleRepository';
 import { WikiTitleHelper } from '../../entities/wikiTitle';
 import { ConceptContainer } from '../../entities/conceptContainer';
+import { IKnownNameService } from '../knownNamesService';
 const ms = require('ms');
 
 export class ExploreWikiEntitiesByNames extends UseCase<string[], void, void> {
@@ -23,7 +24,8 @@ export class ExploreWikiEntitiesByNames extends UseCase<string[], void, void> {
         entityRep: IWikiEntityRepository,
         private wikiSearchNameRep: IWikiSearchNameRepository,
         private wikiTitleRep: IWikiTitleRepository,
-        countryTags: ICountryTagsService) {
+        countryTags: ICountryTagsService,
+        knownNames: IKnownNameService) {
         super()
 
         const locale: Locale = {
@@ -31,7 +33,7 @@ export class ExploreWikiEntitiesByNames extends UseCase<string[], void, void> {
             country: container.country,
         };
 
-        this.exploreWikiEntitiesByTitles = new FindWikiEntitiesByTitles(locale);
+        this.exploreWikiEntitiesByTitles = new FindWikiEntitiesByTitles(locale, knownNames);
         this.saveWikiEntities = new SaveWikiEntities(entityRep);
         this.findWikiTitles = new FindWikiTitles(locale, countryTags);
     }

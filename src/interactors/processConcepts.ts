@@ -20,6 +20,7 @@ import { ConceptContainerHelper } from '../entities/conceptContainerHelper';
 import { PopularConceptNamesEnumerator } from './popularConceptNamesEnumerator';
 import { DeleteActorConcepts } from './actions/deleteActorConcepts';
 import { CleanConceptContainer } from './actions/cleanConceptContainer';
+import { IKnownNameService } from './knownNamesService';
 
 export interface ProcessConceptsOptions extends DeleteUnpopularConceptsOptions {
 
@@ -34,7 +35,8 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
         private entityRep: IWikiEntityRepository,
         private wikiSearchNameRep: IWikiSearchNameRepository,
         private wikiTitleRep: IWikiTitleRepository,
-        private countryTags: ICountryTagsService) {
+        private countryTags: ICountryTagsService,
+        private knownNames: IKnownNameService) {
         super()
 
         if (!container.lang || !container.country) {
@@ -60,7 +62,8 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
             this.entityRep,
             this.wikiSearchNameRep,
             this.wikiTitleRep,
-            this.countryTags);
+            this.countryTags,
+            this.knownNames);
         const generateActors = new GenerateActors(this.container,
             new PopularConceptNamesEnumerator({ rootNames: false }, container, this.conceptRep, this.rootNameRep),
             new DeleteActorConcepts(container, this.conceptRep, this.rootNameRep),
