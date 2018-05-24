@@ -31,6 +31,7 @@ export {
     IConceptRootNameRepository,
     IConceptRootNameReadRepository,
     IConceptRootNameWriteRepository,
+    RootNamePopularIdsOptions,
 } from './interactors/conceptRootNameRepository';
 
 export {

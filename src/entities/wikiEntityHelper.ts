@@ -150,7 +150,7 @@ export class WikiEntityHelper {
         if (r < 6) {
             return EntityPopularity.NORMAL;
         }
-        if (r < 8) {
+        if (r < 9) {
             return EntityPopularity.HIGH;
         }
 
