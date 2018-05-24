@@ -6,14 +6,14 @@ import { ConceptHelper } from "./conceptHelper";
 import { Locale } from "../types";
 
 export class ActorHelper {
-    static build(locale: Locale, names: string[], entity?: WikiEntity): ConceptActor {
+    static build(locale: Locale, names: string[], wikiEntity?: WikiEntity): ConceptActor {
 
         const lang = locale.lang.trim().toLowerCase();
         const country = locale.country.trim().toLowerCase();
-        names = ActorHelper.buildNames(lang, names, entity && entity.names);
+        names = ActorHelper.buildNames(lang, names, wikiEntity && wikiEntity.names);
 
-        if (entity && entity.countryCodes && entity.countryCodes.indexOf(country) > -1) {
-            names = names.concat(entity.partialNames || []);
+        if (wikiEntity && wikiEntity.countryCodes && wikiEntity.countryCodes.indexOf(country) > -1) {
+            names = names.concat(wikiEntity.partialNames || []);
         }
 
         names = uniq(names).filter(name => ConceptHelper.isValidName(name, lang));
@@ -22,13 +22,13 @@ export class ActorHelper {
             throw new Error(`Invalid ConceptActor: no names!`);
         }
 
-        const name = entity && entity.name || names[0];
+        const name = wikiEntity && wikiEntity.name || names[0];
 
         const actor: ConceptActor = {
             lang,
             country,
             name,
-            wikiEntity: entity,
+            wikiEntity,
             names,
         };
 

@@ -1,7 +1,8 @@
 
 import test from 'ava';
 import { ActorHelper } from './actorHelper';
-import { Locale } from '..';
+import { Locale, WikiEntityHelper } from '..';
+import { getEntities } from 'wiki-entity';
 
 
 test('#buildNames', t => {
@@ -20,6 +21,17 @@ test('#build', t => {
     t.is(actor.lang, locale.lang);
     t.deepEqual(actor.names, names);
     t.is(actor.wikiEntity, undefined);
+});
+
+test('#build Valeriu Munteanu ro-md', async t => {
+    const locale: Locale = { lang: 'ro', country: 'ro' };
+    const title = 'Valeriu Munteanu (politician)';
+    const webWikiEntity = (await getEntities({ language: locale.lang, titles: title, redirects: true, types: true }))[0];
+    const wikiEntity = WikiEntityHelper.convert(webWikiEntity, locale.lang, locale.country);
+    t.is(wikiEntity.name, title, 'wiki entity name===title');
+    t.is(wikiEntity.wikiPageTitle, title, 'wiki entity page title===title');
+    const actor = ActorHelper.build(locale, ['Valeriu Munteanu'], wikiEntity);
+    t.is(actor.name, title, 'actor name===title');
 });
 
 test('#validate', t => {
