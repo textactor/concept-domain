@@ -42,7 +42,7 @@
     "typescript": "latest"
   },
   "dependencies": {
-    "@textactor/domain": "^0.1.4",
+    "@textactor/domain": "^0.1.5",
     "entity-finder": "^0.5.2",
     "is-abbr-of": "^0.1.1",
     "ms": "^2.1.1",
