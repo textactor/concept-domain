@@ -28,17 +28,6 @@ export class MemoryConceptRepository implements IConceptRepository {
         return Promise.resolve(count);
     }
 
-    getAbbrConceptsWithContextName(containerId: string): Promise<Concept[]> {
-        const list: Concept[] = []
-        for (let item of this.db.values()) {
-            if (item.containerId === containerId && item.isAbbr && item.contextNames) {
-                list.push(item);
-            }
-        }
-
-        return Promise.resolve(list);
-    }
-
     getConceptsWithAbbr(containerId: string): Promise<Concept[]> {
         const list: Concept[] = []
         for (let item of this.db.values()) {
@@ -48,20 +37,6 @@ export class MemoryConceptRepository implements IConceptRepository {
         }
 
         return Promise.resolve(list);
-    }
-
-    deleteByNameHash(hashes: string[]): Promise<number> {
-        let count = 0;
-        for (let hash of hashes) {
-            const list = this.filterByFieldValue('nameHash', hash);
-            count += list.length;
-
-            for (let item of list) {
-                this.db.delete(item.id);
-            }
-        }
-
-        return Promise.resolve(count);
     }
 
     async deleteByRootNameIds(ids: string[]): Promise<number> {
@@ -136,23 +111,6 @@ export class MemoryConceptRepository implements IConceptRepository {
         return Promise.resolve(item);
     }
 
-    private filterByFieldValue(field: keyof Concept, value: any): Concept[] {
-        const list: Concept[] = []
-        for (let item of this.db.values()) {
-            if (item[field] === value) {
-                list.push(item)
-            }
-        }
-
-        return list;
-    }
-
-    getByNameHash(hash: string): Promise<Concept[]> {
-
-        const list = this.filterByFieldValue('nameHash', hash);
-
-        return Promise.resolve(list);
-    }
     getByRootNameId(id: string): Promise<Concept[]> {
         const list: Concept[] = []
         for (let item of this.db.values()) {

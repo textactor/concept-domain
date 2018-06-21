@@ -33,19 +33,4 @@ test('#create', t => {
     t.is(c1.countWords, 2)
     t.is(c1.isAbbr, false)
     t.is(c1.isIrregular, false)
-    t.is(c1.normalName, 'moldova 1')
-})
-
-test('#setConceptsContextName', t => {
-    const concepts = [
-        { name: 'Moldova 1', lang: 'ro', country: 'md', abbr: 'M1', containerId: '1' },
-        { name: 'Comisia Electorala Centrala', lang: 'ro', country: 'md', containerId: '1' },
-        { name: 'CEC', lang: 'ro', country: 'md', containerId: '1' },
-    ].map(item => ConceptHelper.build(item));
-
-    ConceptHelper.setConceptsContextNames(concepts)
-
-    t.is(concepts[0].contextNames, undefined);
-    t.deepEqual(concepts[1].contextNames, ['CEC']);
-    t.deepEqual(concepts[2].contextNames, ['Comisia Electorala Centrala']);
 })

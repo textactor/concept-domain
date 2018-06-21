@@ -42,13 +42,3 @@ test('#getByIds', async t => {
     t.is(concepts[0].id, concept1.id);
     t.is(concepts[1].id, concept2.id);
 })
-
-test('#deleteByNameHash', async t => {
-    const repository = new MemoryConceptRepository();
-
-    const concept1 = ConceptHelper.build({ name: 'Владимир Путин', country: 'ru', lang: 'ru', containerId: '1' });
-    await repository.deleteByNameHash([concept1.nameHash]);
-    const concepts = await repository.getByNameHash(concept1.nameHash);
-
-    t.is(concepts.length, 0);
-})

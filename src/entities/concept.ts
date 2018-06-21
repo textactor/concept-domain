@@ -8,13 +8,9 @@ export type Concept = {
 
     name?: string
     nameLength?: number
-    /** normalized text hash */
-    nameHash?: string
-    normalName?: string
     rootNameIds?: string[]
 
     abbr?: string
-    abbrLongNames?: string[]
 
     popularity?: number
     countWords?: number
@@ -23,8 +19,6 @@ export type Concept = {
     isAbbr?: boolean
     createdAt?: number
     updatedAt?: number
-
-    contextNames?: string[]
 
     knownName?: string
 

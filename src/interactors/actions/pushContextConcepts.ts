@@ -13,7 +13,6 @@ export class PushContextConcepts extends UseCase<Concept[], Concept[], void> {
 
     protected innerExecute(concepts: Concept[]): Promise<Concept[]> {
         concepts = concepts.filter(concept => ConceptHelper.isValid(concept));
-        ConceptHelper.setConceptsContextNames(concepts);
         return Promise.all(concepts.map(concept => this.pushConcept(concept)));
     }
 

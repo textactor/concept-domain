@@ -5,8 +5,6 @@ import { UseCase } from '@textactor/domain';
 import { IConceptRepository } from './conceptRepository';
 import { OnGenerateActorCallback, GenerateActors } from './actions/generateActors';
 import { IWikiEntityRepository } from './wikiEntityRepository';
-import { SetAbbrConceptsContextName } from './actions/setAbbrConceptsContextName';
-import { SetAbbrConceptsLongName } from './actions/setAbbrConceptsLongName';
 import { DeleteUnpopularConcepts, DeleteUnpopularConceptsOptions } from './actions/deleteUnpopularConcepts';
 import { ExploreWikiEntities } from './actions/exploreWikiEntities';
 import { IWikiSearchNameRepository } from './wikiSearchNameRepository';
@@ -53,8 +51,6 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
             return Promise.reject(new Error(`ConceptContainer is not generateable: ${container.status}`));
         }
 
-        const setAbbrConcextName = new SetAbbrConceptsContextName(container, this.conceptRep);
-        const setAbbrLongName = new SetAbbrConceptsLongName(container, this.conceptRep);
         const deleteUnpopularConcepts = new DeleteUnpopularConcepts(container, this.conceptRep, this.rootNameRep);
         const deleteInvalidConcepts = new DeleteInvalidConcepts(container, this.conceptRep, this.rootNameRep, this.entityRep);
         const exploreWikiEntities = new ExploreWikiEntities(container,
@@ -77,14 +73,14 @@ export class ProcessConcepts extends UseCase<OnGenerateActorCallback, void, Proc
             await deleteInvalidConcepts.execute(null);
             debug(`<===== End deleteInvalidConcepts`);
 
-            debug(`=====> Start setAbbrLongName`);
-            const setAbbrLongNameMap = await setAbbrLongName.execute(null);
-            debug(`setAbbrLongNameMap=${JSON.stringify(setAbbrLongNameMap)}`);
-            debug(`<===== End setAbbrLongName`);
-            debug(`=====> Start setAbbrConcextName`);
-            const setAbbrContextNameMap = await setAbbrConcextName.execute(null);
-            debug(`setAbbrContextNameMap=${JSON.stringify(setAbbrContextNameMap)}`);
-            debug(`<===== End setAbbrConcextName`);
+            // debug(`=====> Start setAbbrLongName`);
+            // const setAbbrLongNameMap = await setAbbrLongName.execute(null);
+            // debug(`setAbbrLongNameMap=${JSON.stringify(setAbbrLongNameMap)}`);
+            // debug(`<===== End setAbbrLongName`);
+            // debug(`=====> Start setAbbrConcextName`);
+            // const setAbbrContextNameMap = await setAbbrConcextName.execute(null);
+            // debug(`setAbbrContextNameMap=${JSON.stringify(setAbbrContextNameMap)}`);
+            // debug(`<===== End setAbbrConcextName`);
             debug(`=====> Start deleteUnpopularConcepts`);
             await deleteUnpopularConcepts.execute(options);
             debug(`<===== End deleteUnpopularConcepts`);
