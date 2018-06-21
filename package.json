@@ -1,6 +1,6 @@
 {
   "name": "@textactor/concept-domain",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Core Concept module",
   "main": "./lib/index.js",
   "types": "./types/index.d.ts",
@@ -44,7 +44,6 @@
   "dependencies": {
     "@textactor/domain": "^0.1.5",
     "entity-finder": "^0.5.2",
-    "is-abbr-of": "^0.1.1",
     "ms": "^2.1.1",
     "partial-name": "^0.1.4",
     "root-name": "^0.1.8",
