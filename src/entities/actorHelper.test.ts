@@ -27,7 +27,7 @@ test('#build', t => {
 test('#build Valeriu Munteanu ro-md', async t => {
     const locale: Locale = { lang: 'ro', country: 'ro' };
     const title = 'Valeriu Munteanu (politician)';
-    const webWikiEntity = (await getEntities({ language: locale.lang, titles: title, redirects: true, types: true }))[0];
+    const webWikiEntity = (await getEntities({ language: locale.lang, titles: [title], redirects: true, types: true }))[0];
     const builder = new WikiEntityBuilder(locale, new KnownNamesService());
     const wikiEntity = builder.build({ wikiEntity: webWikiEntity });
     t.is(wikiEntity.name, title, 'wiki entity name===title');

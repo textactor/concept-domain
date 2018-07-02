@@ -23,7 +23,7 @@ export class FindWikiEntitiesByTitles extends UseCase<string[], WikiEntity[], nu
         debug(`exploring wiki entities for ${titles.join('|')}`);
 
         const findOptions: WikiEntitiesParams = {
-            titles: titles.join('|'),
+            titles: titles,
             claims: 'item',
             categories: true,
             extract: 3,

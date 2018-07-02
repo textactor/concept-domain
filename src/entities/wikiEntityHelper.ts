@@ -8,13 +8,13 @@ import { ConceptHelper } from './conceptHelper';
 
 export class WikiEntityHelper {
 
-    static getPartialName(name: string, lang: string, entityName: string): string {
+    static getPartialName(name: string, lang: string, entityName: string): string | null {
         if (!name || NameHelper.countWords(name) < 2) {
             return null;
         }
 
         const exResult = /\(([^)]+)\)$/.exec(name);
-        let partial: string
+        let partial: string | null = null;
         if (exResult) {
             partial = name.substr(0, exResult.index).trim();
             if (NameHelper.countWords(partial) < 2) {
@@ -46,7 +46,7 @@ export class WikiEntityHelper {
         return partial;
     }
 
-    static getName(entity: SimpleEntity): string {
+    static getName(entity: SimpleEntity): string | undefined {
         return entity.wikiPageTitle;
     }
 
@@ -90,7 +90,7 @@ export class WikiEntityHelper {
         }
     }
 
-    static splitName(name: string): { simple: string, special: string } {
+    static splitName(name: string): { simple: string, special: string } | null {
         const firstIndex = name.indexOf('(');
         if (firstIndex < 3) {
             return null;
@@ -106,7 +106,7 @@ export class WikiEntityHelper {
         }
     }
 
-    static getSimpleName(name: string): string {
+    static getSimpleName(name: string): string | undefined {
         const splitName = WikiEntityHelper.splitName(name);
         if (splitName) {
             return splitName.simple;
@@ -117,7 +117,7 @@ export class WikiEntityHelper {
         return entity && entity.data && entity.data.P31 && entity.data.P31.indexOf('Q4167410') > -1;
     }
 
-    static getLastname(name: string): string {
+    static getLastname(name: string): string | undefined {
 
         if (!name || name.indexOf('(') > -1) {
             return;
@@ -155,6 +155,21 @@ export class WikiEntityHelper {
         }
 
         return EntityPopularity.POPULAR;
+    }
+
+    static isNotActual(entity: WikiEntity): boolean | undefined {
+        if (!entity.data) {
+            return undefined;
+        }
+        const notActualProps = ['P457', 'P20', 'P576'];
+        const props = Object.keys(entity.data);
+        for (let prop of notActualProps) {
+            if (~props.indexOf(prop)) {
+                return true;
+            }
+        }
+
+        return undefined;
     }
 }
 

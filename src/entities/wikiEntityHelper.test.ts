@@ -30,7 +30,7 @@ test('#convert CIA', async t => {
 
     const lang = 'en';
 
-    const wikiEntity = (await getEntities({ titles: 'Central Intelligence Agency', language: lang, claims: 'item', extract: 3, types: true, redirects: true }))[0];
+    const wikiEntity = (await getEntities({ titles: ['Central Intelligence Agency'], language: lang, claims: 'item', extract: 3, types: true, redirects: true }))[0];
 
     t.not(wikiEntity, null);
 
@@ -40,7 +40,7 @@ test('#convert CIA', async t => {
 
     t.is(entity.name, wikiEntity.label)
     t.is(entity.type, WikiEntityType.ORG)
-    t.is(entity.countryCodes.indexOf('us') > -1, true)
+    t.is(entity.countryCodes && entity.countryCodes.indexOf('us') > -1, true)
     t.is(entity.abbr, 'CIA')
     t.is(entity.wikiDataId, 'Q37230')
 })
@@ -49,7 +49,7 @@ test('#convert (using wiki title as name)', async t => {
 
     const lang = 'ro';
 
-    const wikiEntity = (await getEntities({ ids: 'Q178861', language: lang, claims: 'item', extract: 3, types: true, redirects: true }))[0];
+    const wikiEntity = (await getEntities({ ids: ['Q178861'], language: lang, claims: 'item', extract: 3, types: true, redirects: true }))[0];
 
     t.not(wikiEntity, null);
 
@@ -59,16 +59,16 @@ test('#convert (using wiki title as name)', async t => {
 
     t.is(entity.name, entity.wikiPageTitle)
     t.is(entity.type, WikiEntityType.PLACE)
-    t.is(entity.countryCodes.indexOf('ro') > -1, true)
+    t.is(entity.countryCodes && entity.countryCodes.indexOf('ro') > -1, true)
     t.is(entity.wikiDataId, 'Q178861')
-    t.is(entity.names.find(item => NameHelper.countWords(item) === 1), undefined);
+    t.is(entity.names && entity.names.find(item => NameHelper.countWords(item) === 1), undefined);
 })
 
 test('#convert (Adrian Ursu)', async t => {
 
     const lang = 'ro';
 
-    const wikiEntity = (await getEntities({ ids: 'Q18548924', language: lang, claims: 'item', extract: 3, types: true, redirects: true }))[0];
+    const wikiEntity = (await getEntities({ ids: ['Q18548924'], language: lang, claims: 'item', extract: 3, types: true, redirects: true }))[0];
 
     t.not(wikiEntity, null);
 
@@ -78,16 +78,16 @@ test('#convert (Adrian Ursu)', async t => {
 
     t.is(entity.name, entity.wikiPageTitle);
     t.is(entity.type, WikiEntityType.PERSON)
-    t.is(entity.countryCodes.indexOf('md') > -1, true)
+    t.is(entity.countryCodes && entity.countryCodes.indexOf('md') > -1, true)
     t.is(entity.wikiDataId, 'Q18548924')
-    t.is(entity.partialNames[0], 'Adrian Ursu');
+    t.is(entity.partialNames && entity.partialNames[0], 'Adrian Ursu');
 })
 
 test('#convert (partial names)', async t => {
 
     const lang = 'ro';
 
-    const wikiEntity = (await getEntities({ ids: 'Q4294406', language: lang, claims: 'item', extract: 3, types: true, redirects: true }))[0];
+    const wikiEntity = (await getEntities({ ids: ['Q4294406'], language: lang, claims: 'item', extract: 3, types: true, redirects: true }))[0];
 
     t.not(wikiEntity, null);
 
@@ -103,7 +103,7 @@ test('#convert (partial names)', async t => {
 })
 
 test('#isDisambiguation', async t => {
-    const wikiEntity = (await getEntities({ titles: 'Adrian Ursu', language: 'ro', claims: 'item', extract: 3, types: true, redirects: true }))[0];
+    const wikiEntity = (await getEntities({ titles: ['Adrian Ursu'], language: 'ro', claims: 'item', extract: 3, types: true, redirects: true }))[0];
 
     const builder = new WikiEntityBuilder({ lang: 'ro', country: 'ro' }, new KnownNamesService());
 
@@ -130,6 +130,16 @@ test('#getPartialName long partial', t => {
     t.is(WikiEntityHelper.getPartialName(name1, 'ro', name1), 'Ordinul Ștefan cel Mare', '(Republica Moldova)');
     t.is(WikiEntityHelper.getPartialName('Ștefan cel Mare (ordin)', 'ro', name1), null, 'Ștefan cel Mare (ordin)');
     t.is(WikiEntityHelper.getPartialName('Ordinul Ștefan cel Mare și Sfânt (MD)', 'ro', name1), 'Ordinul Ștefan cel Mare și Sfânt', 'Ordinul Ștefan cel Mare și Sfânt');
+})
+
+test('#isNotActual', async t => {
+    const wikiEntity = (await getEntities({ titles: ['Ștefan Bănică'], language: 'ro', claims: 'item', extract: 3, types: true, redirects: true }))[0];
+
+    const builder = new WikiEntityBuilder({ lang: 'ro', country: 'ro' }, new KnownNamesService());
+
+    const entity = builder.build({ wikiEntity });
+
+    t.is(WikiEntityHelper.isNotActual(entity), true);
 })
 
 class KnownNamesService implements IKnownNameService {

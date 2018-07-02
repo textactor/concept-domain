@@ -49,6 +49,6 @@
     "root-name": "^0.1.8",
     "shortid": "^2.2.8",
     "text-country": "^0.1.1",
-    "wiki-entity": "^0.3.6"
+    "wiki-entity": "^0.4.0"
   }
 }
