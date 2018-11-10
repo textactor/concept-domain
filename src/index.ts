@@ -1,117 +1,105 @@
 
-export { Locale } from './types';
+// entities
 
-export { ConceptActor } from './entities/actor';
-export { ActorHelper } from './entities/actorHelper';
-export { Concept } from './entities/concept';
-export { ConceptHelper, KnownConceptData } from './entities/conceptHelper';
-export { RootName } from './entities/rootName';
-export { RootNameHelper, KnownRootNameData } from './entities/rootNameHelper';
-export { WikiEntity, WikiEntityType } from './entities/wikiEntity';
-export { WikiEntityHelper } from './entities/wikiEntityHelper';
-export { WikiTitle, WikiTitleHelper } from './entities/wikiTitle';
-export { WikiSearchName, WikiSearchNameHelper } from './entities/wikiSearchName';
+export {
+    Actor,
+    ActorName,
+    ActorNameType,
+} from './entities/actor';
+
+export {
+    ActorHelper,
+} from './entities/actor-helper';
+
+export {
+    ActorNameCollection,
+} from './entities/actor-name-collection';
+
+export {
+    Concept,
+} from './entities/concept';
+
+export {
+    ConceptHelper,
+    BuildConceptParams,
+} from './entities/concept-helper';
+
 export {
     ConceptContainer,
     ConceptContainerStatus,
-} from './entities/conceptContainer';
+    ConceptContainerStatusKeys,
+} from './entities/concept-container';
 
 export {
     ConceptContainerHelper,
-    KnownConceptContainerData,
-} from './entities/conceptContainerHelper';
+    BuildConceptContainerParams,
+} from './entities/concept-container-helper';
 
 export {
-    IConceptRepository,
-    IConceptReadRepository,
-    IConceptWriteRepository,
-} from './interactors/conceptRepository';
+    WikiEntity,
+    WikiEntityData,
+    WikiEntityType,
+} from './entities/wiki-entity';
 
 export {
-    IConceptRootNameRepository,
-    IConceptRootNameReadRepository,
-    IConceptRootNameWriteRepository,
-    RootNamePopularIdsOptions,
-} from './interactors/conceptRootNameRepository';
+    BuildWikiSearchNameParams,
+    WikiSearchName,
+    WikiSearchNameHelper,
+} from './entities/wiki-search-name';
 
 export {
-    IWikiEntityRepository,
-    IWikiEntityReadRepository,
-    IWikiEntityWriteRepository,
-} from './interactors/wikiEntityRepository';
+    BuildWikiTitleParams,
+    WikiTitle,
+    WikiTitleHelper,
+} from './entities/wiki-title';
+
+
+// repositories
+
 
 export {
-    IWikiTitleRepository,
-    IWikiTitleReadRepository,
-    IWikiTitleWriteRepository,
-} from './interactors/wikiTitleRepository';
+    ConceptContainerRepository,
+    ContainerListFilters,
+} from './repositories/concept-container-repository';
 
 export {
-    IWikiSearchNameRepository,
-    IWikiSearchNameReadRepository,
-    IWikiSearchNameWriteRepository,
-} from './interactors/wikiSearchNameRepository';
+    ConceptRepository,
+    PopularConceptsOptions,
+} from './repositories/concept-repository';
 
 export {
-    IConceptContainerReadRepository,
-    IConceptContainerWriteRepository,
-    IConceptContainerRepository,
-} from './interactors/conceptContainerRepository';
-
-export { MemoryConceptRepository } from './interactors/memoryConceptRepository';
-export { MemoryRootNameRepository } from './interactors/memoryRootNameRepository';
-export { MemoryWikiEntityRepository } from './interactors/memoryWikiEntityRepository';
-export { MemoryWikiSearchNameRepository } from './interactors/memoryWikiSearchNameRepository';
-export { MemoryWikiTitleRepository } from './interactors/memoryWikiTitleRepository';
-export { MemoryConceptContainerRepository } from './interactors/memoryConceptContainerRepository';
-
-export { PushContextConcepts } from './interactors/actions/pushContextConcepts';
-export {
-    DeleteUnpopularConcepts,
-} from './interactors/actions/deleteUnpopularConcepts';
+    WikiEntityRepository,
+} from './repositories/wiki-entity-repository';
 
 export {
-    BuildActorByNames
-} from './interactors/actions/buildActorByNames';
+    WikiSearchNameRepository,
+} from './repositories/wiki-search-name-repository';
 
 export {
-    ExploreWikiEntitiesByNames
-} from './interactors/actions/exploreWikiEntitiesByNames';
+    WikiTitleRepository,
+} from './repositories/wiki-title-repository';
+
+
+// services
+
 
 export {
-    FindWikiEntitiesByTitles
-} from './interactors/actions/findWikiEntitiesByTitles';
+    KnownName,
+    KnownNameService,
+} from './services/known-names-service';
 
 export {
-    CleanConceptContainer
-} from './interactors/actions/cleanConceptContainer';
+    NameCorrectionService,
+} from './services/name-correction-service';
 
 export {
-    ProcessConcepts,
-    ProcessConceptsOptions,
-} from './interactors/processConcepts';
+    NamesEnumerator,
+} from './services/names-enumerator';
+
+
+
+// utils
 
 export {
-    ProcessName
-} from './interactors/processName';
-
-export {
-    INameCorrectionService
-} from './interactors/nameCorrectionService';
-
-export {
-    ICountryTagsService
-} from './interactors/actions/findWikiTitles';
-
-export {
-    IKnownNameService
-} from './interactors/knownNamesService';
-
-export {
-    INamesEnumerator
-} from './interactors/namesEnumerator';
-
-export {
-    PopularConceptNamesEnumerator,
-    PopularConceptNamesEnumeratorOptions,
-} from './interactors/popularConceptNamesEnumerator';
+    Locale,
+} from './types';

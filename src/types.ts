@@ -1,5 +1,5 @@
 
-export type Locale = {
+export interface Locale {
     lang: string
     country: string
 }
