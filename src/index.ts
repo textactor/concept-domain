@@ -2,20 +2,6 @@
 // entities
 
 export {
-    Actor,
-    ActorName,
-    ActorNameType,
-} from './entities/actor';
-
-export {
-    ActorHelper,
-} from './entities/actor-helper';
-
-export {
-    ActorNameCollection,
-} from './entities/actor-name-collection';
-
-export {
     Concept,
 } from './entities/concept';
 
@@ -78,25 +64,6 @@ export {
 export {
     WikiTitleRepository,
 } from './repositories/wiki-title-repository';
-
-
-// services
-
-
-export {
-    KnownName,
-    KnownNameService,
-} from './services/known-names-service';
-
-export {
-    NameCorrectionService,
-} from './services/name-correction-service';
-
-export {
-    NamesEnumerator,
-} from './services/names-enumerator';
-
-
 
 // utils
 

@@ -1,6 +1,5 @@
 
 import { Concept } from './concept';
-import { ActorNameCollection } from './actor-name-collection';
 import { NameHelper, md5, uniq } from '@textactor/domain';
 
 export type BuildConceptParams = {
@@ -103,16 +102,6 @@ export class ConceptHelper {
 
     public static setRootIds(concept: Concept) {
         concept.rootNameIds = uniq(concept.rootNameIds.concat(ConceptHelper.rootIds([concept.knownName, concept.name], concept.lang, concept.country, concept.containerId)));
-    }
-
-    public static getConceptsNames(concepts: Concept[]) {
-        if (concepts.length === 0) {
-            throw new Error(`No concepts!`);
-        }
-        const { lang } = concepts[0];
-        concepts = concepts.sort((a, b) => b.popularity - a.popularity);
-
-        return ActorNameCollection.fromConcepts(lang, concepts);
     }
 
     static isValidName(name: string | null | undefined, lang: string): boolean {
