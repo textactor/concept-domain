@@ -1,6 +1,6 @@
 
 import { Concept } from './concept';
-import { NameHelper, md5, uniq } from '@textactor/domain';
+import { NameHelper, md5, uniq, unixTime } from '@textactor/domain';
 
 export type BuildConceptParams = {
     lang: string
@@ -11,6 +11,7 @@ export type BuildConceptParams = {
     knownName?: string
     context?: string
     popularity?: number
+    createdAt?: Date
 }
 
 export class ConceptHelper {
@@ -34,6 +35,9 @@ export class ConceptHelper {
 
         const popularity = params.popularity || 1;
 
+        const createdAt = unixTime(params.createdAt);
+        const expiresAt = ConceptHelper.createExpiresAt(createdAt);
+
         const concept: Concept = {
             id,
             country,
@@ -49,6 +53,8 @@ export class ConceptHelper {
             rootNameIds,
             popularity,
             context: params.context,
+            createdAt,
+            expiresAt,
         };
 
         if (params.knownName && ConceptHelper.isValidName(params.knownName, lang)) {
@@ -56,6 +62,16 @@ export class ConceptHelper {
         }
 
         return concept;
+    }
+
+    public static getExpiresAtFieldName() {
+        return 'expiresAt';
+    }
+
+    public static createExpiresAt(createdAt: number) {
+        const TTL = 86400 * 15 // 15 days
+
+        return createdAt + TTL;
     }
 
     public static nameHash(name: string, lang: string, country: string, containerId: string) {

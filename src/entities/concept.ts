@@ -17,10 +17,12 @@ export type Concept = {
     endsWithNumber: boolean
     isIrregular: boolean
     isAbbr: boolean
-    createdAt?: number
+    createdAt: number
     updatedAt?: number
 
     knownName?: string
 
     context?: string
+
+    expiresAt: number
 }

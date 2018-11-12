@@ -1,13 +1,14 @@
 
-import { NameHelper, md5 } from "@textactor/domain";
+import { NameHelper, md5, unixTime } from "@textactor/domain";
 
 export type WikiSearchName = {
     id: string
     lang: string
     country: string
     name: string
-    createdAt?: number
+    createdAt: number
     updatedAt?: number
+    expiresAt: number
 }
 
 export type BuildWikiSearchNameParams = {
@@ -25,16 +26,30 @@ export class WikiSearchNameHelper {
         const country = params.country.trim().toLowerCase();
         const id = WikiSearchNameHelper.createId(name, lang, country);
 
+        const createdAt = unixTime();
+        const expiresAt = WikiSearchNameHelper.createExpiresAt(createdAt);
+
         const searchName: WikiSearchName = {
             id,
             name,
             lang,
             country,
-            createdAt: Math.round(Date.now() / 1000),
-            updatedAt: params.updatedAt || Math.round(Date.now() / 1000),
+            createdAt: createdAt,
+            updatedAt: params.updatedAt || createdAt,
+            expiresAt,
         };
 
         return searchName;
+    }
+
+    public static getExpiresAtFieldName() {
+        return 'expiresAt';
+    }
+
+    public static createExpiresAt(createdAt: number) {
+        const TTL = 86400 * 4 // 4 days
+
+        return createdAt + TTL;
     }
 
     static createId(name: string, lang: string, country: string) {

@@ -19,9 +19,4 @@ export interface ConceptRepository extends Repository<Concept> {
     deleteAll(containerId: string): Promise<number>
     deleteIds(ids: string[]): Promise<number>
     deleteByRootNameIds(ids: string[]): Promise<number>
-    /**
-     * Create a new concept or update existing with new fields and increment popularity
-     * @param concept Concept to process
-     */
-    createOrUpdate(concept: Concept): Promise<Concept>
 }

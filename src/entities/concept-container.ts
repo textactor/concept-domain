@@ -34,6 +34,7 @@ export type ConceptContainer = {
 
     lastError?: string
 
-    createdAt?: number
+    createdAt: number
     updatedAt?: number
+    expiresAt: number
 }

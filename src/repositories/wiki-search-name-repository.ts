@@ -4,5 +4,5 @@ import { Repository } from '@textactor/domain';
 
 
 export interface WikiSearchNameRepository extends Repository<WikiSearchName> {
-    createOrUpdate(data: WikiSearchName): Promise<WikiSearchName>
+    
 }

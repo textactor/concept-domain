@@ -1,12 +1,13 @@
 
-import { NameHelper, md5 } from "@textactor/domain";
+import { NameHelper, md5, unixTime } from "@textactor/domain";
 
 export type WikiTitle = {
     id: string
     lang: string
     title: string
-    createdAt?: number
+    createdAt: number
     updatedAt?: number
+    expiresAt: number
 }
 
 export type BuildWikiTitleParams = {
@@ -23,15 +24,29 @@ export class WikiTitleHelper {
 
         const id = WikiTitleHelper.createId(title, lang);
 
+        const createdAt = unixTime();
+        const expiresAt = WikiTitleHelper.createExpiresAt(createdAt);
+
         const wikiTitle: WikiTitle = {
             id,
             title,
             lang,
-            createdAt: Math.round(Date.now() / 1000),
-            updatedAt: params.updatedAt || Math.round(Date.now() / 1000),
+            createdAt,
+            updatedAt: params.updatedAt || createdAt,
+            expiresAt,
         };
 
         return wikiTitle;
+    }
+
+    public static getExpiresAtFieldName() {
+        return 'expiresAt';
+    }
+
+    public static createExpiresAt(createdAt: number) {
+        const TTL = 86400 * 5 // 5 days
+
+        return createdAt + TTL;
     }
 
     static createId(title: string, lang: string) {

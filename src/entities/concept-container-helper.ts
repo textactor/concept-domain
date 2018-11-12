@@ -1,5 +1,6 @@
 import { ConceptContainer, ConceptContainerStatus } from "./concept-container";
 import { generate as generateNewId } from 'shortid';
+import { unixTime } from '@textactor/domain';
 
 export type BuildConceptContainerParams = {
     lang: string
@@ -7,10 +8,14 @@ export type BuildConceptContainerParams = {
     name: string
     uniqueName: string
     ownerId: string
+    createdAt?: Date
 }
 
 export class ConceptContainerHelper {
     static build(params: BuildConceptContainerParams): ConceptContainer {
+        const createdAt = unixTime(params.createdAt);
+        const expiresAt = ConceptContainerHelper.createExpiresAt(createdAt);
+
         const container: ConceptContainer = {
             id: ConceptContainerHelper.newId(),
             status: ConceptContainerStatus.NEW,
@@ -19,9 +24,21 @@ export class ConceptContainerHelper {
             lang: params.lang,
             country: params.country,
             ownerId: params.ownerId,
+            createdAt,
+            expiresAt,
         };
 
         return container;
+    }
+
+    public static createExpiresAt(createdAt: number) {
+        const TTL = 86400 * 15 // 15 days
+
+        return createdAt + TTL;
+    }
+
+    public static getExpiresAtFieldName() {
+        return 'expiresAt';
     }
 
     static newId() {
