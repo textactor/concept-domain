@@ -37,6 +37,7 @@ export {
 
 export {
     WikiEntityHelper,
+    EntityPopularity,
 } from './entities/wiki-entity-helper';
 
 export {
