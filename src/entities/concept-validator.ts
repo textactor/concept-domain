@@ -24,6 +24,7 @@ const schema = {
     endsWithNumber: Joi.boolean(),
     context: Joi.string().max(500).truncate(),
     containerId: Joi.string().regex(/^[a-zA-Z0-9_-]{6,32}$/),
+    countWords: Joi.number().integer().min(1),
 
     createdAt: Joi.date().timestamp('unix').raw(),
     updatedAt: Joi.date().timestamp('unix').raw(),
@@ -45,6 +46,7 @@ const createSchema = Joi.object().keys({
     endsWithNumber: schema.endsWithNumber.required(),
     context: schema.context,
     containerId: schema.containerId.required(),
+    countWords: schema.countWords.required(),
 
     createdAt: schema.createdAt.required(),
     updatedAt: schema.updatedAt,

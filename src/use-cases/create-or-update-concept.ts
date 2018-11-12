@@ -14,8 +14,12 @@ export class CreateOrUpdateConcept extends UseCase<Concept, Concept, void>{
             const popularity = item.popularity + dbItem.popularity;
             const rootNameIds = uniq(dbItem.rootNameIds.concat(item.rootNameIds));
             const abbr = item.abbr || dbItem.abbr;
+            const set: Partial<Concept> = { popularity, rootNameIds };
+            if (abbr) {
+                set.abbr = abbr;
+            }
             const id = item.id;
-            return this.rep.update({ id: id, set: { popularity, rootNameIds, abbr } });
+            return this.rep.update({ id: id, set });
         }
         else {
             return this.rep.create(item);
