@@ -12,7 +12,6 @@ export class WikiTitleValidator extends JoiEntityValidator<WikiTitle>{
 const schema = {
     id: Joi.string().regex(/^[a-zA-Z0-9_-]{32,40}$/),
     lang: Joi.string().regex(/^[a-z]{2}$/),
-    country: Joi.string().regex(/^[a-z]{2}$/),
     title: Joi.string().min(2).max(200).trim(),
 
     createdAt: Joi.date().timestamp('unix').raw(),
@@ -23,7 +22,6 @@ const schema = {
 const createSchema = Joi.object().keys({
     id: schema.id.required(),
     lang: schema.lang.required(),
-    country: schema.country.required(),
     title: schema.title.required(),
 
     createdAt: schema.createdAt.required(),
