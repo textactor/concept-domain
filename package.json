@@ -36,13 +36,14 @@
   "homepage": "https://github.com/textactor/concept-domain#readme",
   "devDependencies": {
     "@types/joi": "^14.0.0",
-    "@types/node": "10.12.5",
+    "@types/node": "10.12.6",
     "@types/shortid": "^0.0.29",
     "ava": "^0.25.0",
     "rimraf": "^2.6.2",
     "typescript": "3.1.6"
   },
   "dependencies": {
+    "@textactor/domain": "^0.2.0",
     "joi": "^14.0.6",
     "ms": "^2.1.1",
     "shortid": "^2.2.14"
