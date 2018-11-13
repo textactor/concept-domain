@@ -64,6 +64,16 @@ export {
     WikiTitleValidator,
 } from './entities/wiki-title-validator';
 
+export {
+    LearningText,
+    BuildLearningTextParams,
+    LearningTextHelper,
+} from './entities/learning-text';
+
+export {
+    LearningTextValidator,
+} from './entities/learning-text-validator';
+
 
 // repositories
 
@@ -89,6 +99,11 @@ export {
 export {
     WikiTitleRepository,
 } from './repositories/wiki-title-repository';
+
+export {
+    LearningTextListParams,
+    LearningTextRepository,
+} from './repositories/learning-text-repository';
 
 // utils
 
