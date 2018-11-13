@@ -35,7 +35,7 @@ const createSchema = Joi.object().keys({
     createdAt: schema.createdAt.required(),
     updatedAt: schema.updatedAt,
     expiresAt: schema.expiresAt.required(),
-});
+}).required();
 
 const updateSchema = Joi.object().keys({
     id: schema.id.required(),
@@ -46,4 +46,4 @@ const updateSchema = Joi.object().keys({
         expiresAt: schema.expiresAt,
     }),
     delete: Joi.array().valid('lastError'),
-});
+}).or('set', 'delete').required();
