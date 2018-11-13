@@ -38,6 +38,10 @@ export class LearningTextHelper {
         return item;
     }
 
+    static getExpiresAtFieldName() {
+        return 'expiresAt';
+    }
+
     static createExpiresAt(createdAt: number) {
         return createdAt + 86400 * 7; // 7 days
     }
