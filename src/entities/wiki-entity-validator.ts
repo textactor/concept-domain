@@ -15,7 +15,7 @@ const schema = {
     lang: Joi.string().regex(/^[a-z]{2}$/),
     name: Joi.string().min(2).max(200).trim(),
     simpleName: Joi.string().min(2).max(200).trim(),
-    specialName: Joi.string().min(2).max(200).trim(),
+    specialName: Joi.string().min(1).max(200).trim(),
     aliases: Joi.array().items(Joi.string().min(2).max(200).trim()).max(50),
     names: Joi.array().items(Joi.string().min(2).max(200).trim().required()).min(1),
     namesHashes: Joi.array().items(Joi.string().trim().min(16).max(40).required()).min(1),
