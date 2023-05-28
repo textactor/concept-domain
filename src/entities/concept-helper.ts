@@ -1,130 +1,190 @@
-
-import { Concept } from './concept';
-import { NameHelper, md5, uniq, unixTime } from '@textactor/domain';
+import { Concept } from "./concept";
+import { NameHelper, md5, uniq, unixTime } from "@textactor/domain";
 
 export type BuildConceptParams = {
-    lang: string
-    country: string
-    name: string
-    containerId: string
-    abbr?: string
-    knownName?: string
-    context?: string
-    popularity?: number
-    createdAt?: Date
-}
+  lang: string;
+  country: string;
+  name: string;
+  containerId: string;
+  abbr?: string;
+  knownName?: string;
+  context?: string;
+  popularity?: number;
+  createdAt?: Date;
+};
 
 export class ConceptHelper {
+  static build(params: BuildConceptParams): Concept {
+    const lang = params.lang.trim().toLowerCase();
+    const country = params.country.trim().toLowerCase();
+    const containerId = params.containerId.trim();
+    const name = params.name.trim();
+    const nameLength = name.length;
 
-    static build(params: BuildConceptParams): Concept {
+    const normalName = NameHelper.normalizeName(name, lang);
+    const id = ConceptHelper.id(normalName, lang, country, containerId);
 
-        const lang = params.lang.trim().toLowerCase();
-        const country = params.country.trim().toLowerCase();
-        const containerId = params.containerId.trim();
-        const name = params.name.trim();
-        const nameLength = name.length;
+    const isAbbr = NameHelper.isAbbr(name);
+    const countWords = NameHelper.countWords(name);
+    const isIrregular = NameHelper.isIrregular(name);
+    const endsWithNumber = NameHelper.endsWithNumberWord(name);
+    const rootNameIds = ConceptHelper.rootIds(
+      [params.knownName, name],
+      lang,
+      country,
+      containerId
+    );
 
-        const normalName = NameHelper.normalizeName(name, lang);
-        const id = ConceptHelper.id(normalName, lang, country, containerId);
+    const popularity = params.popularity || 1;
 
-        const isAbbr = NameHelper.isAbbr(name);
-        const countWords = NameHelper.countWords(name);
-        const isIrregular = NameHelper.isIrregular(name);
-        const endsWithNumber = NameHelper.endsWithNumberWord(name);
-        const rootNameIds = ConceptHelper.rootIds([params.knownName, name], lang, country, containerId);
+    const createdAt = unixTime(params.createdAt);
+    const expiresAt = ConceptHelper.createExpiresAt(createdAt);
 
-        const popularity = params.popularity || 1;
+    const concept: Concept = {
+      id,
+      country,
+      lang,
+      containerId,
+      name,
+      nameLength,
+      isAbbr,
+      countWords,
+      isIrregular,
+      endsWithNumber,
+      abbr: params.abbr,
+      rootNameIds,
+      popularity,
+      context: params.context,
+      createdAt,
+      expiresAt
+    };
 
-        const createdAt = unixTime(params.createdAt);
-        const expiresAt = ConceptHelper.createExpiresAt(createdAt);
-
-        const concept: Concept = {
-            id,
-            country,
-            lang,
-            containerId,
-            name,
-            nameLength,
-            isAbbr,
-            countWords,
-            isIrregular,
-            endsWithNumber,
-            abbr: params.abbr,
-            rootNameIds,
-            popularity,
-            context: params.context,
-            createdAt,
-            expiresAt,
-        };
-
-        if (params.knownName && ConceptHelper.isValidName(params.knownName, lang)) {
-            concept.knownName = params.knownName.trim();
-        }
-
-        return concept;
+    if (params.knownName && ConceptHelper.isValidName(params.knownName, lang)) {
+      concept.knownName = params.knownName.trim();
     }
 
-    public static getExpiresAtFieldName() {
-        return 'expiresAt';
-    }
+    return concept;
+  }
 
-    public static createExpiresAt(createdAt: number) {
-        const TTL = 86400 * 15 // 15 days
+  public static getExpiresAtFieldName() {
+    return "expiresAt";
+  }
 
-        return createdAt + TTL;
-    }
+  public static createExpiresAt(createdAt: number) {
+    const TTL = 86400 * 15; // 15 days
 
-    public static nameHash(name: string, lang: string, country: string, containerId: string) {
-        name = name.trim();
-        name = NameHelper.normalizeName(name, lang);
-        name = NameHelper.atonic(name);
+    return createdAt + TTL;
+  }
 
-        return ConceptHelper.hash(name, lang, country, containerId);
-    }
+  public static nameHash(
+    name: string,
+    lang: string,
+    country: string,
+    containerId: string
+  ) {
+    name = name.trim();
+    name = NameHelper.normalizeName(name, lang);
+    name = NameHelper.atonic(name);
 
-    public static hash(name: string, lang: string, country: string, containerId: string) {
-        return md5([lang.trim().toLowerCase(), country.trim().toLowerCase(), containerId.trim(), name.trim()].join('_'))
-    }
+    return ConceptHelper.hash(name, lang, country, containerId);
+  }
 
-    public static id(name: string, lang: string, country: string, containerId: string) {
-        name = NameHelper.normalizeName(name, lang);
-        return ConceptHelper.hash(name, lang, country, containerId);
-    }
+  public static hash(
+    name: string,
+    lang: string,
+    country: string,
+    containerId: string
+  ) {
+    return md5(
+      [
+        lang.trim().toLowerCase(),
+        country.trim().toLowerCase(),
+        containerId.trim(),
+        name.trim()
+      ].join("_")
+    );
+  }
 
-    public static ids(names: string[], lang: string, country: string, containerId: string) {
-        return uniq(names.map(name => ConceptHelper.id(name, lang, country, containerId)));
-    }
+  public static id(
+    name: string,
+    lang: string,
+    country: string,
+    containerId: string
+  ) {
+    name = NameHelper.normalizeName(name, lang);
+    return ConceptHelper.hash(name, lang, country, containerId);
+  }
 
-    public static rootName(name: string, lang: string) {
-        lang = lang.trim();
-        name = name.trim();
+  public static ids(
+    names: string[],
+    lang: string,
+    country: string,
+    containerId: string
+  ) {
+    return uniq(
+      names.map((name) => ConceptHelper.id(name, lang, country, containerId))
+    );
+  }
 
-        name = NameHelper.normalizeName(name, lang);
-        name = NameHelper.atonic(name);
+  public static rootName(name: string, lang: string) {
+    lang = lang.trim();
+    name = name.trim();
 
-        return name;
-    }
+    name = NameHelper.normalizeName(name, lang);
+    name = NameHelper.atonic(name);
 
-    public static rootId(name: string, lang: string, country: string, containerId: string) {
-        name = ConceptHelper.rootName(name, lang);
+    return name;
+  }
 
-        return ConceptHelper.id(name, lang, country, containerId);
-    }
+  public static rootId(
+    name: string,
+    lang: string,
+    country: string,
+    containerId: string
+  ) {
+    name = ConceptHelper.rootName(name, lang);
 
-    static rootIds(names: (string | undefined | null)[], lang: string, country: string, containerId: string) {
-        const filteredNames = names.filter(name => name && name.trim().length > 1) as string[];
-        return uniq(filteredNames.map(name => ConceptHelper.rootId(name, lang, country, containerId)));
-    }
+    return ConceptHelper.id(name, lang, country, containerId);
+  }
 
-    public static setRootIds(concept: Concept) {
-        concept.rootNameIds = uniq(concept.rootNameIds.concat(ConceptHelper.rootIds([concept.knownName, concept.name], concept.lang, concept.country, concept.containerId)));
-    }
+  static rootIds(
+    names: (string | undefined | null)[],
+    lang: string,
+    country: string,
+    containerId: string
+  ) {
+    const filteredNames = names.filter(
+      (name) => name && name.trim().length > 1
+    ) as string[];
+    return uniq(
+      filteredNames.map((name) =>
+        ConceptHelper.rootId(name, lang, country, containerId)
+      )
+    );
+  }
 
-    static isValidName(name: string | null | undefined, lang: string): boolean {
-        return typeof name === 'string' && name.trim().length > 1 && NameHelper.normalizeName(name, lang).length > 1;
-    }
+  public static setRootIds(concept: Concept) {
+    concept.rootNameIds = uniq(
+      concept.rootNameIds.concat(
+        ConceptHelper.rootIds(
+          [concept.knownName, concept.name],
+          concept.lang,
+          concept.country,
+          concept.containerId
+        )
+      )
+    );
+  }
 
-    static isValid(concept: Concept) {
-        return ConceptHelper.isValidName(concept.name, concept.lang);
-    }
+  static isValidName(name: string | null | undefined, lang: string): boolean {
+    return (
+      typeof name === "string" &&
+      name.trim().length > 1 &&
+      NameHelper.normalizeName(name, lang).length > 1
+    );
+  }
+
+  static isValid(concept: Concept) {
+    return ConceptHelper.isValidName(concept.name, concept.lang);
+  }
 }

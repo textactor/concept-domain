@@ -1,37 +1,39 @@
 import { JoiEntityValidator } from "@textactor/domain";
-import * as Joi from 'joi';
+import * as Joi from "joi";
 import { Concept } from "./concept";
 
-export class ConceptValidator extends JoiEntityValidator<Concept>{
-    constructor() {
-        super({ createSchema, updateSchema })
-    }
+export class ConceptValidator extends JoiEntityValidator<Concept> {
+  constructor() {
+    super({ createSchema, updateSchema });
+  }
 }
-
 
 const schema = {
-    id: Joi.string().regex(/^[a-zA-Z0-9_-]{6,32}$/),
-    lang: Joi.string().regex(/^[a-z]{2}$/),
-    country: Joi.string().regex(/^[a-z]{2}$/),
-    name: Joi.string().min(2).max(200).trim(),
-    knownName: Joi.string().min(2).max(200).trim(),
-    nameLength: Joi.number().integer().min(2),
-    rootNameIds: Joi.array().items(Joi.string().trim().min(16).max(40).required()).min(1),
-    abbr: Joi.string().min(2).max(50),
-    popularity: Joi.number().integer().min(1),
-    isAbbr: Joi.boolean(),
-    isIrregular: Joi.boolean(),
-    endsWithNumber: Joi.boolean(),
-    context: Joi.string().max(500).truncate(),
-    containerId: Joi.string().regex(/^[a-zA-Z0-9_-]{6,32}$/),
-    countWords: Joi.number().integer().min(1),
+  id: Joi.string().regex(/^[a-zA-Z0-9_-]{6,32}$/),
+  lang: Joi.string().regex(/^[a-z]{2}$/),
+  country: Joi.string().regex(/^[a-z]{2}$/),
+  name: Joi.string().min(2).max(200).trim(),
+  knownName: Joi.string().min(2).max(200).trim(),
+  nameLength: Joi.number().integer().min(2),
+  rootNameIds: Joi.array()
+    .items(Joi.string().trim().min(16).max(40).required())
+    .min(1),
+  abbr: Joi.string().min(2).max(50),
+  popularity: Joi.number().integer().min(1),
+  isAbbr: Joi.boolean(),
+  isIrregular: Joi.boolean(),
+  endsWithNumber: Joi.boolean(),
+  context: Joi.string().max(500).truncate(),
+  containerId: Joi.string().regex(/^[a-zA-Z0-9_-]{6,32}$/),
+  countWords: Joi.number().integer().min(1),
 
-    createdAt: Joi.date().timestamp('unix').raw(),
-    updatedAt: Joi.date().timestamp('unix').raw(),
-    expiresAt: Joi.date().timestamp('unix').raw(),
-}
+  createdAt: Joi.date().timestamp("unix").raw(),
+  updatedAt: Joi.date().timestamp("unix").raw(),
+  expiresAt: Joi.date().timestamp("unix").raw()
+};
 
-const createSchema = Joi.object().keys({
+const createSchema = Joi.object()
+  .keys({
     id: schema.id.required(),
     lang: schema.lang.required(),
     country: schema.country.required(),
@@ -50,19 +52,23 @@ const createSchema = Joi.object().keys({
 
     createdAt: schema.createdAt.required(),
     updatedAt: schema.updatedAt,
-    expiresAt: schema.expiresAt.required(),
-}).required();
+    expiresAt: schema.expiresAt.required()
+  })
+  .required();
 
-const updateSchema = Joi.object().keys({
+const updateSchema = Joi.object()
+  .keys({
     id: schema.id.required(),
     set: Joi.object().keys({
-        knownName: schema.knownName,
-        rootNameIds: schema.rootNameIds,
-        abbr: schema.abbr,
-        popularity: schema.popularity,
-        context: schema.context,
-        updatedAt: schema.updatedAt,
-        expiresAt: schema.expiresAt,
+      knownName: schema.knownName,
+      rootNameIds: schema.rootNameIds,
+      abbr: schema.abbr,
+      popularity: schema.popularity,
+      context: schema.context,
+      updatedAt: schema.updatedAt,
+      expiresAt: schema.expiresAt
     }),
-    delete: Joi.array().valid('context', 'knownName', 'abbr'),
-}).or('set', 'delete').required();
+    delete: Joi.array().valid("context", "knownName", "abbr")
+  })
+  .or("set", "delete")
+  .required();
